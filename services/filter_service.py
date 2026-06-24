@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 from models.job import JobPosting
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class FilterService:
         category: str = "전체",
         experience: str = "전체",
         education: str = "전체",
-        tech_stacks: List[str] = None,
+        tech_stacks: Optional[List[str]] = None,
         location: str = "전체"
     ) -> List[JobPosting]:
 

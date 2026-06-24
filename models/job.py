@@ -65,7 +65,7 @@ class JobPosting:
         category: str = "전체",
         experience: str = "전체",
         education: str = "전체",
-        tech_stacks: List[str] = None,
+        tech_stacks: Optional[List[str]] = None,
         location: str = "전체"
     ) -> bool:
         """필터 조건에 맞는지 확인 (디버깅 버전)"""
@@ -79,10 +79,16 @@ class JobPosting:
             return False
 
         # 키워드
+        # if keyword:
+        #     keyword_lower = keyword.lower()
+        #     searchable = f"{self.title} {self.company} {self.description}".lower()
+        #     if keyword_lower not in searchable:
+        #         log_fail("키워드")
+        #         return False
         if keyword:
-            keyword_lower = keyword.lower()
             searchable = f"{self.title} {self.company} {self.description}".lower()
-            if keyword_lower not in searchable:
+            keywords = keyword.lower().split()
+            if not all(kw in searchable for kw in keywords):
                 log_fail("키워드")
                 return False
 
