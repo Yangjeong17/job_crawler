@@ -23,6 +23,17 @@ class JobPosting:
 
     crawled_at: datetime = field(default_factory=datetime.now)
 
+    # 변경 감지용 필드
+    job_id: str = ""
+    content_hash: str = ""
+    is_modified: bool = False
+    updated_at: Optional[datetime] = None
+
+    def __post_init__(self):
+        if not self.content_hash:
+            from utils.hash_utils import generate_content_hash
+            self.content_hash = generate_content_hash(self)
+
     def is_expired(self) -> bool:
         """마감일이 지났는지 확인"""
         if not self.deadline:
@@ -185,7 +196,11 @@ class JobPosting:
             "deadline": self.deadline,
             "posted_date": self.posted_date,
             "description": self.description,
-            "crawled_at": self.crawled_at.isoformat()
+            "crawled_at": self.crawled_at.isoformat(),
+            "job_id": self.job_id,
+            "content_hash": self.content_hash,
+            "is_modified": self.is_modified,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
     def to_html_card(self) -> str:

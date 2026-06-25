@@ -43,18 +43,8 @@ class FilterService:
                 continue
 
         after_filter_count = len(filtered)
+        unique = FilterService.deduplicate(filtered)
 
-        seen = set()
-        unique = []
-        for job in filtered:
-            clean_company = job.company.replace("(주)", "").strip()
-            clean_title = job.title.strip()
-            key = f"{clean_company}_{clean_title}".lower().replace(" ", "")
-            if key not in seen:
-                seen.add(key)
-                unique.append(job)
-
-        # 🔥 요약은 항상 INFO로
         logger.info(
             f"필터링 요약: 원본({len(jobs)}) -> "
             f"필터통과({after_filter_count}) -> "
@@ -64,6 +54,22 @@ class FilterService:
         if len(unique) == 0 and len(jobs) > 0:
             logger.error("!!! 모든 공고가 필터링에서 탈락했습니다. !!!")
 
+        return unique
+
+    @staticmethod
+    def deduplicate(jobs: List[JobPosting]) -> List[JobPosting]:
+        """회사명 + 제목 기준 중복 제거."""
+        seen = set()
+        unique = []
+        for job in jobs:
+            key = (
+                job.company.replace("(주)", "").strip().lower().replace(" ", "")
+                + "_"
+                + job.title.strip().lower().replace(" ", "")
+            )
+            if key not in seen:
+                seen.add(key)
+                unique.append(job)
         return unique
 
     @staticmethod

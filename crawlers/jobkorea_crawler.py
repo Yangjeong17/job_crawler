@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 
 from crawlers.base_crawler import BaseCrawler
 from models.job import JobPosting
+from utils.url_utils import normalize_job_url, extract_job_id
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -173,6 +174,7 @@ class JobKoreaCrawler(BaseCrawler):
 
         if url and not url.startswith("http"):
             url = self.BASE_URL + url
+        url = normalize_job_url(url)
 
         # 회사명
         company_selectors = [
@@ -270,7 +272,8 @@ class JobKoreaCrawler(BaseCrawler):
             education=education,
             deadline=deadline,
             posted_date=posted_date,
-            description=", ".join(dict.fromkeys(job_categories))
+            description=", ".join(dict.fromkeys(job_categories)),
+            job_id=extract_job_id(url) or "",
         )
 
     def _normalize_card(self, item):
@@ -289,7 +292,7 @@ class JobKoreaCrawler(BaseCrawler):
     def _find_job_url(self, card) -> str:
         try:
             link = card.find_element(By.CSS_SELECTOR, "a[href*='/Recruit/GI_Read/']")
-            return link.get_attribute("href") or ""
+            return normalize_job_url(link.get_attribute("href") or "")
         except Exception:
             return ""
 

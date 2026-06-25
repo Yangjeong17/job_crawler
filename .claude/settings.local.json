@@ -15,7 +15,17 @@
       "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"crawlers/jobkorea_crawler.py\\\\\", \\\\\"services/db_service.py\\\\\", \\\\\"gui/app.py\\\\\"]]'\")",
       "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"services/db_service.py\\\\\", \\\\\"gui/app.py\\\\\"]]'\")",
       "Bash(wsl -e bash -c \"grep -n 'load_search_history\\\\|list_db_files\\\\|migrate_swipe' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
-      "Bash(wsl -e bash -c \"find /home/yj/Base/Dev/mini_project/JobHub -name '__pycache__' -exec rm -rf {} + 2>/dev/null; echo 'done'\")"
+      "Bash(wsl -e bash -c \"find /home/yj/Base/Dev/mini_project/JobHub -name '__pycache__' -exec rm -rf {} + 2>/dev/null; echo 'done'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"services/filter_service.py\\\\\", \\\\\"gui/app.py\\\\\"]]'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"crawlers/saramin_crawler.py\\\\\", \\\\\"crawlers/jobkorea_crawler.py\\\\\"]]'\")",
+      "Read(//mnt/c/Users/**)",
+      "Read(///wsl.localhost/ubuntu/home/yj/Base/Dev/mini_project/**)",
+      "Bash(ls \"\\\\\\\\\\\\\\\\wsl.localhost\\\\\\\\ubuntu\\\\\\\\home\\\\\\\\yj\\\\\\\\Base\\\\\\\\Dev\\\\\\\\mini_project\\\\\\\\JobHub\\\\\\\\utils\\\\\\\\\")",
+      "Bash(cd \"\\\\\\\\wsl.localhost\\\\ubuntu\\\\home\\\\yj\\\\Base\\\\Dev\\\\mini_project\\\\JobHub\")",
+      "Bash(python -m pytest tests/test_url_utils.py -v)",
+      "Bash(.venv\\\\Scripts\\\\python.exe -m pytest tests/test_url_utils.py -v)",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -m pytest tests/test_url_utils.py -v 2>&1\")",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/pip install pytest -q && .venv/bin/python -m pytest tests/test_url_utils.py -v 2>&1\")"
     ]
   }
 }

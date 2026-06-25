@@ -75,7 +75,7 @@ def _init_state():
         loaded = load_latest_jobs()
         if loaded:
             st.session_state.all_jobs = loaded
-            st.session_state.filtered_jobs = loaded
+            st.session_state.filtered_jobs = FilterService.deduplicate(loaded)
             st.session_state.screen_index = _find_resume_index(
                 loaded,
                 st.session_state.not_interested_urls,
@@ -462,7 +462,8 @@ def main():
                 for kw, cnt, last_crawled in history:
                     kw_display = kw if kw else "(키워드 없음)"
                     date_str = last_crawled[:10] if last_crawled else "-"
-                    st.markdown(f"**{kw_display}** &nbsp; {cnt}건 &nbsp; `{date_str}`")
+                    st.caption(f"{cnt}건 · {date_str}")
+                    st.code(kw_display, language=None)
 
         st.divider()
         with st.expander("📂 이전 DB 스와이프 가져오기"):

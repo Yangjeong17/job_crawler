@@ -9,6 +9,7 @@ from selenium.webdriver.common.keys import Keys
 
 from crawlers.base_crawler import BaseCrawler
 from models.job import JobPosting
+from utils.url_utils import normalize_job_url, extract_job_id
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -159,6 +160,7 @@ class SaraminCrawler(BaseCrawler):
 
         if url and not url.startswith("http"):
             url = self.BASE_URL + url
+        url = normalize_job_url(url)
 
         # 회사명
         company = self.safe_get_text(
@@ -214,5 +216,6 @@ class SaraminCrawler(BaseCrawler):
             job_type=job_type,
             deadline=deadline,
             posted_date=posted_date,
-            description=sector
+            description=sector,
+            job_id=extract_job_id(url) or "",
         )

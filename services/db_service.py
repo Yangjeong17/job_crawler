@@ -39,10 +39,14 @@ def init_db():
                 is_saved          INTEGER DEFAULT 0,
                 saved_at          TEXT,
                 is_favorite       INTEGER DEFAULT 0,
-                favorited_at      TEXT
+                favorited_at      TEXT,
+                job_id            TEXT,
+                content_hash      TEXT,
+                updated_at        TEXT,
+                is_modified       INTEGER DEFAULT 0
             )
         """)
-        # 기존 테이블에 컬럼 없으면 추가 (마이그레이션)
+        # 기존 테이블에 컬럼 없으면 추가 (순차 마이그레이션)
         existing = {r[1] for r in conn.execute("PRAGMA table_info(job_postings)").fetchall()}
         for col, typedef in [
             ("is_not_interested", "INTEGER DEFAULT 0"),
@@ -50,6 +54,10 @@ def init_db():
             ("saved_at",          "TEXT"),
             ("is_favorite",       "INTEGER DEFAULT 0"),
             ("favorited_at",      "TEXT"),
+            ("job_id",            "TEXT"),
+            ("content_hash",      "TEXT"),
+            ("updated_at",        "TEXT"),
+            ("is_modified",       "INTEGER DEFAULT 0"),
         ]:
             if col not in existing:
                 conn.execute(f"ALTER TABLE job_postings ADD COLUMN {col} {typedef}")
@@ -58,26 +66,78 @@ def init_db():
 
 
 def save_jobs(jobs: List[JobPosting], keyword: str = ""):
-    """크롤링 결과 저장. 이미 존재하는 URL은 건너뜀 (사용자 표시 보존)."""
+    """크롤링 결과 저장.
+
+    - job_id가 있는 경우: (source, job_id)로 기존 공고 조회
+        - content_hash 동일 → 스킵 (변경 없음)
+        - content_hash 변경 → 업데이트 + is_modified=1, updated_at 갱신
+        - 없으면 신규 INSERT
+    - job_id가 없는 경우: url 기준 INSERT OR IGNORE (기존 동작 유지)
+    """
     if not jobs:
         return
+    saved = updated = skipped = 0
+    now = datetime.now().isoformat()
+
     with sqlite3.connect(DB_PATH) as conn:
         for job in jobs:
-            conn.execute("""
+            if job.job_id:
+                row = conn.execute(
+                    "SELECT content_hash FROM job_postings WHERE source=? AND job_id=?",
+                    (job.source, job.job_id)
+                ).fetchone()
+
+                if row is not None:
+                    existing_hash = row[0] or ""
+                    if existing_hash != job.content_hash:
+                        # 내용 변경 감지 → 업데이트
+                        conn.execute("""
+                            UPDATE job_postings SET
+                                title=?, company=?, location=?, experience=?, education=?,
+                                salary=?, tech_stack=?, job_type=?, deadline=?, posted_date=?,
+                                description=?, content_hash=?, updated_at=?, is_modified=1,
+                                crawled_at=?, search_keyword=?
+                            WHERE source=? AND job_id=?
+                        """, (
+                            job.title, job.company, job.location, job.experience,
+                            job.education, job.salary,
+                            json.dumps(job.tech_stack, ensure_ascii=False),
+                            job.job_type, job.deadline, job.posted_date,
+                            job.description, job.content_hash, now,
+                            job.crawled_at.isoformat(), keyword,
+                            job.source, job.job_id,
+                        ))
+                        updated += 1
+                    else:
+                        skipped += 1
+                    continue
+
+            # 신규 공고 (또는 job_id 없는 공고)
+            cur = conn.execute("""
                 INSERT OR IGNORE INTO job_postings
                 (url, title, company, source, location, experience, education,
                  salary, tech_stack, job_type, deadline, posted_date,
-                 description, crawled_at, search_keyword)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 description, crawled_at, search_keyword, job_id, content_hash)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 job.url, job.title, job.company, job.source,
                 job.location, job.experience, job.education, job.salary,
                 json.dumps(job.tech_stack, ensure_ascii=False),
                 job.job_type, job.deadline, job.posted_date,
                 job.description, job.crawled_at.isoformat(), keyword,
+                job.job_id, job.content_hash,
             ))
+            if cur.rowcount > 0:
+                saved += 1
+            else:
+                skipped += 1
+
         conn.commit()
-    logger.info(f"DB 저장 완료: {len(jobs)}건 (keyword='{keyword}')")
+
+    logger.info(
+        f"DB 저장: 신규 {saved}건, 내용변경 {updated}건, 스킵 {skipped}건 "
+        f"(keyword='{keyword}')"
+    )
 
 
 def mark_not_interested(url: str):
@@ -165,7 +225,8 @@ def load_latest_jobs() -> List[JobPosting]:
             rows = conn.execute("""
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
-                       posted_date, description, crawled_at
+                       posted_date, description, crawled_at,
+                       job_id, content_hash, is_modified, updated_at
                 FROM job_postings
                 WHERE crawled_at >= datetime(?, '-1 hour')
                 ORDER BY rowid ASC
@@ -196,7 +257,8 @@ def _load_by_flag(col: str) -> List[JobPosting]:
             rows = conn.execute(f"""
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
-                       posted_date, description, crawled_at
+                       posted_date, description, crawled_at,
+                       job_id, content_hash, is_modified, updated_at
                 FROM job_postings
                 WHERE {col}=1
                 ORDER BY rowid DESC
@@ -268,6 +330,12 @@ def migrate_swipe_decisions(src_db_name: str) -> dict:
 
 
 def _row_to_job(r) -> JobPosting:
+    updated_at = None
+    if len(r) > 17 and r[17]:
+        try:
+            updated_at = datetime.fromisoformat(r[17])
+        except Exception:
+            pass
     return JobPosting(
         url=r[0], title=r[1], company=r[2], source=r[3],
         location=r[4] or "", experience=r[5] or "",
@@ -276,4 +344,8 @@ def _row_to_job(r) -> JobPosting:
         job_type=r[9] or "", deadline=r[10] or "",
         posted_date=r[11] or "", description=r[12] or "",
         crawled_at=datetime.fromisoformat(r[13]),
+        job_id=r[14] if len(r) > 14 and r[14] else "",
+        content_hash=r[15] if len(r) > 15 and r[15] else "",
+        is_modified=bool(r[16]) if len(r) > 16 and r[16] else False,
+        updated_at=updated_at,
     )
