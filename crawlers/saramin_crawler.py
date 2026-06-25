@@ -166,14 +166,22 @@ class SaraminCrawler(BaseCrawler):
             item, ".corp_name a, .area_corp .corp_name a"
         )
 
-        # 조건 정보
-        conditions = self.safe_get_text(item, ".job_condition")
-        cond_parts = [c.strip() for c in conditions.split("|")] if conditions else []
+        # 조건 정보 — span 단위로 개별 추출 (| 구분자는 CSS 가상요소라 text에 미포함)
+        cond_parts = []
+        try:
+            cond_el = item.find_element(By.CSS_SELECTOR, ".job_condition")
+            cond_parts = [
+                s.text.strip()
+                for s in cond_el.find_elements(By.CSS_SELECTOR, "span")
+                if s.text.strip()
+            ]
+        except Exception:
+            pass
 
-        location = cond_parts[0] if len(cond_parts) > 0 else ""
+        location   = cond_parts[0] if len(cond_parts) > 0 else ""
         experience = cond_parts[1] if len(cond_parts) > 1 else ""
-        education = cond_parts[2] if len(cond_parts) > 2 else ""
-        job_type = cond_parts[3] if len(cond_parts) > 3 else ""
+        education  = cond_parts[2] if len(cond_parts) > 2 else ""
+        job_type   = cond_parts[3] if len(cond_parts) > 3 else ""
 
         # 마감일
         deadline = self.safe_get_text(item, ".job_date .date")

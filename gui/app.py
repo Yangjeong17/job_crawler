@@ -1,10 +1,12 @@
 import json
+import os
 import re
 import logging
 import streamlit as st
 import streamlit.components.v1 as components
 from datetime import datetime
 from typing import List
+from dotenv import set_key, load_dotenv
 
 from config import Config
 from models.job import JobPosting
@@ -14,12 +16,32 @@ from services.mail_service import MailService
 from scheduler.daily_scheduler import DailyScheduler
 from utils.helpers import get_source_display_name, get_source_color
 from services.db_service import (
-    init_db, save_jobs, load_latest_jobs,
+    init_db, save_jobs, load_latest_jobs, load_all_jobs,
     mark_not_interested, mark_saved, mark_favorite, unmark,
+    reassign_to_saved, reassign_to_favorite, reassign_to_not_interested,
     load_not_interested_urls, load_saved_urls, load_favorite_urls,
     load_not_interested_jobs, load_saved_jobs, load_favorite_jobs,
     migrate_swipe_decisions, load_search_history, list_db_files,
+    count_all_jobs,
 )
+from services import analysis_service
+
+_ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+_EMAIL_DEFAULTS = {"your_email@gmail.com", "your_app_password", "receiver@gmail.com", ""}
+
+_SHORTCUTS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "shortcuts.json")
+DEFAULT_SHORTCUTS = {
+    "not_interested": "ArrowLeft",
+    "save":           "ArrowRight",
+    "favorite":       "0",
+    "undo":           "ArrowUp",
+    "open_url":       "ArrowDown",
+}
+_KEY_DISPLAY = {
+    "ArrowLeft": "←", "ArrowRight": "→",
+    "ArrowUp": "↑",  "ArrowDown": "↓",
+    " ": "Space",
+}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,10 +81,18 @@ def _init_state():
         "ni_jobs_cache":       None,  # 뷰 전환 시 lazy 로드, 액션 시 무효화
         "saved_jobs_cache":    None,
         "fav_jobs_cache":      None,
+        "all_db_jobs_cache":   None,
+        "analysis_cache":      {},    # url → AI 분석 텍스트
+        "_pending_mail_send":  False, # 이메일 설정 저장 후 발송 트리거
+        "shortcuts":           None,  # 단축키 설정 (lazy 로드)
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
+
+    # 단축키 lazy 로드
+    if st.session_state.shortcuts is None:
+        st.session_state.shortcuts = _load_shortcuts()
 
     # URL 집합 lazy 로드 (세션 최초 1회)
     if st.session_state.not_interested_urls is None:
@@ -78,6 +108,84 @@ def _init_state():
         if loaded:
             st.session_state.all_jobs = loaded
             st.session_state.filtered_jobs = FilterService.deduplicate(loaded)
+
+
+def _load_shortcuts() -> dict:
+    try:
+        with open(_SHORTCUTS_PATH, encoding="utf-8") as f:
+            return {**DEFAULT_SHORTCUTS, **json.load(f)}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return DEFAULT_SHORTCUTS.copy()
+
+
+def _save_shortcuts_file(sc: dict):
+    with open(_SHORTCUTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(sc, f, ensure_ascii=False, indent=2)
+
+
+def _key_display(key: str) -> str:
+    return _KEY_DISPLAY.get(key, key)
+
+
+@st.dialog("⌨️ 단축키 커스텀")
+def _shortcut_dialog():
+    sc = st.session_state.shortcuts.copy()
+    st.caption("화살표: ArrowLeft / ArrowRight / ArrowUp / ArrowDown  |  숫자·영문자는 그대로 입력  |  특수: Enter, Space")
+    sc["not_interested"] = st.text_input("👎 관심없음", value=sc["not_interested"])
+    sc["save"]           = st.text_input("⭐ 저장",     value=sc["save"])
+    sc["favorite"]       = st.text_input("❤️ 즐겨찾기", value=sc["favorite"])
+    sc["undo"]           = st.text_input("↩ 실행취소",  value=sc["undo"])
+    sc["open_url"]       = st.text_input("🔗 공고보기", value=sc["open_url"])
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("저장", type="primary", use_container_width=True):
+            st.session_state.shortcuts = sc
+            _save_shortcuts_file(sc)
+            st.rerun()
+    with col2:
+        if st.button("기본값 초기화", use_container_width=True):
+            st.session_state.shortcuts = DEFAULT_SHORTCUTS.copy()
+            _save_shortcuts_file(DEFAULT_SHORTCUTS.copy())
+            st.rerun()
+
+
+def _has_email_config() -> bool:
+    return (
+        Config.EMAIL_SENDER not in _EMAIL_DEFAULTS
+        and Config.EMAIL_PASSWORD not in _EMAIL_DEFAULTS
+        and Config.EMAIL_RECEIVER not in _EMAIL_DEFAULTS
+    )
+
+
+def _save_email_config(sender: str, password: str, receiver: str):
+    set_key(_ENV_PATH, "EMAIL_SENDER", sender)
+    set_key(_ENV_PATH, "EMAIL_PASSWORD", password)
+    set_key(_ENV_PATH, "EMAIL_RECEIVER", receiver)
+    load_dotenv(_ENV_PATH, override=True)
+    Config.EMAIL_SENDER = sender
+    Config.EMAIL_PASSWORD = password
+    Config.EMAIL_RECEIVER = receiver
+
+
+@st.dialog("📧 이메일 설정")
+def _email_setup_dialog():
+    st.markdown("한 번만 입력하면 `.env`에 저장되어 이후 자동으로 사용됩니다.")
+    sender   = st.text_input("발신 Gmail 주소", placeholder="yourmail@gmail.com")
+    password = st.text_input(
+        "Gmail 앱 비밀번호 (16자리)", type="password",
+        help="Google 계정 → 보안 → 2단계 인증 → 앱 비밀번호에서 발급"
+    )
+    receiver = st.text_input("수신 이메일 주소", placeholder="receiver@gmail.com")
+    st.caption("💡 앱 비밀번호: [myaccount.google.com](https://myaccount.google.com) → 보안 → 2단계 인증 → 앱 비밀번호")
+
+    if st.button("저장 후 발송", type="primary", use_container_width=True):
+        if not all([sender, password, receiver]):
+            st.error("모든 항목을 입력하세요.")
+        else:
+            _save_email_config(sender, password, receiver)
+            st.session_state._pending_mail_send = True
+            st.rerun()
 
 
 def _action_not_interested(job: JobPosting):
@@ -127,8 +235,49 @@ def _action_undo():
     st.rerun()
 
 
+def _action_ni_to_saved(job: JobPosting):
+    reassign_to_saved(job.url)
+    st.session_state.not_interested_urls.discard(job.url)
+    st.session_state.saved_urls.add(job.url)
+    st.session_state.ni_jobs_cache = None
+    st.session_state.saved_jobs_cache = None
+    st.toast("⭐ 저장으로 변경 완료", icon="⭐")
+    st.rerun()
+
+
+def _action_ni_to_favorite(job: JobPosting):
+    reassign_to_favorite(job.url)
+    st.session_state.not_interested_urls.discard(job.url)
+    st.session_state.favorite_urls.add(job.url)
+    st.session_state.ni_jobs_cache = None
+    st.session_state.fav_jobs_cache = None
+    st.toast("❤️ 즐겨찾기로 변경 완료", icon="❤️")
+    st.rerun()
+
+
+def _action_saved_to_ni(job: JobPosting):
+    reassign_to_not_interested(job.url)
+    st.session_state.saved_urls.discard(job.url)
+    st.session_state.not_interested_urls.add(job.url)
+    st.session_state.saved_jobs_cache = None
+    st.session_state.ni_jobs_cache = None
+    st.toast("👎 관심없음으로 변경 완료", icon="👎")
+    st.rerun()
+
+
+def _action_saved_to_favorite(job: JobPosting):
+    reassign_to_favorite(job.url)
+    st.session_state.saved_urls.discard(job.url)
+    st.session_state.favorite_urls.add(job.url)
+    st.session_state.saved_jobs_cache = None
+    st.session_state.fav_jobs_cache = None
+    st.toast("❤️ 즐겨찾기로 변경 완료", icon="❤️")
+    st.rerun()
+
+
 def _inject_keyboard_shortcuts(job_url: str):
     """키보드 단축키 JS 주입. 매 rerun마다 기존 리스너를 교체한다."""
+    sc = st.session_state.shortcuts
     components.html(f"""
 <script>
 (function() {{
@@ -137,8 +286,9 @@ def _inject_keyboard_shortcuts(job_url: str):
         doc.removeEventListener('keydown', window.parent._kjHandler);
     }}
     var jobUrl = {json.dumps(job_url)};
+    var SC = {json.dumps(sc)};
     window.parent._kjHandler = function(e) {{
-        if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter'].includes(e.key)) return;
+        if (!Object.values(SC).includes(e.key)) return;
         e.preventDefault();
         function clickBtn(text) {{
             var btns = doc.querySelectorAll('button');
@@ -146,11 +296,11 @@ def _inject_keyboard_shortcuts(job_url: str):
                 if (btns[i].innerText.trim() === text) {{ btns[i].click(); return; }}
             }}
         }}
-        if (e.key === 'ArrowLeft')  clickBtn('👎 관심없음');
-        if (e.key === 'ArrowRight') clickBtn('⭐ 저장');
-        if (e.key === 'ArrowUp')    clickBtn('↩ 실행취소');
-        if (e.key === 'ArrowDown')  window.parent.open(jobUrl, '_blank');
-        if (e.key === 'Enter')      clickBtn('❤️ 즐겨찾기');
+        if (e.key === SC.not_interested) clickBtn('👎 관심없음');
+        if (e.key === SC.save)           clickBtn('⭐ 저장');
+        if (e.key === SC.undo)           clickBtn('↩ 실행취소');
+        if (e.key === SC.open_url)       window.parent.open(jobUrl, '_blank');
+        if (e.key === SC.favorite)       clickBtn('❤️ 즐겨찾기');
     }};
     doc.addEventListener('keydown', window.parent._kjHandler);
 }})();
@@ -222,9 +372,11 @@ def _render_screening_card(job: JobPosting):
     st.markdown(html, unsafe_allow_html=True)
 
 
+_SORT_MAP = {"최신순": "latest", "마감일순": "deadline", "회사명순": "company", "사이트순": "source"}
+
+
 def _render_screening():
-    _sort_map = {"최신순": "latest", "마감일순": "deadline", "회사명순": "company", "사이트순": "source"}
-    _sort_key = _sort_map.get(st.session_state.get("sort_label", "최신순"), "latest")
+    _sort_key = _SORT_MAP.get(st.session_state.get("sort_label", "최신순"), "latest")
     jobs = FilterService.sort_jobs(st.session_state.filtered_jobs, _sort_key)
     if not jobs:
         st.info("공고가 없습니다. 사이드바에서 검색하세요.")
@@ -240,12 +392,14 @@ def _render_screening():
     total          = len(jobs)
 
     # 진행률 + 액션 카운트 표시
+    db_total = count_all_jobs()
     progress = reviewed_count / total if total else 0
     st.progress(progress, text=(
         f"진행: {reviewed_count} / {total}  |  "
         f"👎 {len(ni_urls)}  ⭐ {len(sv_urls)}  ❤️ {len(fav_urls)}  |  "
         f"남은 공고: {len(all_screening)}건"
     ))
+    st.caption(f"검색된 결과: {total}건  |  누적 건수: {db_total}건")
 
     if not all_screening:
         st.success("모든 공고를 확인했습니다!")
@@ -267,14 +421,34 @@ def _render_screening():
         st.info(f"'{source_filter}' 공고가 없습니다. (다른 사이트 공고는 남아 있음)")
         return
 
+    search_q = st.text_input(
+        "재검색", key="search_screening",
+        placeholder="공고명 또는 회사명으로 검색",
+        label_visibility="collapsed",
+    )
+    if search_q:
+        q = search_q.lower()
+        screening_jobs = [j for j in screening_jobs if q in j.title.lower() or q in j.company.lower()]
+        if not screening_jobs:
+            st.info(f"'{search_q}'에 해당하는 공고가 없습니다.")
+            return
+
     job = screening_jobs[0]
 
     # 카드 렌더링
     _render_screening_card(job)
 
-    # 단축키 안내 (caption보다 큰 폰트)
+    # 단축키 안내 (동적)
+    sc = st.session_state.shortcuts
+    hint = " &nbsp;|&nbsp; ".join([
+        f"{_key_display(sc['not_interested'])} 관심없음",
+        f"{_key_display(sc['save'])} 저장",
+        f"{_key_display(sc['favorite'])} 즐겨찾기",
+        f"{_key_display(sc['undo'])} 실행취소",
+        f"{_key_display(sc['open_url'])} 공고보기",
+    ])
     st.markdown(
-        '<p style="font-size:25px;color:#555;margin:6px 0;">⌨️ &nbsp; ← 관심없음 &nbsp;|&nbsp; → 저장 &nbsp;|&nbsp; Enter 즐겨찾기 &nbsp;|&nbsp; ↑ 실행취소 &nbsp;|&nbsp; ↓ 공고보기</p>',
+        f'<p style="font-size:25px;color:#555;margin:6px 0;">⌨️ &nbsp; {hint}</p>',
         unsafe_allow_html=True,
     )
 
@@ -299,13 +473,129 @@ def _render_screening():
     _inject_keyboard_shortcuts(job.url)
 
 
-def _render_job_list(jobs: List[JobPosting], empty_msg: str = "공고가 없습니다."):
+def _render_analysis(job: JobPosting):
+    cache = st.session_state.analysis_cache
+    col_btn, _ = st.columns([1, 4])
+    with col_btn:
+        if st.button("🤖 AI 분석", key=f"analyze_{job.url}", use_container_width=True):
+            with st.spinner("분석 중..."):
+                result = analysis_service.analyze_job(job)
+                cache[job.url] = result if result else "⚠️ 분석 결과를 가져오지 못했습니다."
+    if job.url in cache:
+        with st.expander("📋 AI 분석 결과", expanded=True):
+            st.markdown(cache[job.url])
+
+
+def _render_job_list(jobs: List[JobPosting], empty_msg: str = "공고가 없습니다.", mode: str = ""):
     if not jobs:
         st.info(empty_msg)
         return
+
+    src_filter = st.radio(
+        "사이트 필터", ["전체", "사람인", "잡코리아"],
+        horizontal=True, key=f"src_filter_{mode}", label_visibility="collapsed",
+    )
+    src_map = {"사람인": "saramin", "잡코리아": "jobkorea"}
+    if src_filter != "전체":
+        jobs = [j for j in jobs if j.source == src_map[src_filter]]
+
+    search_q = st.text_input(
+        "재검색", key=f"search_q_{mode}",
+        placeholder="공고명 또는 회사명으로 검색",
+        label_visibility="collapsed",
+    )
+    if search_q:
+        q = search_q.lower()
+        jobs = [j for j in jobs if q in j.title.lower() or q in j.company.lower()]
+
+    if not jobs:
+        st.info("검색 결과가 없습니다.")
+        return
+
     st.caption(f"총 {len(jobs)}건")
     for job in jobs:
         _render_card(job)
+        if mode == "ni":
+            col1, col2, _ = st.columns([1, 1, 3])
+            with col1:
+                if st.button("⭐ 저장으로 변경", key=f"ni_save_{job.url}", use_container_width=True):
+                    _action_ni_to_saved(job)
+            with col2:
+                if st.button("❤️ 즐겨찾기로 변경", key=f"ni_fav_{job.url}", use_container_width=True):
+                    _action_ni_to_favorite(job)
+        elif mode == "saved":
+            col1, col2, _ = st.columns([1, 1, 3])
+            with col1:
+                if st.button("👎 관심없음으로 변경", key=f"sv_ni_{job.url}", use_container_width=True):
+                    _action_saved_to_ni(job)
+            with col2:
+                if st.button("❤️ 즐겨찾기로 변경", key=f"sv_fav_{job.url}", use_container_width=True):
+                    _action_saved_to_favorite(job)
+            _render_analysis(job)
+        elif mode == "fav":
+            _render_analysis(job)
+
+
+def _render_scheduler():
+    if st.session_state.fav_jobs_cache is None:
+        st.session_state.fav_jobs_cache = load_favorite_jobs()
+
+    fav_jobs = st.session_state.fav_jobs_cache
+    if not fav_jobs:
+        st.info("즐겨찾기한 공고가 없습니다. 즐겨찾기 탭에서 공고를 추가하세요.")
+        return
+
+    sorted_jobs = FilterService.sort_jobs(fav_jobs, "deadline")
+    now = datetime.now()
+    st.caption(f"❤️ 즐겨찾기 {len(sorted_jobs)}건  —  마감일 순")
+
+    for job in sorted_jobs:
+        s = (job.deadline or "").replace("~", "").replace("까지", "").strip()
+        days_left = None
+        for fmt in ["%Y-%m-%d", "%Y.%m.%d", "%Y/%m/%d", "%m/%d", "%m.%d"]:
+            try:
+                d = datetime.strptime(s, fmt)
+                if d.year == 1900:
+                    d = d.replace(year=now.year)
+                days_left = (d - now).days
+                break
+            except ValueError:
+                continue
+
+        if days_left is None:
+            dl_label = job.deadline or "상시채용"
+            dl_color = "#888"
+        elif days_left < 0:
+            dl_label = f"마감 ({job.deadline})"
+            dl_color = "#bbb"
+        elif days_left == 0:
+            dl_label = f"D-day ({job.deadline})"
+            dl_color = "#E53935"
+        elif days_left <= 3:
+            dl_label = f"D-{days_left} ({job.deadline})"
+            dl_color = "#E53935"
+        elif days_left <= 7:
+            dl_label = f"D-{days_left} ({job.deadline})"
+            dl_color = "#FB8C00"
+        else:
+            dl_label = f"D-{days_left} ({job.deadline})"
+            dl_color = "#2E7D32"
+
+        color = get_source_color(job.source)
+        source_name = get_source_display_name(job.source)
+        title = job.title if len(job.title) <= 60 else job.title[:57] + "..."
+
+        html = (
+            f'<div style="border:1px solid #ddd;border-radius:8px;padding:12px 16px;margin:6px 0;background:#fff;">'
+            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+            f'<span style="background:{color};color:#fff;padding:2px 8px;border-radius:4px;font-size:18px;font-weight:bold;">{source_name}</span>'
+            f'<span style="color:{dl_color};font-size:22px;font-weight:bold;">{dl_label}</span>'
+            f'</div>'
+            f'<h4 style="margin:4px 0;"><a href="{job.url}" target="_blank" style="color:#212121;text-decoration:none;">{title}</a></h4>'
+            f'<p style="margin:2px 0;color:#555;font-size:20px;">🏢 {job.company}</p>'
+            f'</div>'
+        )
+        st.markdown(html, unsafe_allow_html=True)
 
 
 def _render_card(job: JobPosting):
@@ -392,29 +682,33 @@ def main():
 
     # ── 사이드바 ──────────────────────────────────────────────
     with st.sidebar:
+        if st.button("⌨️ 단축키 커스텀", use_container_width=True):
+            _shortcut_dialog()
+        st.divider()
         st.header("검색 조건")
-        keyword  = st.text_input("키워드", placeholder="예: 백엔드 Python")
+        with st.form("search_form"):
+            keyword  = st.text_input("키워드", placeholder="예: 백엔드 Python")
 
-        st.subheader("사이트")
-        saramin  = st.checkbox("사람인",  value=True)
-        jobkorea = st.checkbox("잡코리아", value=True)
+            st.subheader("사이트")
+            saramin  = st.checkbox("사람인",  value=True)
+            jobkorea = st.checkbox("잡코리아", value=True)
 
-        # 현재 사용안함
-        # st.subheader("필터")
-        # category   = st.selectbox("직종", Config.JOB_CATEGORIES)
-        # experience = st.selectbox("경력", Config.EXPERIENCE_LEVELS)
-        # education  = st.selectbox("학력", Config.EDUCATION_LEVELS)
-        # location   = st.selectbox("지역", Config.LOCATIONS)
+            # 현재 사용안함
+            # st.subheader("필터")
+            # category   = st.selectbox("직종", Config.JOB_CATEGORIES)
+            # experience = st.selectbox("경력", Config.EXPERIENCE_LEVELS)
+            # education  = st.selectbox("학력", Config.EDUCATION_LEVELS)
+            # location   = st.selectbox("지역", Config.LOCATIONS)
 
-        # 현재 사용안함
-        # st.subheader("기술스택")
-        # tech_stacks = st.multiselect(
-        #     "기술스택 선택",
-        #     [t for t in Config.TECH_STACKS if t != "전체"],
-        #     label_visibility="collapsed",
-        # )
+            # 현재 사용안함
+            # st.subheader("기술스택")
+            # tech_stacks = st.multiselect(
+            #     "기술스택 선택",
+            #     [t for t in Config.TECH_STACKS if t != "전체"],
+            #     label_visibility="collapsed",
+            # )
 
-        do_search = st.button("🔍 검색", use_container_width=True, type="primary")
+            do_search = st.form_submit_button("🔍 검색", use_container_width=True, type="primary")
 
         st.divider()
 
@@ -424,16 +718,29 @@ def main():
 
         st.divider()
 
-        if st.button("📧 메일 발송", use_container_width=True):
-            if not st.session_state.filtered_jobs:
-                st.warning("발송할 공고가 없습니다. 먼저 검색하세요.")
-            else:
-                with st.spinner("이메일 발송 중..."):
-                    ok = MailService.send_jobs_email(st.session_state.filtered_jobs)
-                if ok:
-                    st.success(f"{len(st.session_state.filtered_jobs)}건 발송 완료")
-                else:
-                    st.error("이메일 발송 실패. .env를 확인하세요.")
+        # ── 메일 발송 기능 비활성화 ──────────────────────────────
+        # if st.button("📧 메일 발송", use_container_width=True):
+        #     if not st.session_state.filtered_jobs:
+        #         st.warning("발송할 공고가 없습니다. 먼저 검색하세요.")
+        #     elif not _has_email_config():
+        #         _email_setup_dialog()
+        #     else:
+        #         with st.spinner("이메일 발송 중..."):
+        #             ok = MailService.send_jobs_email(st.session_state.filtered_jobs)
+        #         if ok:
+        #             st.success(f"{len(st.session_state.filtered_jobs)}건 발송 완료")
+        #         else:
+        #             st.error("이메일 발송 실패. 앱 비밀번호를 확인하세요.")
+
+        # if st.session_state._pending_mail_send and _has_email_config():
+        #     st.session_state._pending_mail_send = False
+        #     with st.spinner("이메일 발송 중..."):
+        #         ok = MailService.send_jobs_email(st.session_state.filtered_jobs)
+        #     if ok:
+        #         st.success(f"{len(st.session_state.filtered_jobs)}건 발송 완료")
+        #     else:
+        #         st.error("이메일 발송 실패. 앱 비밀번호를 확인하세요.")
+        # ────────────────────────────────────────────────────────
 
         st.divider()
         with st.expander("🔍 검색 기록"):
@@ -493,26 +800,26 @@ def main():
                             st.session_state.favorite_urls = load_favorite_urls()
                             st.rerun()
 
-        auto_send = st.toggle(
-            f"매일 자동 발송 ({Config.DAILY_SEND_TIME})",
-            value=st.session_state.auto_send,
-        )
-        if auto_send != st.session_state.auto_send:
-            st.session_state.auto_send = auto_send
-            if auto_send:
-                sched_params = dict(
-                    keyword=keyword, category="전체", experience="전체",
-                    education="전체", location="전체", tech_stacks=[],
-                )
-                sched = DailyScheduler(search_params=sched_params)
-                sched.start()
-                st.session_state.scheduler = sched
-                st.success(f"자동 발송 ON (매일 {Config.DAILY_SEND_TIME})")
-            else:
-                if st.session_state.scheduler:
-                    st.session_state.scheduler.stop()
-                    st.session_state.scheduler = None
-                st.info("자동 발송 OFF")
+        # auto_send = st.toggle(
+        #     f"매일 자동 발송 ({Config.DAILY_SEND_TIME})",
+        #     value=st.session_state.auto_send,
+        # )
+        # if auto_send != st.session_state.auto_send:
+        #     st.session_state.auto_send = auto_send
+        #     if auto_send:
+        #         sched_params = dict(
+        #             keyword=keyword, category="전체", experience="전체",
+        #             education="전체", location="전체", tech_stacks=[],
+        #         )
+        #         sched = DailyScheduler(search_params=sched_params)
+        #         sched.start()
+        #         st.session_state.scheduler = sched
+        #         st.success(f"자동 발송 ON (매일 {Config.DAILY_SEND_TIME})")
+        #     else:
+        #         if st.session_state.scheduler:
+        #             st.session_state.scheduler.stop()
+        #             st.session_state.scheduler = None
+        #         st.info("자동 발송 OFF")
 
     # ── 검색 실행 ─────────────────────────────────────────────
     if do_search:
@@ -531,35 +838,44 @@ def main():
             st.session_state.filtered_jobs = filtered
             st.session_state.rendered_count = PAGE_SIZE
             save_jobs(all_jobs, keyword)
+            st.session_state.all_db_jobs_cache = None
 
-    # ── 뷰 모드 탭 ────────────────────────────────────────────
-    view_mode = st.radio(
-        "보기 모드",
-        ["스크리닝", "관심없음 목록", "저장한 공고", "즐겨찾기 목록"],
-        horizontal=True,
-        label_visibility="collapsed",
-    )
-    st.session_state.view_mode = view_mode
-    st.divider()
+    # tabs
+    _sort_key = _SORT_MAP.get(st.session_state.get("sort_label", "최신순"), "latest")
 
-    # ── 모드별 렌더링 ─────────────────────────────────────────
-    if view_mode == "스크리닝":
+    tab_screen, tab_all, tab_ni, tab_saved, tab_fav, tab_sched = st.tabs([
+        "🔍 검색목록", "📋 전체", "👎 관심없음", "⭐ 저장", "❤️ 즐겨찾기", "📅 스케줄러"
+    ])
+
+    with tab_screen:
         _render_screening()
 
-    elif view_mode == "관심없음 목록":
+    with tab_all:
+        if st.session_state.all_db_jobs_cache is None:
+            st.session_state.all_db_jobs_cache = load_all_jobs()
+        sorted_all = FilterService.sort_jobs(st.session_state.all_db_jobs_cache, _sort_key)
+        _render_job_list(sorted_all, "DB에 저장된 공고가 없습니다.", mode="all")
+
+    with tab_ni:
         if st.session_state.ni_jobs_cache is None:
             st.session_state.ni_jobs_cache = load_not_interested_jobs()
-        _render_job_list(st.session_state.ni_jobs_cache, "관심없음으로 표시한 공고가 없습니다.")
+        sorted_ni = FilterService.sort_jobs(st.session_state.ni_jobs_cache, _sort_key)
+        _render_job_list(sorted_ni, "관심없음으로 표시한 공고가 없습니다.", mode="ni")
 
-    elif view_mode == "저장한 공고":
+    with tab_saved:
         if st.session_state.saved_jobs_cache is None:
             st.session_state.saved_jobs_cache = load_saved_jobs()
-        _render_job_list(st.session_state.saved_jobs_cache, "저장한 공고가 없습니다.")
+        sorted_saved = FilterService.sort_jobs(st.session_state.saved_jobs_cache, _sort_key)
+        _render_job_list(sorted_saved, "저장한 공고가 없습니다.", mode="saved")
 
-    elif view_mode == "즐겨찾기 목록":
+    with tab_fav:
         if st.session_state.fav_jobs_cache is None:
             st.session_state.fav_jobs_cache = load_favorite_jobs()
-        _render_job_list(st.session_state.fav_jobs_cache, "즐겨찾기한 공고가 없습니다.")
+        sorted_fav = FilterService.sort_jobs(st.session_state.fav_jobs_cache, _sort_key)
+        _render_job_list(sorted_fav, "즐겨찾기한 공고가 없습니다.", mode="fav")
+
+    with tab_sched:
+        _render_scheduler()
 
 
 if __name__ == "__main__":

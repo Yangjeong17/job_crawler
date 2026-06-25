@@ -181,6 +181,36 @@ def unmark(url: str):
         conn.commit()
 
 
+def reassign_to_saved(url: str):
+    """관심없음 → 저장으로 상태 전환."""
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_not_interested=0, is_saved=1, saved_at=?, is_favorite=0, favorited_at=NULL WHERE url=?",
+            (datetime.now().isoformat(), url),
+        )
+        conn.commit()
+
+
+def reassign_to_not_interested(url: str):
+    """저장/즐겨찾기 → 관심없음으로 상태 전환."""
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_not_interested=1, is_saved=0, saved_at=NULL, is_favorite=0, favorited_at=NULL WHERE url=?",
+            (url,),
+        )
+        conn.commit()
+
+
+def reassign_to_favorite(url: str):
+    """관심없음/저장 → 즐겨찾기로 상태 전환."""
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_not_interested=0, is_saved=0, saved_at=NULL, is_favorite=1, favorited_at=? WHERE url=?",
+            (datetime.now().isoformat(), url),
+        )
+        conn.commit()
+
+
 def load_not_interested_urls() -> Set[str]:
     try:
         with sqlite3.connect(DB_PATH) as conn:
@@ -244,6 +274,24 @@ def load_latest_jobs() -> List[JobPosting]:
         return []
 
 
+def load_all_jobs() -> List[JobPosting]:
+    """DB 전체 공고 로드 (crawled_at 역순)."""
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            rows = conn.execute("""
+                SELECT url, title, company, source, location, experience,
+                       education, salary, tech_stack, job_type, deadline,
+                       posted_date, description, crawled_at,
+                       job_id, content_hash, is_modified, updated_at, categories
+                FROM job_postings
+                ORDER BY crawled_at DESC
+            """).fetchall()
+        return [_row_to_job(r) for r in rows]
+    except Exception as e:
+        logger.error(f"load_all_jobs 실패: {e}")
+        return []
+
+
 def load_not_interested_jobs() -> List[JobPosting]:
     return _load_by_flag("is_not_interested")
 
@@ -277,6 +325,16 @@ def _load_by_flag(col: str) -> List[JobPosting]:
     except Exception as e:
         logger.error(f"_load_by_flag({col}) 실패: {e}")
         return []
+
+
+def count_all_jobs() -> int:
+    """DB에 저장된 전체 공고 수."""
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            return conn.execute("SELECT COUNT(*) FROM job_postings").fetchone()[0]
+    except Exception as e:
+        logger.error(f"count_all_jobs 실패: {e}")
+        return 0
 
 
 def load_search_history():
