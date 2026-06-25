@@ -49,8 +49,6 @@ _STRATEGIES: dict[str, _SiteStrategy] = {
 _HOST_MAP = {
     "saramin.co.kr":  "saramin",
     "jobkorea.co.kr": "jobkorea",
-    "wanted.co.kr":   "wanted",
-    "incruit.com":    "incruit",
 }
 
 

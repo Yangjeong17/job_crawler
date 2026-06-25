@@ -28,7 +28,10 @@
       "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/pip install pytest -q && .venv/bin/python -m pytest tests/test_url_utils.py -v 2>&1\")",
       "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c 'from services.db_service import migrate_swipe_decisions; print\\(\\\\\"OK\\\\\"\\)' 2>&1\")",
       "Bash(wsl -d ubuntu bash -c 'cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c '\\\\'' *)",
-      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -m pytest tests/test_url_utils.py -q 2>&1\")"
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -m pytest tests/test_url_utils.py -q 2>&1\")",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"gui/app.py\\\\\", \\\\\"models/job.py\\\\\", \\\\\"crawlers/saramin_crawler.py\\\\\", \\\\\"services/db_service.py\\\\\"]]'\")",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"config.py\\\\\", \\\\\"crawlers/saramin_crawler.py\\\\\", \\\\\"crawlers/jobkorea_crawler.py\\\\\", \\\\\"utils/hash_utils.py\\\\\", \\\\\"utils/url_utils.py\\\\\", \\\\\"models/job.py\\\\\", \\\\\"services/filter_service.py\\\\\"]]'\")",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"gui/app.py\\\\\"]]'\")"
     ]
   }
 }

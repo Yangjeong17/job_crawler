@@ -261,16 +261,12 @@ class JobKoreaCrawler(BaseCrawler):
                 break
 
         # 직종 카테고리: 위치/경력/학력/급여/혜택 제외한 짧은 항목
-        _benefit_kws = [
-            "지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차",
-            "복지", "상여", "인센티브", "만원", "연봉",
-        ]
         categories = list(dict.fromkeys([
             t for t in description_parts
             if t not in (location, experience, education)
             and t != salary
             and len(t) < 25
-            and not any(kw in t for kw in _benefit_kws)
+            and not any(kw in t for kw in Config.BENEFIT_KEYWORDS)
         ]))
 
         return JobPosting(

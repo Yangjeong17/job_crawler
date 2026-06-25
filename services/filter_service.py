@@ -23,7 +23,6 @@ class FilterService:
         logger.info(f"필터링 프로세스 시작: 총 {len(jobs)}개 대상")
         logger.info(f"설정된 필터 - 키워드: '{keyword}', 경력: '{experience}', 지역: '{location}'")
 
-        # 🔥 처음 5개만 상세 정보 출력 (INFO 레벨이라 항상 보임)
         for idx, job in enumerate(jobs):
             try:
                 is_match = job.matches_filter(

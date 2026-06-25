@@ -256,7 +256,12 @@ def load_favorite_jobs() -> List[JobPosting]:
     return _load_by_flag("is_favorite")
 
 
+_VALID_FLAG_COLS = frozenset({"is_not_interested", "is_saved", "is_favorite"})
+
+
 def _load_by_flag(col: str) -> List[JobPosting]:
+    if col not in _VALID_FLAG_COLS:
+        raise ValueError(f"허용되지 않은 컬럼: {col!r}")
     try:
         with sqlite3.connect(DB_PATH) as conn:
             rows = conn.execute(f"""

@@ -1,6 +1,9 @@
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -51,8 +54,7 @@ class JobPosting:
         # 날짜 파싱 시도
         date_formats = [
             "%Y-%m-%d", "%Y.%m.%d", "%Y/%m/%d",
-            "%m/%d", "%m.%d", "~%m.%d",
-            "~%Y.%m.%d", "~ %Y.%m.%d", "~ %m.%d"
+            "%m/%d", "%m.%d",
         ]
 
         deadline_str = self.deadline.replace("~", "").replace("까지", "").strip()
@@ -80,104 +82,36 @@ class JobPosting:
         tech_stacks: Optional[List[str]] = None,
         location: str = "전체"
     ) -> bool:
-        """필터 조건에 맞는지 확인 (디버깅 버전)"""
+        """필터 조건에 맞는지 확인"""
 
         def log_fail(reason):
-            print(f"❌ [{reason}] | title='{self.title}' | exp='{self.experience}' | loc='{self.location}' | edu='{self.education}'")
+            logger.debug(
+                "[%s] title='%s' exp='%s' loc='%s'",
+                reason, self.title, self.experience, self.location,
+            )
 
-        # 만료 체크
         if self.is_expired():
             log_fail("만료")
             return False
 
-        # 키워드
-        # if keyword:
-        #     keyword_lower = keyword.lower()
-        #     searchable = f"{self.title} {self.company} {self.description}".lower()
-        #     if keyword_lower not in searchable:
-        #         log_fail("키워드")
-        #         return False
-        # 키워드 필터는 사이트 URL 검색(서버 측)에서 이미 적용됨 — 내부 재필터 제거
-        # if keyword:
-        #     searchable = f"{self.title} {self.company} {self.description}".lower()
-        #     keywords = keyword.lower().split()
-        #     if not all(kw in searchable for kw in keywords):
-        #         log_fail("키워드")
-        #         return False
+        # 키워드 필터: 사이트 URL 검색(서버 측)에서 이미 적용됨 — 내부 재필터 생략
 
-        # 직종
-        # if category and category != "전체":
-        #     category_lower = category.lower()
-        #     searchable = f"{self.title} {self.description} {self.job_type}".lower()
-        #     if category_lower not in searchable:
-        #         log_fail("직종")
-        #         return False
-
-        # 경력
-        # if experience and experience != "전체":
-        #     exp_field = (self.experience or "").strip()
-        #     title_field = (self.title or "").strip()
-
-        #     if experience == "신입":
-        #         신입_keywords = [
-        #             "신입", "경력무관", "경력 무관", "신입·경력",
-        #             "신입/경력", "경력없이", "무관"
-        #         ]
-        #         matched = any(kw in exp_field for kw in 신입_keywords) or \
-        #                 any(kw in title_field for kw in 신입_keywords)
-
-        #         if not matched:
-        #             log_fail("경력-신입")
-        #             return False
-
-        #     elif experience == "경력":
-        #         경력_keywords = ["경력", "년", "연차"]
-        #         제외_keywords = ["신입", "경력무관", "무관"]
-        #         matched = any(kw in exp_field for kw in 경력_keywords)
-        #         excluded = any(kw in exp_field for kw in 제외_keywords)
-
-        #         if not matched or excluded:
-        #             log_fail("경력-경력")
-        #             return False
-
-        #     else:
-        #         year = experience.replace("년", "").strip()
-        #         if year.isdigit():
-        #             if year not in exp_field and year not in title_field:
-        #                 log_fail("경력-연차")
-        #                 return False
-
-        # # 학력
-        # if education and education != "전체":
-        #     if education != "학력무관" and education not in self.education:
-        #         if "학력무관" not in self.education:
-        #             log_fail("학력")
-        #             return False
-
-        # 기술스택
         if tech_stacks:
-            job_stacks = " ".join(self.tech_stack).lower()
-            job_searchable = f"{self.title} {self.description}".lower()
-            combined = f"{job_stacks} {job_searchable}"
-
+            combined = " ".join(self.tech_stack).lower() + " " + f"{self.title} {self.description}".lower()
             if not any(ts.lower() in combined for ts in tech_stacks):
                 log_fail("기술스택")
                 return False
 
-        # 지역
+        _location_keywords = {
+            "서울": ["서울"],
+            "경기": ["경기", "수원", "성남", "고양", "용인", "부천",
+                    "안산", "안양", "화성", "의정부", "파주", "시흥",
+                    "하남", "광명", "평택", "과천", "의왕", "군포"],
+        }
         if location and location != "전체":
             job_location = (self.location or "").strip()
-
-            location_keywords = {
-                "서울": ["서울"],
-                "경기": ["경기", "수원", "성남", "고양", "용인", "부천",
-                        "안산", "안양", "화성", "의정부", "파주", "시흥",
-                        "하남", "광명", "평택", "과천", "의왕", "군포"],
-            }
-
-            keywords = location_keywords.get(location, [location])
-
-            if not any(kw in job_location for kw in keywords):
+            kws = _location_keywords.get(location, [location])
+            if not any(kw in job_location for kw in kws):
                 log_fail("지역")
                 return False
 

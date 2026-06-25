@@ -24,8 +24,3 @@ def generate_content_hash(job: "JobPosting") -> str:
     ]
     normalized = "|".join(parts).lower()
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
-
-
-def detect_job_change(existing_hash: str, new_job: "JobPosting") -> bool:
-    """기존 해시와 새 공고 해시를 비교. 내용이 바뀌었으면 True."""
-    return existing_hash != generate_content_hash(new_job)

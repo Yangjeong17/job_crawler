@@ -5,7 +5,6 @@ from typing import List
 from urllib.parse import quote_plus
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 from crawlers.base_crawler import BaseCrawler
 from models.job import JobPosting
@@ -198,17 +197,13 @@ class SaraminCrawler(BaseCrawler):
                     tech_stack.append(tech)
 
         # tech_stack에 없는 항목만 categories로 분리
-        _benefit_kws = [
-            "지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차",
-            "복지", "상여", "인센티브", "헤드헌팅", "연봉", "만원",
-        ]
         tech_set = {t.lower() for t in tech_stack}
         categories = [
             s.strip() for s in sector.split(",")
             if s.strip()
             and s.strip().lower() not in tech_set
             and len(s.strip()) < 20
-            and not any(k in s for k in _benefit_kws)
+            and not any(k in s for k in Config.BENEFIT_KEYWORDS)
         ]
 
         # 연봉 ("합격 시 N만원" 형태는 채용 보상금이므로 제거)

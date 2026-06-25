@@ -8,7 +8,7 @@ from typing import List
 
 from config import Config
 from models.job import JobPosting
-from crawlers import SaraminCrawler, JobKoreaCrawler, WantedCrawler
+from crawlers import SaraminCrawler, JobKoreaCrawler
 from services.filter_service import FilterService
 from services.mail_service import MailService
 from scheduler.daily_scheduler import DailyScheduler
@@ -51,12 +51,14 @@ def _init_state():
         "rendered_count":      PAGE_SIZE,
         "scheduler":           None,
         "auto_send":           False,
-        "screen_index":        0,
         "not_interested_urls": None,  # set, loaded lazily
         "saved_urls":          None,  # set, loaded lazily
         "favorite_urls":       None,  # set, loaded lazily
         "action_history":      [],    # list of (url, action)
         "view_mode":           "스크리닝",
+        "ni_jobs_cache":       None,  # 뷰 전환 시 lazy 로드, 액션 시 무효화
+        "saved_jobs_cache":    None,
+        "fav_jobs_cache":      None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -76,28 +78,13 @@ def _init_state():
         if loaded:
             st.session_state.all_jobs = loaded
             st.session_state.filtered_jobs = FilterService.deduplicate(loaded)
-            st.session_state.screen_index = _find_resume_index(
-                loaded,
-                st.session_state.not_interested_urls,
-                st.session_state.saved_urls,
-                st.session_state.favorite_urls,
-            )
-
-
-def _find_resume_index(jobs, ni_urls, sv_urls, fav_urls=None) -> int:
-    """처음 '미확인' 카드 인덱스 반환."""
-    fav_urls = fav_urls or set()
-    for i, job in enumerate(jobs):
-        if job.url not in ni_urls and job.url not in sv_urls and job.url not in fav_urls:
-            return i
-    return len(jobs)
 
 
 def _action_not_interested(job: JobPosting):
     mark_not_interested(job.url)
     st.session_state.not_interested_urls.add(job.url)
     st.session_state.action_history.append((job.url, "not_interested"))
-    st.session_state.screen_index += 1
+    st.session_state.ni_jobs_cache = None
     st.toast("👎 관심없음 처리", icon="👎")
     st.rerun()
 
@@ -106,7 +93,7 @@ def _action_save(job: JobPosting):
     mark_saved(job.url)
     st.session_state.saved_urls.add(job.url)
     st.session_state.action_history.append((job.url, "saved"))
-    st.session_state.screen_index += 1
+    st.session_state.saved_jobs_cache = None
     st.toast("⭐ 저장 완료", icon="⭐")
     st.rerun()
 
@@ -115,7 +102,7 @@ def _action_favorite(job: JobPosting):
     mark_favorite(job.url)
     st.session_state.favorite_urls.add(job.url)
     st.session_state.action_history.append((job.url, "favorite"))
-    st.session_state.screen_index += 1
+    st.session_state.fav_jobs_cache = None
     st.toast("❤️ 즐겨찾기 추가 — SUPER LIKE!", icon="❤️")
     st.rerun()
 
@@ -129,11 +116,13 @@ def _action_undo():
     labels = {"not_interested": "👎 관심없음", "saved": "⭐ 저장", "favorite": "❤️ 즐겨찾기"}
     if action == "not_interested":
         st.session_state.not_interested_urls.discard(url)
+        st.session_state.ni_jobs_cache = None
     elif action == "saved":
         st.session_state.saved_urls.discard(url)
+        st.session_state.saved_jobs_cache = None
     elif action == "favorite":
         st.session_state.favorite_urls.discard(url)
-    st.session_state.screen_index = max(0, st.session_state.screen_index - 1)
+        st.session_state.fav_jobs_cache = None
     st.toast(f"↩ {labels.get(action, action)} 취소", icon="↩️")
     st.rerun()
 
@@ -409,8 +398,6 @@ def main():
         st.subheader("사이트")
         saramin  = st.checkbox("사람인",  value=True)
         jobkorea = st.checkbox("잡코리아", value=True)
-        # wanted = st.checkbox("원티드", value=True)  # 검색결과가 많지 않아 보류
-        wanted = False
 
         # 현재 사용안함
         # st.subheader("필터")
@@ -529,10 +516,10 @@ def main():
 
     # ── 검색 실행 ─────────────────────────────────────────────
     if do_search:
-        if not (saramin or jobkorea or wanted):
+        if not (saramin or jobkorea):
             st.warning("사이트를 하나 이상 선택하세요.")
         else:
-            sites  = {"saramin": saramin, "jobkorea": jobkorea, "wanted": wanted}
+            sites  = {"saramin": saramin, "jobkorea": jobkorea}
             params = dict(
                 category="전체", experience="전체",
                 education="전체", location="전체", tech_stacks=[],
@@ -543,12 +530,6 @@ def main():
             st.session_state.all_jobs      = all_jobs
             st.session_state.filtered_jobs = filtered
             st.session_state.rendered_count = PAGE_SIZE
-            # 새 검색 후 미확인 첫 번째 카드부터 재개
-            st.session_state.screen_index  = _find_resume_index(
-                filtered,
-                st.session_state.not_interested_urls,
-                st.session_state.saved_urls,
-            )
             save_jobs(all_jobs, keyword)
 
     # ── 뷰 모드 탭 ────────────────────────────────────────────
@@ -566,16 +547,19 @@ def main():
         _render_screening()
 
     elif view_mode == "관심없음 목록":
-        ni_jobs = load_not_interested_jobs()
-        _render_job_list(ni_jobs, "관심없음으로 표시한 공고가 없습니다.")
+        if st.session_state.ni_jobs_cache is None:
+            st.session_state.ni_jobs_cache = load_not_interested_jobs()
+        _render_job_list(st.session_state.ni_jobs_cache, "관심없음으로 표시한 공고가 없습니다.")
 
     elif view_mode == "저장한 공고":
-        saved_jobs = load_saved_jobs()
-        _render_job_list(saved_jobs, "저장한 공고가 없습니다.")
+        if st.session_state.saved_jobs_cache is None:
+            st.session_state.saved_jobs_cache = load_saved_jobs()
+        _render_job_list(st.session_state.saved_jobs_cache, "저장한 공고가 없습니다.")
 
     elif view_mode == "즐겨찾기 목록":
-        fav_jobs = load_favorite_jobs()
-        _render_job_list(fav_jobs, "즐겨찾기한 공고가 없습니다.")
+        if st.session_state.fav_jobs_cache is None:
+            st.session_state.fav_jobs_cache = load_favorite_jobs()
+        _render_job_list(st.session_state.fav_jobs_cache, "즐겨찾기한 공고가 없습니다.")
 
 
 if __name__ == "__main__":
