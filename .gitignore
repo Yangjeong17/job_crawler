@@ -27,3 +27,8 @@ Thumbs.db
 # 🗄️ Local DB & runtime state
 *.db
 .last_db
+
+# 📝 Documentation
+
+HANDOFF.md
+.ai-docs
