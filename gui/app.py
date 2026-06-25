@@ -196,19 +196,14 @@ def _render_screening_card(job: JobPosting):
     plain_meta = "  |  ".join(plain_parts)
     plain_row = f'<p style="margin:4px 0;color:#777;font-size:18px;">{plain_meta}</p>' if plain_meta else ""
 
-    # 직종 카테고리 태그 (description에서 파싱)
+    # 직종 카테고리 태그 (크롤러에서 분리된 categories 필드 직접 사용)
     categories_html = ""
-    if job.description:
-        _benefit_kws = ["지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차", "복지", "상여", "인센티브", "헤드헌팅"]
-        clean_desc = re.sub(r'(?:등록일|수정일)\s*\d+[./]\d+[./]\d+', '', job.description)
-        raw_cats = [c.strip() for c in re.split(r'[,、]', clean_desc)]
-        categories = [c for c in raw_cats if c and len(c) < 20 and not any(k in c for k in _benefit_kws)][:5]
-        if categories:
-            cat_tags = "".join(
-                f'<span style="background:#F3E5F5;color:#7B1FA2;padding:2px 8px;border-radius:4px;font-size:17px;margin-right:4px;">{c}</span>'
-                for c in categories
-            )
-            categories_html = f'<div style="margin-top:8px;">{cat_tags}</div>'
+    if job.categories:
+        cat_tags = "".join(
+            f'<span style="background:#F3E5F5;color:#7B1FA2;padding:2px 8px;border-radius:4px;font-size:17px;margin-right:4px;">{c}</span>'
+            for c in job.categories[:5]
+        )
+        categories_html = f'<div style="margin-top:8px;">{cat_tags}</div>'
 
     # 기술스택 태그
     stacks_html = ""
@@ -398,13 +393,13 @@ def _run_crawlers(keyword: str, sites: dict, params: dict) -> List[JobPosting]:
 
 def main():
     st.set_page_config(
-        page_title="취조 - 취업 조지기",
+        page_title="취업 크롤러",
         page_icon="💼",
         layout="wide",
     )
     _init_state()
 
-    st.title("💼 취업 조지기 : 취조")
+    st.title("💼 취업 크롤러")
 
     # ── 사이드바 ──────────────────────────────────────────────
     with st.sidebar:
@@ -491,8 +486,12 @@ def main():
                         st.info("이전 DB에 스와이프 기록이 없습니다.")
                     else:
                         total = result['ni'] + result['sv'] + result['fav']
+                        not_matched = result.get('not_matched', 0)
                         if total == 0:
-                            st.info("현재 DB에 URL이 일치하는 공고가 없습니다.")
+                            st.warning(
+                                f"매칭된 공고가 없습니다. "
+                                f"(미매칭 {not_matched}건 — 새 DB에 없는 공고이거나 이미 결정된 공고)"
+                            )
                         else:
                             st.success(
                                 f"총 {total}건 완료 — "
@@ -500,6 +499,8 @@ def main():
                                 f"⭐ 저장 {result['sv']}건 / "
                                 f"❤️ 즐겨찾기 {result['fav']}건"
                             )
+                            if not_matched > 0:
+                                st.caption(f"미매칭 {not_matched}건: 새 DB에 없는 공고 (만료 또는 미크롤링)")
                             st.session_state.not_interested_urls = load_not_interested_urls()
                             st.session_state.saved_urls = load_saved_urls()
                             st.session_state.favorite_urls = load_favorite_urls()

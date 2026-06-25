@@ -193,10 +193,23 @@ class SaraminCrawler(BaseCrawler):
 
         tech_stack = []
         if sector:
-            known_stacks = Config.TECH_STACKS
-            for tech in known_stacks:
+            for tech in Config.TECH_STACKS:
                 if tech.lower() in sector.lower():
                     tech_stack.append(tech)
+
+        # tech_stack에 없는 항목만 categories로 분리
+        _benefit_kws = [
+            "지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차",
+            "복지", "상여", "인센티브", "헤드헌팅", "연봉", "만원",
+        ]
+        tech_set = {t.lower() for t in tech_stack}
+        categories = [
+            s.strip() for s in sector.split(",")
+            if s.strip()
+            and s.strip().lower() not in tech_set
+            and len(s.strip()) < 20
+            and not any(k in s for k in _benefit_kws)
+        ]
 
         # 연봉 ("합격 시 N만원" 형태는 채용 보상금이므로 제거)
         salary = self.safe_get_text(item, ".area_job .job_salary") or ""
@@ -213,9 +226,10 @@ class SaraminCrawler(BaseCrawler):
             education=education,
             salary=salary,
             tech_stack=tech_stack,
+            categories=categories,
             job_type=job_type,
             deadline=deadline,
             posted_date=posted_date,
-            description=sector,
+            description="",
             job_id=extract_job_id(url) or "",
         )

@@ -25,7 +25,10 @@
       "Bash(python -m pytest tests/test_url_utils.py -v)",
       "Bash(.venv\\\\Scripts\\\\python.exe -m pytest tests/test_url_utils.py -v)",
       "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -m pytest tests/test_url_utils.py -v 2>&1\")",
-      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/pip install pytest -q && .venv/bin/python -m pytest tests/test_url_utils.py -v 2>&1\")"
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/pip install pytest -q && .venv/bin/python -m pytest tests/test_url_utils.py -v 2>&1\")",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c 'from services.db_service import migrate_swipe_decisions; print\\(\\\\\"OK\\\\\"\\)' 2>&1\")",
+      "Bash(wsl -d ubuntu bash -c 'cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -c '\\\\'' *)",
+      "Bash(wsl -d ubuntu bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && .venv/bin/python -m pytest tests/test_url_utils.py -q 2>&1\")"
     ]
   }
 }

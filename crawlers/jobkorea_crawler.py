@@ -253,14 +253,25 @@ class JobKoreaCrawler(BaseCrawler):
             except Exception:
                 continue
 
-        # 직종 카테고리: 위치/경력/학력/혜택 제외한 짧은 항목
-        _benefit_kws = ["지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차", "복지", "상여", "인센티브"]
-        job_categories = [
+        # 급여 추출: "연봉 N,000만원~" 형태
+        salary = ""
+        for t in description_parts:
+            if any(k in t for k in ["만원", "연봉"]):
+                salary = t
+                break
+
+        # 직종 카테고리: 위치/경력/학력/급여/혜택 제외한 짧은 항목
+        _benefit_kws = [
+            "지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차",
+            "복지", "상여", "인센티브", "만원", "연봉",
+        ]
+        categories = list(dict.fromkeys([
             t for t in description_parts
             if t not in (location, experience, education)
+            and t != salary
             and len(t) < 25
             and not any(kw in t for kw in _benefit_kws)
-        ]
+        ]))
 
         return JobPosting(
             title=title,
@@ -270,9 +281,11 @@ class JobKoreaCrawler(BaseCrawler):
             location=location,
             experience=experience,
             education=education,
+            salary=salary,
+            categories=categories,
             deadline=deadline,
             posted_date=posted_date,
-            description=", ".join(dict.fromkeys(job_categories)),
+            description="",
             job_id=extract_job_id(url) or "",
         )
 

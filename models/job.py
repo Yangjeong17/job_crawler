@@ -16,6 +16,7 @@ class JobPosting:
     education: str = ""
     salary: str = ""
     tech_stack: List[str] = field(default_factory=list)
+    categories: List[str] = field(default_factory=list)
     job_type: str = ""  # 정규직, 계약직 등
     deadline: str = ""
     posted_date: str = ""
@@ -192,6 +193,7 @@ class JobPosting:
             "education": self.education,
             "salary": self.salary,
             "tech_stack": self.tech_stack,
+            "categories": self.categories,
             "job_type": self.job_type,
             "deadline": self.deadline,
             "posted_date": self.posted_date,

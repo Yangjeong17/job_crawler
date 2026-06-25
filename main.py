@@ -4,7 +4,7 @@ import sys
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 _LAST_DB_FILE = os.path.join(_ROOT, ".last_db")
-DEFAULT_DB = "jobs_before.db"
+DEFAULT_DB = "jobs_database.db"
 
 
 def _load_last_db() -> str:
@@ -23,10 +23,11 @@ def _save_last_db(name: str):
 
 def ask_db_name() -> str:
     last = _load_last_db()
+    last_without_ext = os.path.splitext(last)[0]
     print("\n" + "=" * 30)
     print("      사용할 DB 파일명을 입력하세요")
     print("=" * 30)
-    print(f"  ✅ 엔터 → 이전 파일 사용 ({last})")
+    print(f"  ✅ 엔터 → 이전 파일 사용 ({last_without_ext})")
     name = input("  📥 새 이름 입력 > ").strip()
     if not name:
         return last

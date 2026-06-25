@@ -43,7 +43,8 @@ def init_db():
                 job_id            TEXT,
                 content_hash      TEXT,
                 updated_at        TEXT,
-                is_modified       INTEGER DEFAULT 0
+                is_modified       INTEGER DEFAULT 0,
+                categories        TEXT
             )
         """)
         # 기존 테이블에 컬럼 없으면 추가 (순차 마이그레이션)
@@ -58,6 +59,7 @@ def init_db():
             ("content_hash",      "TEXT"),
             ("updated_at",        "TEXT"),
             ("is_modified",       "INTEGER DEFAULT 0"),
+            ("categories",        "TEXT"),
         ]:
             if col not in existing:
                 conn.execute(f"ALTER TABLE job_postings ADD COLUMN {col} {typedef}")
@@ -96,7 +98,7 @@ def save_jobs(jobs: List[JobPosting], keyword: str = ""):
                                 title=?, company=?, location=?, experience=?, education=?,
                                 salary=?, tech_stack=?, job_type=?, deadline=?, posted_date=?,
                                 description=?, content_hash=?, updated_at=?, is_modified=1,
-                                crawled_at=?, search_keyword=?
+                                crawled_at=?, search_keyword=?, categories=?
                             WHERE source=? AND job_id=?
                         """, (
                             job.title, job.company, job.location, job.experience,
@@ -105,6 +107,7 @@ def save_jobs(jobs: List[JobPosting], keyword: str = ""):
                             job.job_type, job.deadline, job.posted_date,
                             job.description, job.content_hash, now,
                             job.crawled_at.isoformat(), keyword,
+                            json.dumps(job.categories, ensure_ascii=False),
                             job.source, job.job_id,
                         ))
                         updated += 1
@@ -117,8 +120,9 @@ def save_jobs(jobs: List[JobPosting], keyword: str = ""):
                 INSERT OR IGNORE INTO job_postings
                 (url, title, company, source, location, experience, education,
                  salary, tech_stack, job_type, deadline, posted_date,
-                 description, crawled_at, search_keyword, job_id, content_hash)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 description, crawled_at, search_keyword, job_id, content_hash,
+                 categories)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 job.url, job.title, job.company, job.source,
                 job.location, job.experience, job.education, job.salary,
@@ -126,6 +130,7 @@ def save_jobs(jobs: List[JobPosting], keyword: str = ""):
                 job.job_type, job.deadline, job.posted_date,
                 job.description, job.crawled_at.isoformat(), keyword,
                 job.job_id, job.content_hash,
+                json.dumps(job.categories, ensure_ascii=False),
             ))
             if cur.rowcount > 0:
                 saved += 1
@@ -226,7 +231,7 @@ def load_latest_jobs() -> List[JobPosting]:
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
                        posted_date, description, crawled_at,
-                       job_id, content_hash, is_modified, updated_at
+                       job_id, content_hash, is_modified, updated_at, categories
                 FROM job_postings
                 WHERE crawled_at >= datetime(?, '-1 hour')
                 ORDER BY rowid ASC
@@ -258,7 +263,7 @@ def _load_by_flag(col: str) -> List[JobPosting]:
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
                        posted_date, description, crawled_at,
-                       job_id, content_hash, is_modified, updated_at
+                       job_id, content_hash, is_modified, updated_at, categories
                 FROM job_postings
                 WHERE {col}=1
                 ORDER BY rowid DESC
@@ -295,15 +300,26 @@ def list_db_files() -> list:
 
 
 def migrate_swipe_decisions(src_db_name: str) -> dict:
-    """이전 DB에서 스와이프 결정(관심없음/저장/즐겨찾기)을 현재 DB로 복사.
-    반환값: {'ni': N, 'sv': N, 'fav': N} | {'error': 'not_found'} | {'error': 'empty'}"""
+    """이전 DB에서 스와이프 결정(관심없음/저장/즐겨찾기)을 현재 DB로 마이그레이션.
+
+    매칭 전략:
+      1순위 — (source, job_id) 매칭: URL 정규화 여부와 무관하게 동작
+      2순위 — url 매칭: job_id 추출 실패한 레코드 폴백
+
+    반환값:
+      {'ni': N, 'sv': N, 'fav': N, 'not_matched': N}
+      {'error': 'not_found'} | {'error': 'empty'}
+    """
+    from utils.url_utils import extract_job_id
+
     src_path = os.path.join(os.path.dirname(DB_PATH), src_db_name)
     if not os.path.exists(src_path):
         return {'error': 'not_found'}
 
     with sqlite3.connect(src_path) as src:
         rows = src.execute("""
-            SELECT url, is_not_interested, is_saved, saved_at, is_favorite, favorited_at
+            SELECT url, source, is_not_interested, is_saved, saved_at,
+                   is_favorite, favorited_at
             FROM job_postings
             WHERE is_not_interested=1 OR is_saved=1 OR is_favorite=1
         """).fetchall()
@@ -311,18 +327,43 @@ def migrate_swipe_decisions(src_db_name: str) -> dict:
     if not rows:
         return {'error': 'empty'}
 
-    counts = {'ni': 0, 'sv': 0, 'fav': 0}
+    counts = {'ni': 0, 'sv': 0, 'fav': 0, 'not_matched': 0}
+
     with sqlite3.connect(DB_PATH) as conn:
-        for url, ni, sv, sv_at, fav, fav_at in rows:
-            cur = conn.execute("""
-                UPDATE job_postings
-                SET is_not_interested=?, is_saved=?, saved_at=?, is_favorite=?, favorited_at=?
-                WHERE url=? AND is_not_interested=0 AND is_saved=0 AND is_favorite=0
-            """, (ni, sv, sv_at, fav, fav_at, url))
-            if cur.rowcount > 0:
-                if ni: counts['ni'] += 1
-                if sv: counts['sv'] += 1
+        for url, source, ni, sv, sv_at, fav, fav_at in rows:
+            swipe_args = (ni, sv, sv_at, fav, fav_at)
+            matched = False
+
+            # 1순위: (source, job_id) 매칭
+            job_id = extract_job_id(url)
+            if job_id and source:
+                cur = conn.execute("""
+                    UPDATE job_postings
+                    SET is_not_interested=?, is_saved=?, saved_at=?,
+                        is_favorite=?, favorited_at=?
+                    WHERE source=? AND job_id=?
+                      AND is_not_interested=0 AND is_saved=0 AND is_favorite=0
+                """, (*swipe_args, source, job_id))
+                matched = cur.rowcount > 0
+
+            # 2순위: url 직접 매칭 (job_id 추출 실패 또는 1순위 미매칭 시)
+            if not matched:
+                cur = conn.execute("""
+                    UPDATE job_postings
+                    SET is_not_interested=?, is_saved=?, saved_at=?,
+                        is_favorite=?, favorited_at=?
+                    WHERE url=?
+                      AND is_not_interested=0 AND is_saved=0 AND is_favorite=0
+                """, (*swipe_args, url))
+                matched = cur.rowcount > 0
+
+            if matched:
+                if ni:  counts['ni']  += 1
+                if sv:  counts['sv']  += 1
                 if fav: counts['fav'] += 1
+            else:
+                counts['not_matched'] += 1
+
         conn.commit()
 
     logger.info(f"스와이프 마이그레이션: {src_db_name} → {_db_name}, {counts}")
@@ -348,4 +389,5 @@ def _row_to_job(r) -> JobPosting:
         content_hash=r[15] if len(r) > 15 and r[15] else "",
         is_modified=bool(r[16]) if len(r) > 16 and r[16] else False,
         updated_at=updated_at,
+        categories=json.loads(r[18]) if len(r) > 18 and r[18] else [],
     )
