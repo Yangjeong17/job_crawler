@@ -274,6 +274,23 @@ def load_latest_jobs() -> List[JobPosting]:
         return []
 
 
+def get_job_by_url(url: str):
+    """URL로 단일 공고 조회."""
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            row = conn.execute("""
+                SELECT url, title, company, source, location, experience,
+                       education, salary, tech_stack, job_type, deadline,
+                       posted_date, description, crawled_at,
+                       job_id, content_hash, is_modified, updated_at, categories
+                FROM job_postings WHERE url=?
+            """, (url,)).fetchone()
+        return _row_to_job(row) if row else None
+    except Exception as e:
+        logger.error(f"get_job_by_url 실패: {e}")
+        return None
+
+
 def load_all_jobs() -> List[JobPosting]:
     """DB 전체 공고 로드 (crawled_at 역순)."""
     try:

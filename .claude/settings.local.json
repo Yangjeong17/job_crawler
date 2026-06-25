@@ -85,7 +85,19 @@
       "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && ls -1\")",
       "Bash(wsl -e bash -c \"sed -n '68,112p' /home/yj/Base/Dev/mini_project/JobHub/gui/app.py\")",
       "Bash(wsl -e bash -c \"sed -n '489,540p' /home/yj/Base/Dev/mini_project/JobHub/gui/app.py\")",
-      "Bash(wsl -e bash -c \"sed -n '810,882p' /home/yj/Base/Dev/mini_project/JobHub/gui/app.py\")"
+      "Bash(wsl -e bash -c \"sed -n '810,882p' /home/yj/Base/Dev/mini_project/JobHub/gui/app.py\")",
+      "Bash(wsl -e bash -c \"cat /home/yj/Base/Dev/mini_project/JobHub/crawlers/__init__.py && echo '---' && grep -n 'def run\\\\|def crawl\\\\|def __init__' /home/yj/Base/Dev/mini_project/JobHub/crawlers/base_crawler.py | head -15 && echo '---' && cat /home/yj/Base/Dev/mini_project/JobHub/requirements.txt\")",
+      "Bash(wsl -e bash -c \"sed -n '168,185p' /home/yj/Base/Dev/mini_project/JobHub/crawlers/base_crawler.py\")",
+      "Bash(wsl -e bash -c \"mkdir -p /home/yj/Base/Dev/mini_project/JobHub/api && touch /home/yj/Base/Dev/mini_project/JobHub/api/__init__.py\")",
+      "Bash(wsl -e bash -c \"grep -n 'def load_all_jobs' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
+      "Bash(wsl -e bash -c \"python3 /tmp/add_get_job.py && python3 -m py_compile /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py && echo OK\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -m py_compile api/main.py && echo 'Syntax OK'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && pip install fastapi 'uvicorn[standard]' -q && echo 'Installed OK'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && which uv && uv pip install fastapi 'uvicorn[standard]' 2>&1 | tail -5 || pip install fastapi 'uvicorn[standard]' --break-system-packages -q && echo 'Installed OK'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && ~/.local/bin/uvicorn api.main:app --port 8000 --timeout-graceful-shutdown 1 &  sleep 4 && curl -s http://localhost:8000/api/stats && kill %1 2>/dev/null; echo\")",
+      "Bash(wsl -e bash -c \"grep -n 'get_job_by_url\\\\|def load_all_jobs' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
+      "Bash(wsl -e bash -c \"sed -n '275,280p' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
+      "Bash(wsl -e *)"
     ]
   }
 }
