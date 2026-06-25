@@ -1,0 +1,279 @@
+import sqlite3
+import json
+import os
+import logging
+from datetime import datetime
+from typing import List, Set
+
+from models.job import JobPosting
+
+logger = logging.getLogger(__name__)
+
+_db_name = os.environ.get("JOBHUB_DB_NAME", "jobs_before.db")
+DB_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    _db_name
+)
+
+
+def init_db():
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS job_postings (
+                url               TEXT PRIMARY KEY,
+                title             TEXT,
+                company           TEXT,
+                source            TEXT,
+                location          TEXT,
+                experience        TEXT,
+                education         TEXT,
+                salary            TEXT,
+                tech_stack        TEXT,
+                job_type          TEXT,
+                deadline          TEXT,
+                posted_date       TEXT,
+                description       TEXT,
+                crawled_at        TEXT,
+                search_keyword    TEXT,
+                is_not_interested INTEGER DEFAULT 0,
+                is_saved          INTEGER DEFAULT 0,
+                saved_at          TEXT,
+                is_favorite       INTEGER DEFAULT 0,
+                favorited_at      TEXT
+            )
+        """)
+        # 기존 테이블에 컬럼 없으면 추가 (마이그레이션)
+        existing = {r[1] for r in conn.execute("PRAGMA table_info(job_postings)").fetchall()}
+        for col, typedef in [
+            ("is_not_interested", "INTEGER DEFAULT 0"),
+            ("is_saved",          "INTEGER DEFAULT 0"),
+            ("saved_at",          "TEXT"),
+            ("is_favorite",       "INTEGER DEFAULT 0"),
+            ("favorited_at",      "TEXT"),
+        ]:
+            if col not in existing:
+                conn.execute(f"ALTER TABLE job_postings ADD COLUMN {col} {typedef}")
+        conn.commit()
+    logger.info(f"DB 초기화 완료: {DB_PATH}")
+
+
+def save_jobs(jobs: List[JobPosting], keyword: str = ""):
+    """크롤링 결과 저장. 이미 존재하는 URL은 건너뜀 (사용자 표시 보존)."""
+    if not jobs:
+        return
+    with sqlite3.connect(DB_PATH) as conn:
+        for job in jobs:
+            conn.execute("""
+                INSERT OR IGNORE INTO job_postings
+                (url, title, company, source, location, experience, education,
+                 salary, tech_stack, job_type, deadline, posted_date,
+                 description, crawled_at, search_keyword)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                job.url, job.title, job.company, job.source,
+                job.location, job.experience, job.education, job.salary,
+                json.dumps(job.tech_stack, ensure_ascii=False),
+                job.job_type, job.deadline, job.posted_date,
+                job.description, job.crawled_at.isoformat(), keyword,
+            ))
+        conn.commit()
+    logger.info(f"DB 저장 완료: {len(jobs)}건 (keyword='{keyword}')")
+
+
+def mark_not_interested(url: str):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_not_interested=1 WHERE url=?", (url,)
+        )
+        conn.commit()
+
+
+def mark_saved(url: str):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_saved=1, saved_at=? WHERE url=?",
+            (datetime.now().isoformat(), url),
+        )
+        conn.commit()
+
+
+def mark_favorite(url: str):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_favorite=1, favorited_at=? WHERE url=?",
+            (datetime.now().isoformat(), url),
+        )
+        conn.commit()
+
+
+def unmark(url: str):
+    """관심없음, 저장, 즐겨찾기 모두 취소 (실행취소용)."""
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET is_not_interested=0, is_saved=0, saved_at=NULL, is_favorite=0, favorited_at=NULL WHERE url=?",
+            (url,)
+        )
+        conn.commit()
+
+
+def load_not_interested_urls() -> Set[str]:
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            rows = conn.execute(
+                "SELECT url FROM job_postings WHERE is_not_interested=1"
+            ).fetchall()
+        return {r[0] for r in rows}
+    except Exception as e:
+        logger.error(f"load_not_interested_urls 실패: {e}")
+        return set()
+
+
+def load_saved_urls() -> Set[str]:
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            rows = conn.execute(
+                "SELECT url FROM job_postings WHERE is_saved=1"
+            ).fetchall()
+        return {r[0] for r in rows}
+    except Exception as e:
+        logger.error(f"load_saved_urls 실패: {e}")
+        return set()
+
+
+def load_favorite_urls() -> Set[str]:
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            rows = conn.execute(
+                "SELECT url FROM job_postings WHERE is_favorite=1"
+            ).fetchall()
+        return {r[0] for r in rows}
+    except Exception as e:
+        logger.error(f"load_favorite_urls 실패: {e}")
+        return set()
+
+
+def load_latest_jobs() -> List[JobPosting]:
+    """가장 최근 크롤링 세션(1시간 이내) 결과 로드."""
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            row = conn.execute(
+                "SELECT MAX(crawled_at) FROM job_postings"
+            ).fetchone()
+            if not row or not row[0]:
+                return []
+            latest = row[0]
+            rows = conn.execute("""
+                SELECT url, title, company, source, location, experience,
+                       education, salary, tech_stack, job_type, deadline,
+                       posted_date, description, crawled_at
+                FROM job_postings
+                WHERE crawled_at >= datetime(?, '-1 hour')
+                ORDER BY rowid ASC
+            """, (latest,)).fetchall()
+        jobs = [_row_to_job(r) for r in rows]
+        logger.info(f"DB 로드 완료: {len(jobs)}건")
+        return jobs
+    except Exception as e:
+        logger.error(f"load_latest_jobs 실패: {e}")
+        return []
+
+
+def load_not_interested_jobs() -> List[JobPosting]:
+    return _load_by_flag("is_not_interested")
+
+
+def load_saved_jobs() -> List[JobPosting]:
+    return _load_by_flag("is_saved")
+
+
+def load_favorite_jobs() -> List[JobPosting]:
+    return _load_by_flag("is_favorite")
+
+
+def _load_by_flag(col: str) -> List[JobPosting]:
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            rows = conn.execute(f"""
+                SELECT url, title, company, source, location, experience,
+                       education, salary, tech_stack, job_type, deadline,
+                       posted_date, description, crawled_at
+                FROM job_postings
+                WHERE {col}=1
+                ORDER BY rowid DESC
+            """).fetchall()
+        return [_row_to_job(r) for r in rows]
+    except Exception as e:
+        logger.error(f"_load_by_flag({col}) 실패: {e}")
+        return []
+
+
+def load_search_history():
+    """검색 키워드 히스토리 반환: [(keyword, count, last_crawled), ...]"""
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            return conn.execute("""
+                SELECT search_keyword, COUNT(*) as cnt, MAX(crawled_at) as last_crawled
+                FROM job_postings
+                WHERE search_keyword IS NOT NULL AND search_keyword != ''
+                GROUP BY search_keyword
+                ORDER BY last_crawled DESC
+            """).fetchall()
+    except Exception as e:
+        logger.error(f"load_search_history 실패: {e}")
+        return []
+
+
+def list_db_files() -> list:
+    """같은 디렉토리 내 .db 파일 목록 반환 (현재 DB 제외)."""
+    db_dir = os.path.dirname(DB_PATH)
+    return sorted(
+        f for f in os.listdir(db_dir)
+        if f.endswith(".db") and f != _db_name
+    )
+
+
+def migrate_swipe_decisions(src_db_name: str) -> dict:
+    """이전 DB에서 스와이프 결정(관심없음/저장/즐겨찾기)을 현재 DB로 복사.
+    반환값: {'ni': N, 'sv': N, 'fav': N} | {'error': 'not_found'} | {'error': 'empty'}"""
+    src_path = os.path.join(os.path.dirname(DB_PATH), src_db_name)
+    if not os.path.exists(src_path):
+        return {'error': 'not_found'}
+
+    with sqlite3.connect(src_path) as src:
+        rows = src.execute("""
+            SELECT url, is_not_interested, is_saved, saved_at, is_favorite, favorited_at
+            FROM job_postings
+            WHERE is_not_interested=1 OR is_saved=1 OR is_favorite=1
+        """).fetchall()
+
+    if not rows:
+        return {'error': 'empty'}
+
+    counts = {'ni': 0, 'sv': 0, 'fav': 0}
+    with sqlite3.connect(DB_PATH) as conn:
+        for url, ni, sv, sv_at, fav, fav_at in rows:
+            cur = conn.execute("""
+                UPDATE job_postings
+                SET is_not_interested=?, is_saved=?, saved_at=?, is_favorite=?, favorited_at=?
+                WHERE url=? AND is_not_interested=0 AND is_saved=0 AND is_favorite=0
+            """, (ni, sv, sv_at, fav, fav_at, url))
+            if cur.rowcount > 0:
+                if ni: counts['ni'] += 1
+                if sv: counts['sv'] += 1
+                if fav: counts['fav'] += 1
+        conn.commit()
+
+    logger.info(f"스와이프 마이그레이션: {src_db_name} → {_db_name}, {counts}")
+    return counts
+
+
+def _row_to_job(r) -> JobPosting:
+    return JobPosting(
+        url=r[0], title=r[1], company=r[2], source=r[3],
+        location=r[4] or "", experience=r[5] or "",
+        education=r[6] or "", salary=r[7] or "",
+        tech_stack=json.loads(r[8]) if r[8] else [],
+        job_type=r[9] or "", deadline=r[10] or "",
+        posted_date=r[11] or "", description=r[12] or "",
+        crawled_at=datetime.fromisoformat(r[13]),
+    )

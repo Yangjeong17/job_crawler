@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import List, Optional
 from models.job import JobPosting
 
@@ -79,5 +80,18 @@ class FilterService:
             return sorted(jobs, key=lambda j: j.company)
         elif sort_by == "source":
             return sorted(jobs, key=lambda j: j.source)
+        elif sort_by == "deadline":
+            def _deadline_key(j: JobPosting):
+                s = (j.deadline or "").replace("~", "").replace("까지", "").strip()
+                for fmt in ["%Y-%m-%d", "%Y.%m.%d", "%Y/%m/%d", "%m/%d", "%m.%d"]:
+                    try:
+                        d = datetime.strptime(s, fmt)
+                        if d.year == 1900:
+                            d = d.replace(year=datetime.now().year)
+                        return d
+                    except ValueError:
+                        continue
+                return datetime.max  # 파싱 불가(상시채용 등) → 맨 뒤
+            return sorted(jobs, key=_deadline_key)
         else:
             return sorted(jobs, key=lambda j: j.crawled_at, reverse=True)

@@ -222,13 +222,43 @@ class JobKoreaCrawler(BaseCrawler):
                 ".//span[contains(., '경력') or contains(., '신입') or contains(., '년↑') or contains(., '년 이상')]"
             )
 
-        # 마감일
-        deadline_selectors = [".date", ".deadline", ".end-date", "span[class*='text-gray500']"]
+        # 마감일 / 등록일
+        # safe_get_text는 첫 번째 요소만 반환하므로, find_elements로 전체 순회
         deadline = ""
-        for sel in deadline_selectors:
-            deadline = self.safe_get_text(card, sel)
-            if deadline and re.search(r"마감|상시|채용시|\d{1,2}[./]\d{1,2}", deadline):
-                break
+        posted_date = ""
+        date_selectors = ["span[class*='text-gray']", ".date", ".deadline", ".end-date"]
+        for sel in date_selectors:
+            try:
+                date_els = card.find_elements(By.CSS_SELECTOR, sel)
+                for el in date_els:
+                    text = el.text.strip()
+                    if not text:
+                        continue
+                    if not deadline and re.search(r"마감|상시|채용시", text):
+                        # 마감 바로 앞 날짜 추출: "06/22(월) 등록\n•\n08/21(금) 마감" → "08/21"
+                        dm = re.search(r'(\d{1,2}[./]\d{1,2})(?:\([^)]*\))?\s*마감', text)
+                        if dm:
+                            deadline = dm.group(1)
+                        elif re.search(r'상시|채용시', text):
+                            deadline = "상시채용"
+                    if not posted_date and "등록" in text:
+                        # 등록 바로 앞 날짜 추출: "06/22(월) 등록" → "06/22"
+                        pm = re.search(r'(\d{1,2}[./]\d{1,2})(?:\([^)]*\))?\s*등록', text)
+                        if pm:
+                            posted_date = pm.group(1)
+                if deadline:
+                    break
+            except Exception:
+                continue
+
+        # 직종 카테고리: 위치/경력/학력/혜택 제외한 짧은 항목
+        _benefit_kws = ["지원", "보험", "제도", "수당", "식사", "할인", "연차", "반차", "복지", "상여", "인센티브"]
+        job_categories = [
+            t for t in description_parts
+            if t not in (location, experience, education)
+            and len(t) < 25
+            and not any(kw in t for kw in _benefit_kws)
+        ]
 
         return JobPosting(
             title=title,
@@ -239,7 +269,8 @@ class JobKoreaCrawler(BaseCrawler):
             experience=experience,
             education=education,
             deadline=deadline,
-            description=", ".join(dict.fromkeys(description_parts))
+            posted_date=posted_date,
+            description=", ".join(dict.fromkeys(job_categories))
         )
 
     def _normalize_card(self, item):

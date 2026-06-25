@@ -85,12 +85,13 @@ class JobPosting:
         #     if keyword_lower not in searchable:
         #         log_fail("키워드")
         #         return False
-        if keyword:
-            searchable = f"{self.title} {self.company} {self.description}".lower()
-            keywords = keyword.lower().split()
-            if not all(kw in searchable for kw in keywords):
-                log_fail("키워드")
-                return False
+        # 키워드 필터는 사이트 URL 검색(서버 측)에서 이미 적용됨 — 내부 재필터 제거
+        # if keyword:
+        #     searchable = f"{self.title} {self.company} {self.description}".lower()
+        #     keywords = keyword.lower().split()
+        #     if not all(kw in searchable for kw in keywords):
+        #         log_fail("키워드")
+        #         return False
 
         # 직종
         # if category and category != "전체":

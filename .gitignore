@@ -23,3 +23,7 @@ dist/
 # 🖥️ OS Specific
 .DS_Store
 Thumbs.db
+
+# 🗄️ Local DB & runtime state
+*.db
+.last_db

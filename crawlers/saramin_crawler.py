@@ -1,3 +1,4 @@
+import re
 import time
 import logging
 from typing import List
@@ -176,8 +177,18 @@ class SaraminCrawler(BaseCrawler):
         # 마감일
         deadline = self.safe_get_text(item, ".job_date .date")
 
-        # 기술 스택 (직무 분야에서 추출)
-        sector = self.safe_get_text(item, ".job_sector")
+        # 직무 분야 (카테고리 태그 + 기술스택 추출에 사용)
+        sector_raw = self.safe_get_text(item, ".job_sector") or ""
+
+        # 등록일/수정일 추출 (sector 텍스트에 포함된 경우)
+        posted_date = ""
+        m = re.search(r'(?:등록일|수정일)\s*(\d{2})[./](\d{2})[./](\d{2})', sector_raw)
+        if m:
+            posted_date = f"20{m.group(1)}-{m.group(2)}-{m.group(3)}"
+
+        # 날짜 텍스트 제거한 깨끗한 sector 텍스트
+        sector = re.sub(r'(?:등록일|수정일)\s*\d{2}[./]\d{2}[./]\d{2}', '', sector_raw).strip().strip(',').strip()
+
         tech_stack = []
         if sector:
             known_stacks = Config.TECH_STACKS
@@ -185,8 +196,10 @@ class SaraminCrawler(BaseCrawler):
                 if tech.lower() in sector.lower():
                     tech_stack.append(tech)
 
-        # 연봉
-        salary = self.safe_get_text(item, ".area_job .job_salary")
+        # 연봉 ("합격 시 N만원" 형태는 채용 보상금이므로 제거)
+        salary = self.safe_get_text(item, ".area_job .job_salary") or ""
+        if "합격 시" in salary:
+            salary = ""
 
         return JobPosting(
             title=title,
@@ -200,5 +213,6 @@ class SaraminCrawler(BaseCrawler):
             tech_stack=tech_stack,
             job_type=job_type,
             deadline=deadline,
+            posted_date=posted_date,
             description=sector
         )

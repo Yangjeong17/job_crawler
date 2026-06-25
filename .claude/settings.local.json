@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c \\\\\"import ast; ast.parse\\(open\\('gui/app.py', encoding='utf-8'\\).read\\(\\)\\); print\\('OK'\\)\\\\\"\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c \\\\\"import ast; ast.parse\\(open\\('services/db_service.py', encoding='utf-8'\\).read\\(\\)\\); print\\('OK'\\)\\\\\"\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c \\\\\"import ast; ast.parse\\(open\\('main.py', encoding='utf-8'\\).read\\(\\)\\); print\\('main.py OK'\\); ast.parse\\(open\\('services/db_service.py', encoding='utf-8'\\).read\\(\\)\\); print\\('db_service.py OK'\\)\\\\\"\")",
+      "Bash(wsl -e bash -c 'cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c \" *)",
+      "Bash(wsl -e bash -c \"cat -n /home/yj/Base/Dev/mini_project/JobHub/gui/app.py\")",
+      "Bash(wsl -e bash -c \"python3 -c \\\\\"import ast; ast.parse\\(open\\('/home/yj/Base/Dev/mini_project/JobHub/gui/app.py', encoding='utf-8'\\).read\\(\\)\\); print\\('OK'\\)\\\\\"\")",
+      "Bash(wsl -e bash -c \"cat -n /home/yj/Base/Dev/mini_project/JobHub/services/filter_service.py\")",
+      "Bash(wsl -e bash -c \"python3 -c \\\\\"import ast; [ast.parse\\(open\\(f, encoding='utf-8'\\).read\\(\\)\\) or print\\(f+' OK'\\) for f in ['gui/app.py','services/filter_service.py']]\\\\\" && echo 'all OK'\")",
+      "Bash(wsl -e bash -c \"cat -n /home/yj/Base/Dev/mini_project/JobHub/crawlers/saramin_crawler.py | tail -60\")",
+      "Bash(wsl -e bash -c \"cat -n /home/yj/Base/Dev/mini_project/JobHub/crawlers/jobkorea_crawler.py | sed -n '188,243p'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"crawlers/saramin_crawler.py\\\\\", \\\\\"crawlers/jobkorea_crawler.py\\\\\", \\\\\"gui/app.py\\\\\"]]'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"crawlers/jobkorea_crawler.py\\\\\", \\\\\"services/db_service.py\\\\\", \\\\\"gui/app.py\\\\\"]]'\")",
+      "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && python3 -c 'import ast; [ast.parse\\(open\\(f, encoding=\\\\\"utf-8\\\\\"\\).read\\(\\)\\) and print\\(f, \\\\\"OK\\\\\"\\) for f in [\\\\\"services/db_service.py\\\\\", \\\\\"gui/app.py\\\\\"]]'\")",
+      "Bash(wsl -e bash -c \"grep -n 'load_search_history\\\\|list_db_files\\\\|migrate_swipe' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
+      "Bash(wsl -e bash -c \"find /home/yj/Base/Dev/mini_project/JobHub -name '__pycache__' -exec rm -rf {} + 2>/dev/null; echo 'done'\")"
+    ]
+  }
+}
