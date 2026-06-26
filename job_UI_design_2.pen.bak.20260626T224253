@@ -210,522 +210,36 @@
       "children": [
         {
           "type": "frame",
-          "id": "Qtzye",
-          "x": 0,
-          "y": 0,
-          "name": "Frame 8",
-          "width": 1172,
+          "id": "S3Azsm",
+          "x": 17,
+          "y": 16,
+          "name": "Card Info",
+          "width": 857,
+          "height": 107,
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "qCukU",
+          "x": 874,
+          "y": 16,
+          "name": "Card Right",
+          "width": 278,
+          "height": 107,
+          "layout": "vertical",
+          "gap": 8,
+          "alignItems": "end"
+        },
+        {
+          "id": "Kvp9B",
+          "type": "ref",
+          "ref": "HUsZZ",
+          "name": "D Badge",
+          "enabled": false,
+          "width": 72,
           "height": 139,
-          "alignItems": "center",
-          "children": [
-            {
-              "id": "Kvp9B",
-              "type": "ref",
-              "ref": "HUsZZ",
-              "name": "D Badge",
-              "enabled": true,
-              "width": 72,
-              "height": 139,
-              "x": 0,
-              "y": 0
-            },
-            {
-              "type": "frame",
-              "id": "S3Azsm",
-              "name": "Card Info",
-              "width": 792,
-              "height": 107,
-              "layout": "none",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "i93gR",
-                  "x": 10,
-                  "y": 67,
-                  "name": "info bottom",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "a4CYq",
-                      "name": "info 1",
-                      "width": 270,
-                      "height": 41,
-                      "layout": "vertical",
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "K5u9xC",
-                          "name": "Frame 6",
-                          "padding": [
-                            2,
-                            0
-                          ],
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "Q4iwMB",
-                              "name": "Company",
-                              "fill": "$--brand-primary",
-                              "content": "카카오페이 주식회사",
-                              "fontFamily": "$--font-primary",
-                              "fontSize": 12,
-                              "fontWeight": "600"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "nOEMb",
-                          "name": "Frame 7",
-                          "padding": [
-                            2,
-                            0
-                          ],
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "qEFJT",
-                              "fill": "$--muted-foreground",
-                              "content": "서울 강남구",
-                              "fontFamily": "$--font-primary",
-                              "fontSize": 11,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "I9yhiP",
-                      "name": "info 2",
-                      "width": "fit_content(490)",
-                      "layout": "vertical",
-                      "children": [
-                        {
-                          "type": "frame",
-                          "id": "K0lIET",
-                          "name": "Role Row",
-                          "width": "fill_container",
-                          "gap": 6,
-                          "padding": [
-                            2,
-                            0
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "frame",
-                              "id": "QStJV",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "sH8yn",
-                                  "fill": "$--foreground",
-                                  "content": "전략기획",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "dBAqm",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "d2vZZ",
-                                  "fill": "$--foreground",
-                                  "content": "경영지원",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "U2Jtq",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "mwn8D",
-                                  "fill": "$--foreground",
-                                  "content": "R&D",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "visuB",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "Skk2C",
-                                  "fill": "$--foreground",
-                                  "content": "QA/QC",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "frame",
-                          "id": "Xzcmq",
-                          "name": "Skill Row",
-                          "width": "fill_container",
-                          "gap": 6,
-                          "padding": [
-                            2,
-                            0
-                          ],
-                          "alignItems": "center",
-                          "children": [
-                            {
-                              "type": "frame",
-                              "id": "FdCFR",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "F4yF0B",
-                                  "fill": "$--foreground",
-                                  "content": "Python",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "Wmc71",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "QqMz0",
-                                  "fill": "$--foreground",
-                                  "content": "FastAPI",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "wieLC",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "BQS04",
-                                  "fill": "$--foreground",
-                                  "content": "PostgreSQL",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "frame",
-                              "id": "Qf0xu",
-                              "fill": "$--secondary",
-                              "cornerRadius": 4,
-                              "padding": [
-                                2,
-                                6
-                              ],
-                              "alignItems": "center",
-                              "children": [
-                                {
-                                  "type": "text",
-                                  "id": "TwYC8",
-                                  "fill": "$--foreground",
-                                  "content": "Redis",
-                                  "fontFamily": "$--font-primary",
-                                  "fontSize": 10,
-                                  "fontWeight": "normal"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "text",
-                  "id": "mdI4E",
-                  "x": 10,
-                  "y": 34,
-                  "name": "Job Title",
-                  "fill": "$--foreground",
-                  "content": "백엔드 개발자 (Python/FastAPI)",
-                  "fontFamily": "$--font-primary",
-                  "fontSize": 14,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "frame",
-                  "id": "x1Eb5F",
-                  "x": 10,
-                  "y": 0,
-                  "name": "Title Row",
-                  "width": "fill_container(847)",
-                  "gap": 8,
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "Pm10S",
-                      "name": "Tag 사람인",
-                      "fill": "$--color-info",
-                      "cornerRadius": 4,
-                      "padding": [
-                        2,
-                        6
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "m8C5j0",
-                          "fill": "$--color-info-foreground",
-                          "content": "사람인",
-                          "fontFamily": "$--font-primary",
-                          "fontSize": 10,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "s0ibx",
-                      "name": "Tag Dday",
-                      "fill": "$--color-info",
-                      "cornerRadius": 4,
-                      "padding": [
-                        2,
-                        6
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "rJyG0",
-                          "fill": "$--color-info-foreground",
-                          "content": "~ 06/30",
-                          "fontFamily": "$--font-primary",
-                          "fontSize": 10,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "qCukU",
-              "layoutPosition": "absolute",
-              "x": 864,
-              "y": 16,
-              "name": "Card Right",
-              "width": 278,
-              "height": 107,
-              "layout": "vertical",
-              "gap": 6,
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "iEPCK",
-                  "name": "tab Btn",
-                  "padding": [
-                    10,
-                    0
-                  ],
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "TEuTk",
-                      "name": "Frame 2",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "cBD1r",
-                          "type": "ref",
-                          "ref": "Q8kChv",
-                          "name": "Btn 관심없음",
-                          "x": 2,
-                          "y": 0,
-                          "padding": [
-                            6,
-                            12
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "RCj0m",
-                      "name": "Frame 3",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "x7C8XR",
-                          "type": "ref",
-                          "ref": "bQcv6",
-                          "name": "Btn 저장",
-                          "x": 2,
-                          "y": 0
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "wmCuN",
-                      "name": "Frame 5",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "CW62o",
-                          "type": "ref",
-                          "ref": "UCn9e",
-                          "name": "Btn 즐겨찾기",
-                          "x": 2,
-                          "y": 0
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "D3om1x",
-                      "name": "Frame 4",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "RyixQ",
-                          "type": "ref",
-                          "ref": "W6w5q",
-                          "name": "Btn 공고보기",
-                          "x": 2,
-                          "y": 0,
-                          "stroke": []
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "CV4EK",
-                  "name": "Btn AI 전체분석",
-                  "width": 276,
-                  "fill": "$--color-info",
-                  "cornerRadius": 8,
-                  "gap": 6,
-                  "padding": [
-                    10,
-                    12
-                  ],
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "Fz0D8",
-                      "width": 12,
-                      "height": 12,
-                      "icon": "sparkles",
-                      "library": "lucide",
-                      "fill": "$--color-info-foreground"
-                    },
-                    {
-                      "type": "text",
-                      "id": "csfOi",
-                      "fill": "$--color-info-foreground",
-                      "content": "AI 분석",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 12,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          "x": 0,
+          "y": 0
         }
       ]
     },
@@ -1185,7 +699,7 @@
           "height": 40,
           "layout": "vertical",
           "padding": [
-            10,
+            0,
             16
           ],
           "justifyContent": "center",
@@ -1226,28 +740,21 @@
         },
         {
           "type": "frame",
-          "id": "fx9Vr",
-          "name": "pedding",
-          "clip": true,
-          "width": 220,
-          "height": 9,
-          "fill": "$--sidebar",
-          "layout": "none"
-        },
-        {
-          "type": "frame",
           "id": "d3c5Vh",
           "name": "Sched Row",
           "width": "fill_container",
-          "height": 45,
-          "fill": "$--brand-primary-bg-hover",
-          "layout": "none",
+          "height": 36,
+          "fill": "$--secondary",
+          "gap": 8,
+          "padding": [
+            0,
+            10
+          ],
+          "alignItems": "center",
           "children": [
             {
               "type": "icon",
               "id": "Km20t",
-              "x": 16,
-              "y": 15.5,
               "width": 14,
               "height": 14,
               "icon": "calendar",
@@ -1257,12 +764,10 @@
             {
               "type": "text",
               "id": "zvDNY",
-              "x": 38,
-              "y": 12,
               "fill": "$--foreground",
               "content": "스케줄러",
               "fontFamily": "$--font-primary",
-              "fontSize": 15,
+              "fontSize": 13,
               "fontWeight": "normal"
             }
           ]
@@ -1383,17 +888,11 @@
           "id": "QubNd",
           "name": "History Section",
           "width": "fill_container",
-          "height": 35,
+          "height": 40,
           "fill": "$--card",
-          "stroke": "$--border",
-          "strokeWidth": {
-            "top": 1,
-            "right": 1,
-            "bottom": 1
-          },
           "gap": 8,
           "padding": [
-            10,
+            0,
             16
           ],
           "alignItems": "center",
@@ -1429,78 +928,54 @@
         },
         {
           "type": "frame",
-          "id": "Vf3xs",
-          "name": "Import Title Row",
-          "width": 220,
-          "height": 35,
-          "fill": "$--card",
-          "stroke": "$--border",
-          "strokeWidth": {
-            "right": 1
-          },
-          "gap": 8,
-          "padding": [
-            0,
-            16
-          ],
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon",
-              "id": "kOV7A",
-              "width": 12,
-              "height": 12,
-              "icon": "chevron-down",
-              "library": "lucide",
-              "fill": "$--muted-foreground"
-            },
-            {
-              "type": "icon",
-              "id": "PGKs8",
-              "width": 12,
-              "height": 12,
-              "icon": "folder-open",
-              "library": "lucide",
-              "fill": "$--primary"
-            },
-            {
-              "type": "text",
-              "id": "AZAvh",
-              "fill": "$--foreground",
-              "content": "이전 DB 스와이프 가져오기",
-              "fontFamily": "$--font-primary",
-              "fontSize": 12,
-              "fontWeight": "normal"
-            }
-          ]
-        },
-        {
-          "type": "frame",
           "id": "UDNiD",
           "name": "Import DB Section",
           "width": 220,
-          "height": 107,
-          "fill": "$import-db-bg",
-          "cornerRadius": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "stroke": "$--border",
-          "strokeWidth": {
-            "bottom": 1
-          },
-          "strokeAlignment": "inner",
+          "fill": "#00000000",
           "layout": "vertical",
           "gap": 8,
           "padding": [
-            8,
-            16,
             12,
             16
           ],
           "children": [
+            {
+              "type": "frame",
+              "id": "Vf3xs",
+              "name": "Import Title Row",
+              "width": "fill_container",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "kOV7A",
+                  "width": 12,
+                  "height": 12,
+                  "icon": "chevron-down",
+                  "library": "lucide",
+                  "fill": "$--muted-foreground"
+                },
+                {
+                  "type": "icon",
+                  "id": "PGKs8",
+                  "width": 12,
+                  "height": 12,
+                  "icon": "folder-open",
+                  "library": "lucide",
+                  "fill": "$--primary"
+                },
+                {
+                  "type": "text",
+                  "id": "AZAvh",
+                  "fill": "$--foreground",
+                  "content": "이전 DB 스와이프 가져오기",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
             {
               "type": "frame",
               "id": "jQtx2",
@@ -5313,8 +4788,8 @@
     {
       "type": "frame",
       "id": "O8SLy6",
-      "x": 894,
-      "y": 90,
+      "x": 54,
+      "y": 353,
       "name": "State – 왼쪽 스와이프",
       "clip": true,
       "width": 680,
@@ -5324,14 +4799,26 @@
       "layout": "none",
       "children": [
         {
+          "type": "text",
+          "id": "QPNW2",
+          "x": 28,
+          "y": 24,
+          "name": "Label",
+          "fill": "$--destructive",
+          "content": "← 왼쪽 스와이프: 관심없음",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
           "type": "rectangle",
           "cornerRadius": 16,
           "id": "b0oec",
-          "x": 30.000000000000114,
-          "y": 29.999999999999886,
+          "x": 30,
+          "y": 30,
           "name": "Card BG",
           "opacity": 0.5,
-          "rotation": -1.6300342742500524e-14,
+          "rotation": 3.0000000000000004,
           "fill": "$--card",
           "width": 620,
           "height": 420,
@@ -5341,28 +4828,27 @@
         {
           "type": "frame",
           "id": "C7HKZT",
-          "x": -38,
-          "y": 160.46780796356285,
+          "x": -60,
+          "y": 160,
           "name": "Card Group",
           "rotation": 14.999999999999998,
           "width": 620,
-          "height": 345,
-          "fill": "$swipe-left",
+          "height": 420,
           "cornerRadius": 12,
-          "stroke": "$swipe-left",
+          "stroke": "$--border",
           "strokeWidth": 1,
           "layout": "none",
           "children": [
             {
               "type": "frame",
               "id": "b3e626ea",
-              "x": -0.25881904510254117,
-              "y": 0.9659258262890944,
+              "x": 0,
+              "y": 0,
               "name": "Job Card",
               "width": 620,
-              "fill": "$swipe-left",
+              "fill": "$--card",
               "cornerRadius": 12,
-              "stroke": "$swipe-left-surface",
+              "stroke": "$--border",
               "strokeWidth": 1,
               "layout": "vertical",
               "gap": 12,
@@ -5376,14 +4862,65 @@
                   "id": "fac71c89",
                   "name": "Card Header",
                   "width": 560,
-                  "height": "fit_content(17)",
                   "justifyContent": "space_between",
-                  "alignItems": "center"
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "deb0b548",
+                      "name": "Tag 사람인",
+                      "fill": "$--color-info",
+                      "cornerRadius": 4,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "824da6f1",
+                          "fill": "$--color-info-foreground",
+                          "content": "사람인",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8a947d03",
+                      "name": "D Badge",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "8f63e7d7",
+                          "fill": "$--destructive",
+                          "content": "⊘",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "58c665ba",
+                          "fill": "$--destructive",
+                          "content": "D-3",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "type": "text",
                   "id": "ad986571",
-                  "fill": "$swipe-left-text",
+                  "fill": "$--foreground",
                   "textGrowth": "fixed-width",
                   "width": 560,
                   "content": "백엔드 개발자 (Python/FastAPI)",
@@ -5394,7 +4931,7 @@
                 {
                   "type": "text",
                   "id": "7c836046",
-                  "fill": "$swipe-left-text",
+                  "fill": "$--brand-primary",
                   "content": "카카오페이 주식회사",
                   "fontFamily": "$--font-primary",
                   "fontSize": 13,
@@ -5411,7 +4948,7 @@
                     {
                       "type": "text",
                       "id": "f8185b5e",
-                      "fill": "$swipe-left-sub",
+                      "fill": "$--muted-foreground",
                       "content": "서울 강남구",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5420,7 +4957,7 @@
                     {
                       "type": "text",
                       "id": "77966c7c",
-                      "fill": "$swipe-left-sub",
+                      "fill": "$--muted-foreground",
                       "content": "경력 3~5년",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5429,7 +4966,7 @@
                     {
                       "type": "text",
                       "id": "5054533a",
-                      "fill": "$swipe-left-sub",
+                      "fill": "$--muted-foreground",
                       "content": "학력 무관",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5441,7 +4978,7 @@
                   "type": "rectangle",
                   "id": "cb96b251",
                   "name": "Divider",
-                  "fill": "$swipe-left-surface",
+                  "fill": "$--border",
                   "width": 560,
                   "height": 1
                 },
@@ -5456,7 +4993,7 @@
                     {
                       "type": "text",
                       "id": "e66a2244",
-                      "fill": "$swipe-left-sub",
+                      "fill": "$--muted-foreground",
                       "content": "기술 스택",
                       "fontFamily": "$--font-primary",
                       "fontSize": 11,
@@ -5471,7 +5008,7 @@
                         {
                           "type": "frame",
                           "id": "833a9cf2",
-                          "fill": "$swipe-left-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5482,7 +5019,7 @@
                             {
                               "type": "text",
                               "id": "c4a9bfd9",
-                              "fill": "$swipe-left-text",
+                              "fill": "$--foreground",
                               "content": "Python",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5493,7 +5030,7 @@
                         {
                           "type": "frame",
                           "id": "70259615",
-                          "fill": "$swipe-left-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5504,7 +5041,7 @@
                             {
                               "type": "text",
                               "id": "0d8a558c",
-                              "fill": "$swipe-left-text",
+                              "fill": "$--foreground",
                               "content": "FastAPI",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5515,7 +5052,7 @@
                         {
                           "type": "frame",
                           "id": "0afc1bf3",
-                          "fill": "$swipe-left-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5526,7 +5063,7 @@
                             {
                               "type": "text",
                               "id": "9d0d0c9b",
-                              "fill": "$swipe-left-text",
+                              "fill": "$--foreground",
                               "content": "PostgreSQL",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5537,7 +5074,7 @@
                         {
                           "type": "frame",
                           "id": "182da7f6",
-                          "fill": "$swipe-left-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5548,7 +5085,7 @@
                             {
                               "type": "text",
                               "id": "cfa6c264",
-                              "fill": "$swipe-left-text",
+                              "fill": "$--foreground",
                               "content": "Redis",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5559,7 +5096,7 @@
                         {
                           "type": "frame",
                           "id": "f5bf85b4",
-                          "fill": "$swipe-left-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5570,7 +5107,7 @@
                             {
                               "type": "text",
                               "id": "4bd536ec",
-                              "fill": "$swipe-left-text",
+                              "fill": "$--foreground",
                               "content": "Docker",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5581,7 +5118,7 @@
                         {
                           "type": "frame",
                           "id": "24e2b9c9",
-                          "fill": "$swipe-left-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5592,7 +5129,7 @@
                             {
                               "type": "text",
                               "id": "a58686d3",
-                              "fill": "$swipe-left-text",
+                              "fill": "$--foreground",
                               "content": "AWS",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5615,8 +5152,8 @@
                     {
                       "type": "text",
                       "id": "619803a3",
-                      "fill": "$swipe-left-sub",
-                      "content": "공고 내용",
+                      "fill": "$--muted-foreground",
+                      "content": "채용 내용",
                       "fontFamily": "$--font-primary",
                       "fontSize": 11,
                       "fontWeight": "600"
@@ -5624,7 +5161,7 @@
                     {
                       "type": "text",
                       "id": "d64a05d1",
-                      "fill": "$swipe-left-text",
+                      "fill": "$--foreground",
                       "textGrowth": "fixed-width",
                       "width": "fill_container",
                       "content": "결제 및 금융 서비스의 백엔드 시스템을 설계하고 개발합니다. 대규모 트래픽을 처리하는 안정적인 API를 구축하며, 마이크로서비스 아키텍처 기반의 서비스를 운영합니다.",
@@ -5639,7 +5176,7 @@
                   "id": "358889e9",
                   "name": "Salary Bar",
                   "width": 560,
-                  "fill": "$swipe-left-surface",
+                  "fill": "$--secondary",
                   "cornerRadius": 8,
                   "gap": 8,
                   "padding": [
@@ -5655,12 +5192,12 @@
                       "height": 14,
                       "icon": "banknote",
                       "library": "lucide",
-                      "fill": "$swipe-left-sub"
+                      "fill": "$--muted-foreground"
                     },
                     {
                       "type": "text",
                       "id": "6d11b35b",
-                      "fill": "$swipe-left-text",
+                      "fill": "$--foreground",
                       "content": "연봉 협의",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5671,63 +5208,14 @@
               ]
             }
           ]
-        },
-        {
-          "type": "frame",
-          "id": "c0vFd",
-          "x": 240,
-          "y": 140,
-          "name": "Swipe Circle",
-          "width": 200,
-          "height": 200,
-          "fill": "$--color-error",
-          "cornerRadius": 100,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#00000080",
-            "offset": {
-              "x": 0,
-              "y": 8
-            },
-            "blur": 32
-          },
-          "layout": "vertical",
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon",
-              "id": "n3TxpG",
-              "width": 40,
-              "height": 40,
-              "icon": "thumbs-down",
-              "library": "lucide",
-              "fill": "$swipe-left-text"
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "id": "dsLRT",
-          "x": 0,
-          "y": 273,
-          "fill": "$swipe-left-text",
-          "textGrowth": "fixed-width",
-          "width": 680,
-          "content": "관심없음",
-          "textAlign": "center",
-          "fontFamily": "$--font-primary",
-          "fontSize": 15,
-          "fontWeight": "600"
         }
       ]
     },
     {
       "type": "frame",
       "id": "xyWdx",
-      "x": 1654,
-      "y": 90,
+      "x": 2414,
+      "y": 33,
       "name": "State – 오른쪽 스와이프",
       "clip": true,
       "width": 680,
@@ -5737,14 +5225,26 @@
       "layout": "none",
       "children": [
         {
+          "type": "text",
+          "id": "M7ULU",
+          "x": 28,
+          "y": 24,
+          "name": "Label",
+          "fill": "$--color-success-foreground",
+          "content": "→ 오른쪽 스와이프: 저장",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
           "type": "rectangle",
           "cornerRadius": 16,
           "id": "jG7K9",
           "x": 30,
-          "y": 30.000000000000085,
+          "y": 30,
           "name": "Card BG",
           "opacity": 0.5,
-          "rotation": -360,
+          "rotation": -3.0000000000000004,
           "fill": "$--card",
           "width": 620,
           "height": 420,
@@ -5754,15 +5254,14 @@
         {
           "type": "frame",
           "id": "LBvnd",
-          "x": 119.29257056036977,
-          "y": -44,
+          "x": 130,
+          "y": -40,
           "name": "Card Group",
           "rotation": -14.999999999999998,
           "width": 620,
-          "height": 345,
-          "fill": "$swipe-right",
+          "height": 420,
           "cornerRadius": 12,
-          "stroke": "$swipe-right",
+          "stroke": "$--border",
           "strokeWidth": 1,
           "layout": "none",
           "children": [
@@ -5773,9 +5272,9 @@
               "y": 0,
               "name": "Job Card",
               "width": 620,
-              "fill": "$swipe-right",
+              "fill": "$--card",
               "cornerRadius": 12,
-              "stroke": "$swipe-right-surface",
+              "stroke": "$--border",
               "strokeWidth": 1,
               "layout": "vertical",
               "gap": 12,
@@ -5789,14 +5288,65 @@
                   "id": "61a52283",
                   "name": "Card Header",
                   "width": 560,
-                  "height": "fit_content(17)",
                   "justifyContent": "space_between",
-                  "alignItems": "center"
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "c3ec1885",
+                      "name": "Tag 사람인",
+                      "fill": "$--color-info",
+                      "cornerRadius": 4,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "18de36be",
+                          "fill": "$--color-info-foreground",
+                          "content": "사람인",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "5838eade",
+                      "name": "D Badge",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "143d3429",
+                          "fill": "$--destructive",
+                          "content": "⊘",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "e4f5b757",
+                          "fill": "$--destructive",
+                          "content": "D-3",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 12,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "type": "text",
                   "id": "c8f75649",
-                  "fill": "$swipe-right-text",
+                  "fill": "$--foreground",
                   "textGrowth": "fixed-width",
                   "width": 560,
                   "content": "백엔드 개발자 (Python/FastAPI)",
@@ -5807,7 +5357,7 @@
                 {
                   "type": "text",
                   "id": "2c0e210f",
-                  "fill": "$swipe-right-text",
+                  "fill": "$--brand-primary",
                   "content": "카카오페이 주식회사",
                   "fontFamily": "$--font-primary",
                   "fontSize": 13,
@@ -5824,7 +5374,7 @@
                     {
                       "type": "text",
                       "id": "1fd5a08f",
-                      "fill": "$swipe-right-sub",
+                      "fill": "$--muted-foreground",
                       "content": "서울 강남구",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5833,7 +5383,7 @@
                     {
                       "type": "text",
                       "id": "dff30390",
-                      "fill": "$swipe-right-sub",
+                      "fill": "$--muted-foreground",
                       "content": "경력 3~5년",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5842,7 +5392,7 @@
                     {
                       "type": "text",
                       "id": "ba3c1b94",
-                      "fill": "$swipe-right-sub",
+                      "fill": "$--muted-foreground",
                       "content": "학력 무관",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -5854,7 +5404,7 @@
                   "type": "rectangle",
                   "id": "a6731842",
                   "name": "Divider",
-                  "fill": "$swipe-right-surface",
+                  "fill": "$--border",
                   "width": 560,
                   "height": 1
                 },
@@ -5869,7 +5419,7 @@
                     {
                       "type": "text",
                       "id": "db417a27",
-                      "fill": "$swipe-right-sub",
+                      "fill": "$--muted-foreground",
                       "content": "기술 스택",
                       "fontFamily": "$--font-primary",
                       "fontSize": 11,
@@ -5884,7 +5434,7 @@
                         {
                           "type": "frame",
                           "id": "347d839a",
-                          "fill": "$swipe-right-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5895,7 +5445,7 @@
                             {
                               "type": "text",
                               "id": "0fde3633",
-                              "fill": "$swipe-right-text",
+                              "fill": "$--foreground",
                               "content": "Python",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5906,7 +5456,7 @@
                         {
                           "type": "frame",
                           "id": "aa9cb8e0",
-                          "fill": "$swipe-right-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5917,7 +5467,7 @@
                             {
                               "type": "text",
                               "id": "1b8f0013",
-                              "fill": "$swipe-right-text",
+                              "fill": "$--foreground",
                               "content": "FastAPI",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5928,7 +5478,7 @@
                         {
                           "type": "frame",
                           "id": "7dc7d4a6",
-                          "fill": "$swipe-right-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5939,7 +5489,7 @@
                             {
                               "type": "text",
                               "id": "8734c8e3",
-                              "fill": "$swipe-right-text",
+                              "fill": "$--foreground",
                               "content": "PostgreSQL",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5950,7 +5500,7 @@
                         {
                           "type": "frame",
                           "id": "8127167c",
-                          "fill": "$swipe-right-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5961,7 +5511,7 @@
                             {
                               "type": "text",
                               "id": "e4980381",
-                              "fill": "$swipe-right-text",
+                              "fill": "$--foreground",
                               "content": "Redis",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5972,7 +5522,7 @@
                         {
                           "type": "frame",
                           "id": "78ca7342",
-                          "fill": "$swipe-right-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -5983,7 +5533,7 @@
                             {
                               "type": "text",
                               "id": "63a7c352",
-                              "fill": "$swipe-right-text",
+                              "fill": "$--foreground",
                               "content": "Docker",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -5994,7 +5544,7 @@
                         {
                           "type": "frame",
                           "id": "25c9719e",
-                          "fill": "$swipe-right-surface",
+                          "fill": "$--secondary",
                           "cornerRadius": 4,
                           "padding": [
                             3,
@@ -6005,7 +5555,7 @@
                             {
                               "type": "text",
                               "id": "56c2beda",
-                              "fill": "$swipe-right-text",
+                              "fill": "$--foreground",
                               "content": "AWS",
                               "fontFamily": "$--font-primary",
                               "fontSize": 11,
@@ -6028,8 +5578,8 @@
                     {
                       "type": "text",
                       "id": "9f6806ce",
-                      "fill": "$swipe-right-sub",
-                      "content": "공고 내용",
+                      "fill": "$--muted-foreground",
+                      "content": "채용 내용",
                       "fontFamily": "$--font-primary",
                       "fontSize": 11,
                       "fontWeight": "600"
@@ -6037,7 +5587,7 @@
                     {
                       "type": "text",
                       "id": "596029e3",
-                      "fill": "$swipe-right-text",
+                      "fill": "$--foreground",
                       "textGrowth": "fixed-width",
                       "width": "fill_container",
                       "content": "결제 및 금융 서비스의 백엔드 시스템을 설계하고 개발합니다. 대규모 트래픽을 처리하는 안정적인 API를 구축하며, 마이크로서비스 아키텍처 기반의 서비스를 운영합니다.",
@@ -6052,7 +5602,7 @@
                   "id": "e3d5a5bc",
                   "name": "Salary Bar",
                   "width": 560,
-                  "fill": "$swipe-right-surface",
+                  "fill": "$--secondary",
                   "cornerRadius": 8,
                   "gap": 8,
                   "padding": [
@@ -6068,12 +5618,12 @@
                       "height": 14,
                       "icon": "banknote",
                       "library": "lucide",
-                      "fill": "$swipe-right-sub"
+                      "fill": "$--muted-foreground"
                     },
                     {
                       "type": "text",
                       "id": "9757c15c",
-                      "fill": "$swipe-right-text",
+                      "fill": "$--foreground",
                       "content": "연봉 협의",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -6084,67 +5634,18 @@
               ]
             }
           ]
-        },
-        {
-          "type": "frame",
-          "id": "TG6rw",
-          "x": 240,
-          "y": 140,
-          "name": "Swipe Circle",
-          "width": 200,
-          "height": 200,
-          "fill": "$--color-success",
-          "cornerRadius": 100,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#00000080",
-            "offset": {
-              "x": 0,
-              "y": 8
-            },
-            "blur": 32
-          },
-          "layout": "vertical",
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon",
-              "id": "WAOVw",
-              "width": 40,
-              "height": 40,
-              "icon": "bookmark",
-              "library": "lucide",
-              "fill": "$swipe-right-text"
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "id": "KShYn",
-          "x": 0,
-          "y": 274,
-          "fill": "$swipe-right-text",
-          "textGrowth": "fixed-width",
-          "width": 680,
-          "content": "저장",
-          "textAlign": "center",
-          "fontFamily": "$--font-primary",
-          "fontSize": 15,
-          "fontWeight": "600"
         }
       ]
     },
     {
       "type": "frame",
       "id": "DLTyP",
-      "x": 894,
-      "y": 1259,
+      "x": 234,
+      "y": 1013,
       "name": "State – 덱 스와이프",
       "clip": true,
       "width": 720,
-      "height": 440,
+      "height": 520,
       "fill": "$--background",
       "cornerRadius": 16,
       "layout": "none",
@@ -6159,7 +5660,7 @@
           "opacity": 0.4,
           "fill": "$--card",
           "width": 620,
-          "height": 345,
+          "height": 420,
           "stroke": "$--border",
           "strokeWidth": 1
         },
@@ -6173,7 +5674,7 @@
           "opacity": 0.55,
           "fill": "$--card",
           "width": 620,
-          "height": 345,
+          "height": 420,
           "stroke": "$--border",
           "strokeWidth": 1
         },
@@ -6187,7 +5688,7 @@
           "opacity": 0.7,
           "fill": "$--card",
           "width": 620,
-          "height": 345,
+          "height": 420,
           "stroke": "$--border",
           "strokeWidth": 1
         },
@@ -6201,7 +5702,7 @@
           "opacity": 0.85,
           "fill": "$--card",
           "width": 620,
-          "height": 345,
+          "height": 420,
           "stroke": "$--border",
           "strokeWidth": 1
         },
@@ -6578,8 +6079,8 @@
     {
       "type": "frame",
       "id": "G79w0",
-      "x": 894,
-      "y": 665,
+      "x": 1734,
+      "y": 1013,
       "name": "State – 슈퍼라이크",
       "clip": true,
       "width": 700,
@@ -6589,13 +6090,25 @@
       "layout": "none",
       "children": [
         {
+          "type": "text",
+          "id": "sPWAh",
+          "x": 28,
+          "y": 20,
+          "name": "Label",
+          "fill": "$--brand-primary-glow",
+          "content": "★  즐겨찾기 → 파란색 확대 (슈퍼라이크)",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        },
+        {
           "type": "frame",
           "id": "xiIMR",
           "x": 40,
-          "y": 77.5,
+          "y": 60,
           "name": "Super Like Card",
           "width": 620,
-          "fill": "$--brand-primary-bg-hover",
+          "fill": "$--card",
           "cornerRadius": 20,
           "stroke": "$--border",
           "strokeWidth": 1,
@@ -6647,9 +6160,8 @@
                     {
                       "type": "text",
                       "id": "b88b66f4",
-                      "name": "📆",
-                      "fill": "$--accent",
-                      "content": "📆",
+                      "fill": "$--destructive",
+                      "content": "⊘",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -6657,7 +6169,7 @@
                     {
                       "type": "text",
                       "id": "c6d19f03",
-                      "fill": "$--accent",
+                      "fill": "$--destructive",
                       "content": "D-3",
                       "fontFamily": "$--font-primary",
                       "fontSize": 12,
@@ -6903,7 +6415,7 @@
                   "type": "text",
                   "id": "7f9965a9",
                   "fill": "$--muted-foreground",
-                  "content": "공고 내용",
+                  "content": "채용 내용",
                   "fontFamily": "$--font-primary",
                   "fontSize": 11,
                   "fontWeight": "600"
@@ -6956,62 +6468,14 @@
               ]
             }
           ]
-        },
-        {
-          "type": "frame",
-          "id": "kcfA4",
-          "x": 250,
-          "y": 150,
-          "name": "Super Circle",
-          "width": 200,
-          "height": 200,
-          "fill": "$--brand-primary-bg",
-          "cornerRadius": 100,
-          "effect": {
-            "type": "shadow",
-            "shadowType": "outer",
-            "color": "#3B82F650",
-            "blur": 40,
-            "spread": 16
-          },
-          "layout": "vertical",
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "NKBNE",
-              "name": "Star Emoji",
-              "fill": "#ffffff",
-              "content": "⭐",
-              "textAlign": "center",
-              "fontFamily": "$--font-primary",
-              "fontSize": 56,
-              "fontWeight": "normal"
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "id": "dfwAX",
-          "x": 0,
-          "y": 279,
-          "fill": "$--brand-primary-glow",
-          "textGrowth": "fixed-width",
-          "width": 700,
-          "content": "즐겨찾기",
-          "textAlign": "center",
-          "fontFamily": "$--font-primary",
-          "fontSize": 15,
-          "fontWeight": "600"
         }
       ]
     },
     {
       "type": "frame",
       "id": "SpnCj",
-      "x": 1654,
-      "y": 665,
+      "x": 2574,
+      "y": 1013,
       "name": "State – 실행취소",
       "clip": true,
       "width": 680,
@@ -7035,8 +6499,8 @@
         {
           "type": "frame",
           "id": "O13Yx",
-          "x": 30,
-          "y": 67.5,
+          "x": 50,
+          "y": 50,
           "name": "Returning Card",
           "width": 620,
           "fill": "$--card",
@@ -7055,17 +6519,13 @@
               "id": "4a3b4b45",
               "name": "Card Header",
               "width": 560,
-              "height": "fit_content(17)",
               "justifyContent": "space_between",
               "alignItems": "center",
               "children": [
                 {
                   "type": "frame",
                   "id": "9d8dd203",
-                  "x": 0,
-                  "y": 0,
                   "name": "Tag 사람인",
-                  "enabled": false,
                   "fill": "$--color-info",
                   "cornerRadius": 4,
                   "padding": [
@@ -7088,10 +6548,7 @@
                 {
                   "type": "frame",
                   "id": "ee27e25d",
-                  "x": 0,
-                  "y": 0,
                   "name": "D Badge",
-                  "enabled": false,
                   "gap": 4,
                   "alignItems": "center",
                   "children": [
@@ -7352,7 +6809,6 @@
                 {
                   "type": "text",
                   "id": "be4b9cb3",
-                  "name": "공고 내용",
                   "fill": "$--muted-foreground",
                   "content": "채용 내용",
                   "fontFamily": "$--font-primary",
@@ -7458,7 +6914,7 @@
           "type": "text",
           "id": "CHRrh",
           "x": 0,
-          "y": 275,
+          "y": 350,
           "fill": "$--white",
           "textGrowth": "fixed-width",
           "width": 680,
@@ -7690,42 +7146,6 @@
     "--overlay": {
       "type": "color",
       "value": "#0C1015"
-    },
-    "swipe-left": {
-      "type": "color",
-      "value": "#66373a"
-    },
-    "swipe-right": {
-      "type": "color",
-      "value": "#2c784b"
-    },
-    "swipe-left-text": {
-      "type": "color",
-      "value": "#f4c0c4"
-    },
-    "swipe-left-sub": {
-      "type": "color",
-      "value": "#9e6369"
-    },
-    "swipe-left-surface": {
-      "type": "color",
-      "value": "#7a4448"
-    },
-    "swipe-right-text": {
-      "type": "color",
-      "value": "#a8f0c6"
-    },
-    "swipe-right-sub": {
-      "type": "color",
-      "value": "#5fa87a"
-    },
-    "swipe-right-surface": {
-      "type": "color",
-      "value": "#3d8a5c"
-    },
-    "import-db-bg": {
-      "type": "color",
-      "value": "#353a40"
     }
   },
   "fileToken": "49e1db10-f077-48f5-b9c5-903f25cd633a"
