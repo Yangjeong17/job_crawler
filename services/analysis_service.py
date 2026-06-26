@@ -1,18 +1,23 @@
 import logging
+import os
+from dotenv import load_dotenv
 from models.job import JobPosting
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-_MODEL = "claude-haiku-4-5-20251001"
+# Bedrock cross-region inference profile ID for Claude Haiku 4.5
+_MODEL = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 _MAX_DESC = 2000
 
 
 def analyze_job(job: JobPosting) -> str:
-    """Claude API로 공고를 분석해 마크다운 문자열 반환. 실패 시 빈 문자열."""
+    """AWS Bedrock Claude Haiku로 공고를 분석해 마크다운 문자열 반환. 실패 시 오류 메시지."""
     try:
-        import anthropic
+        import boto3
     except ImportError:
-        return "⚠️ `anthropic` 패키지가 설치되지 않았습니다. `pip install anthropic`을 실행하세요."
+        return "⚠️ `boto3` 패키지가 설치되지 않았습니다. `pip install boto3`을 실행하세요."
 
     desc = (job.description or "")[:_MAX_DESC]
     stacks = ", ".join(job.tech_stack) if job.tech_stack else "없음"
@@ -48,13 +53,17 @@ def analyze_job(job: JobPosting) -> str:
 - 지원 전 확인하면 좋을 사항을 bullet로"""
 
     try:
-        client = anthropic.Anthropic()
-        message = client.messages.create(
-            model=_MODEL,
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
+        region = os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+        client = boto3.client("bedrock-runtime", region_name=region)
+        response = client.converse(
+            modelId=_MODEL,
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            inferenceConfig={"maxTokens": 1024},
         )
-        return message.content[0].text
+        return response["output"]["message"]["content"][0]["text"]
     except Exception as e:
         logger.error(f"공고 분석 실패 ({job.url}): {e}")
-        return f"⚠️ 분석 실패: {e}\n\nANTHROPIC_API_KEY가 .env에 설정되어 있는지 확인하세요."
+        return (
+            f"⚠️ 분석 실패: {e}\n\n"
+            "AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION이 .env에 설정되어 있는지 확인하세요."
+        )

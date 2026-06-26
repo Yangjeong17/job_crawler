@@ -97,7 +97,15 @@
       "Bash(wsl -e bash -c \"cd /home/yj/Base/Dev/mini_project/JobHub && ~/.local/bin/uvicorn api.main:app --port 8000 --timeout-graceful-shutdown 1 &  sleep 4 && curl -s http://localhost:8000/api/stats && kill %1 2>/dev/null; echo\")",
       "Bash(wsl -e bash -c \"grep -n 'get_job_by_url\\\\|def load_all_jobs' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
       "Bash(wsl -e bash -c \"sed -n '275,280p' /home/yj/Base/Dev/mini_project/JobHub/services/db_service.py\")",
-      "Bash(wsl -e *)"
+      "Bash(wsl -e *)",
+      "Bash(wsl -d Ubuntu -e bash -c 'pkill -f uvicorn 2>/dev/null; sleep 1 *)",
+      "Bash(wsl -d Ubuntu -e bash -c \"cat /tmp/uvicorn.log\")",
+      "Bash(wsl -d Ubuntu -e bash -c 'cd /home/yj/Base/Dev/mini_project/JobHub && JOBHUB_DB_NAME=jobs_swipe.db .venv/bin/uvicorn api.main:app --port 8000 > /tmp/uvicorn2.log 2>&1 & *)",
+      "Bash(wsl -d Ubuntu -e bash -c 'curl -s --max-time 90 -X POST http://localhost:8000/api/analyze   -H '\\\\''Content-Type: application/json'\\\\''   -d '\\\\''{\"url\": \"https://www.jobkorea.co.kr/Recruit/GI_Read/49429518\"}'\\\\''')",
+      "Bash(wsl -d Ubuntu -e bash -c \"cat /tmp/uvicorn2.log\")",
+      "Bash(wsl -d *)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)"
     ]
   }
 }

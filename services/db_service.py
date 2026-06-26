@@ -379,6 +379,16 @@ def list_db_files() -> list:
     )
 
 
+def update_description(url: str, description: str):
+    """상세 페이지에서 가져온 description을 DB에 저장."""
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "UPDATE job_postings SET description=? WHERE url=?",
+            (description, url),
+        )
+        conn.commit()
+
+
 def migrate_swipe_decisions(src_db_name: str) -> dict:
     """이전 DB에서 스와이프 결정(관심없음/저장/즐겨찾기)을 현재 DB로 마이그레이션.
 

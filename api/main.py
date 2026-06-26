@@ -24,9 +24,10 @@ from services.db_service import (
     mark_not_interested, mark_saved, mark_favorite, unmark,
     reassign_to_saved, reassign_to_not_interested, reassign_to_favorite,
     count_all_jobs, load_search_history, list_db_files,
-    migrate_swipe_decisions,
+    migrate_swipe_decisions, update_description,
 )
 from services.analysis_service import analyze_job
+from services.detail_crawler import extract_job_posting
 from services.filter_service import FilterService
 from crawlers import SaraminCrawler, JobKoreaCrawler
 from models.job import JobPosting
@@ -203,11 +204,21 @@ def reassign(req: ReassignRequest):
 # ── AI 분석 ───────────────────────────────────────────────────────────────
 
 @app.post("/api/analyze")
-def analyze(req: AnalyzeRequest):
+async def analyze(req: AnalyzeRequest):
     job = get_job_by_url(req.url)
     if not job:
         raise HTTPException(404, "공고를 찾을 수 없습니다")
-    result = analyze_job(job)
+
+    # sync_playwright와 Claude API 모두 블로킹 → 스레드풀에서 실행
+    if not job.description:
+        logger.info(f"description 없음 → 상세 페이지 크롤링: {job.url}")
+        detail = await asyncio.to_thread(extract_job_posting, job.url)
+        if detail["markdown"]:
+            job.description = detail["markdown"]
+            update_description(job.url, detail["markdown"])
+            logger.info(f"description 저장 완료 ({detail['content_length']}자)")
+
+    result = await asyncio.to_thread(analyze_job, job)
     return {"result": result}
 
 
