@@ -119,8 +119,6 @@
       "reusable": true,
       "fill": "$--secondary",
       "cornerRadius": 8,
-      "stroke": "$--border",
-      "strokeWidth": 1,
       "gap": 5,
       "padding": [
         6,
@@ -213,7 +211,7 @@
           "id": "Qtzye",
           "x": 0,
           "y": 0,
-          "name": "Frame 8",
+          "name": "List Card",
           "width": 1172,
           "height": 139,
           "alignItems": "center",
@@ -584,143 +582,79 @@
             },
             {
               "type": "frame",
-              "id": "qCukU",
-              "layoutPosition": "absolute",
-              "x": 864,
-              "y": 16,
+              "id": "w04PR",
               "name": "Card Right",
-              "width": 278,
-              "height": 107,
+              "width": 314,
+              "height": 140,
               "layout": "vertical",
-              "gap": 6,
               "justifyContent": "center",
               "alignItems": "center",
               "children": [
                 {
                   "type": "frame",
-                  "id": "iEPCK",
-                  "name": "tab Btn",
-                  "padding": [
-                    10,
-                    0
-                  ],
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "TEuTk",
-                      "name": "Frame 2",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "cBD1r",
-                          "type": "ref",
-                          "ref": "Q8kChv",
-                          "name": "Btn 관심없음",
-                          "x": 2,
-                          "y": 0,
-                          "padding": [
-                            6,
-                            12
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "RCj0m",
-                      "name": "Frame 3",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "x7C8XR",
-                          "type": "ref",
-                          "ref": "bQcv6",
-                          "name": "Btn 저장",
-                          "x": 2,
-                          "y": 0
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "wmCuN",
-                      "name": "Frame 5",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "CW62o",
-                          "type": "ref",
-                          "ref": "UCn9e",
-                          "name": "Btn 즐겨찾기",
-                          "x": 2,
-                          "y": 0
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "D3om1x",
-                      "name": "Frame 4",
-                      "padding": [
-                        0,
-                        2
-                      ],
-                      "children": [
-                        {
-                          "id": "RyixQ",
-                          "type": "ref",
-                          "ref": "W6w5q",
-                          "name": "Btn 공고보기",
-                          "x": 2,
-                          "y": 0,
-                          "stroke": []
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "CV4EK",
-                  "name": "Btn AI 전체분석",
-                  "width": 276,
-                  "fill": "$--color-info",
-                  "cornerRadius": 8,
+                  "id": "qCukU",
+                  "name": "Tab Btn",
+                  "width": 338,
+                  "height": 55,
                   "gap": 6,
                   "padding": [
                     10,
-                    12
+                    0
                   ],
                   "justifyContent": "center",
                   "alignItems": "center",
                   "children": [
                     {
-                      "type": "icon",
-                      "id": "Fz0D8",
-                      "width": 12,
-                      "height": 12,
-                      "icon": "sparkles",
-                      "library": "lucide",
-                      "fill": "$--color-info-foreground"
+                      "id": "lOZhQ",
+                      "type": "ref",
+                      "ref": "Q8kChv",
+                      "name": "Btn 관심없음",
+                      "x": -17,
+                      "y": 13
                     },
                     {
-                      "type": "text",
-                      "id": "csfOi",
-                      "fill": "$--color-info-foreground",
-                      "content": "AI 분석",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 12,
-                      "fontWeight": "normal"
+                      "id": "oiUTB",
+                      "type": "ref",
+                      "ref": "bQcv6",
+                      "x": 75,
+                      "y": 13,
+                      "enabled": true
+                    },
+                    {
+                      "id": "GVFNP",
+                      "type": "ref",
+                      "ref": "UCn9e",
+                      "name": "Btn 즐겨찾기",
+                      "x": 170,
+                      "y": 13
+                    },
+                    {
+                      "id": "Yx2rF",
+                      "type": "ref",
+                      "ref": "W6w5q",
+                      "name": "Btn 공고보기",
+                      "x": 262,
+                      "y": 12.5
                     }
+                  ]
+                },
+                {
+                  "id": "Lyf0i",
+                  "type": "ref",
+                  "ref": "JQsQo",
+                  "x": 20,
+                  "y": 82.5,
+                  "name": "Btn AI분석",
+                  "layout": "horizontal",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "width": 274,
+                  "height": "fit_content",
+                  "flipX": false,
+                  "flipY": false,
+                  "padding": [
+                    6,
+                    12
                   ]
                 }
               ]
@@ -869,8 +803,14 @@
           ]
         },
         {
+          "id": "zMToG",
+          "type": "ref",
+          "ref": "RNxVq",
+          "name": "D Badge Legend"
+        },
+        {
           "type": "frame",
-          "id": "kINym",
+          "id": "FlG2T",
           "name": "Spacer",
           "width": "fill_container",
           "height": 1
@@ -2528,7 +2468,15 @@
               "ref": "Crzp9",
               "name": "Top Bar",
               "width": "fill_container",
-              "height": 55
+              "height": 55,
+              "descendants": {
+                "coMfC": {
+                  "enabled": true
+                },
+                "zMToG": {
+                  "enabled": false
+                }
+              }
             },
             {
               "type": "frame",
@@ -3784,6 +3732,44 @@
               "padding": [
                 16,
                 24
+              ],
+              "children": [
+                {
+                  "id": "vfmSv",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "lOZhQ": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "yr6mN",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "lOZhQ": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "l7Fio",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "lOZhQ": {
+                      "enabled": false
+                    }
+                  }
+                }
               ]
             }
           ]
@@ -4129,6 +4115,44 @@
               "padding": [
                 16,
                 24
+              ],
+              "children": [
+                {
+                  "id": "Lu633",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "oiUTB": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "bXqo5",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "oiUTB": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "dtV9Y",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "oiUTB": {
+                      "enabled": false
+                    }
+                  }
+                }
               ]
             }
           ]
@@ -4474,6 +4498,44 @@
               "padding": [
                 16,
                 24
+              ],
+              "children": [
+                {
+                  "id": "YvhVJ",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "GtwOs",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "SnoPL",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                }
               ]
             }
           ]
@@ -4805,7 +4867,7 @@
               "name": "Sched Top Bar",
               "width": "fill_container",
               "height": 48,
-              "fill": "$--sidebar",
+              "fill": "$--neutral-action",
               "stroke": "$--border",
               "strokeWidth": {
                 "bottom": 1
@@ -4867,10 +4929,10 @@
               "type": "frame",
               "id": "l6UT9O",
               "x": 0,
-              "y": 0,
+              "y": 112,
               "name": "Calendar View",
               "enabled": false,
-              "width": "fill_container(0)",
+              "width": "fill_container(1220)",
               "height": 780,
               "fill": "$--background",
               "layout": "vertical"
@@ -4889,6 +4951,56 @@
                 24,
                 24,
                 24
+              ],
+              "children": [
+                {
+                  "id": "VPF1b",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "JFQYs",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "AmWxd",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "Mx7Os",
+                  "type": "ref",
+                  "ref": "PIM6f",
+                  "name": "List Card",
+                  "width": "fill_container",
+                  "descendants": {
+                    "GVFNP": {
+                      "enabled": false
+                    }
+                  }
+                }
               ]
             }
           ]
@@ -5220,7 +5332,7 @@
               "name": "Sched Top Bar",
               "width": "fill_container",
               "height": 48,
-              "fill": "$--sidebar",
+              "fill": "$--neutral-action-border",
               "stroke": "$--border",
               "strokeWidth": {
                 "bottom": 1
@@ -7484,6 +7596,307 @@
           "fontWeight": "normal"
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "JQsQo",
+      "x": -851,
+      "y": -277,
+      "name": "Btn AI분석",
+      "reusable": true,
+      "fill": "$--color-info",
+      "cornerRadius": 8,
+      "gap": 5,
+      "padding": [
+        6,
+        12
+      ],
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "icon",
+          "id": "Iurat",
+          "width": 12,
+          "height": 12,
+          "icon": "sparkles",
+          "library": "lucide",
+          "fill": "$--color-info-foreground"
+        },
+        {
+          "type": "text",
+          "id": "Y169A",
+          "fill": "$--color-info-foreground",
+          "content": "AI분석",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "A100Jl",
+      "x": -1351,
+      "y": -60,
+      "name": "D Badge – 빨강 (D-3이하)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "$--color-error",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "WeBua",
+          "name": "D Day",
+          "fill": "$--color-error-foreground",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "D-3",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "iyg8s",
+      "x": -1281,
+      "y": -60,
+      "name": "D Badge – 노랑 (D-7이하)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "$--color-warning",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "YNtPo",
+          "name": "D Day",
+          "fill": "$--color-warning-foreground",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "D-7",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "n0Zoec",
+      "x": -1211,
+      "y": -60,
+      "name": "D Badge – 초록 (D-30이하)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "$--color-success",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "rdyNS",
+          "name": "D Day",
+          "fill": "$--color-success-foreground",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "D-30",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ptEh6",
+      "x": -1131,
+      "y": -60,
+      "name": "D Badge – 회색 (채용시마감)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "#2a2a2a",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "s95v7",
+          "name": "D Day",
+          "fill": "#888888",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "채용시\n마감",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "RNxVq",
+      "x": -1036,
+      "y": -60,
+      "name": "D Badge Legend",
+      "reusable": true,
+      "cornerRadius": 8,
+      "gap": 16,
+      "padding": [
+        8,
+        14
+      ],
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "sdCXl",
+          "name": "Legend Item",
+          "gap": 6,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "SJxT5",
+              "name": "Dot",
+              "fill": "$--color-error-foreground",
+              "width": 8,
+              "height": 8
+            },
+            {
+              "type": "text",
+              "id": "oC9So",
+              "name": "Label",
+              "fill": "$--muted-foreground",
+              "content": "D-3",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "vDzAd",
+          "name": "Legend Item",
+          "gap": 6,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "LAVgw",
+              "name": "Dot",
+              "fill": "$--color-warning-foreground",
+              "width": 8,
+              "height": 8
+            },
+            {
+              "type": "text",
+              "id": "FOa9f",
+              "name": "Label",
+              "fill": "$--muted-foreground",
+              "content": "D-7",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GmiDj",
+          "name": "Legend Item",
+          "gap": 6,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "muiPu",
+              "name": "Dot",
+              "fill": "$--color-success-foreground",
+              "width": 8,
+              "height": 8
+            },
+            {
+              "type": "text",
+              "id": "Ks8QH",
+              "name": "Label",
+              "fill": "$--muted-foreground",
+              "content": "D-20",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "k3Pfld",
+          "name": "Legend Item",
+          "gap": 6,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "q1nVQf",
+              "name": "Dot",
+              "fill": "#888888",
+              "width": 8,
+              "height": 8
+            },
+            {
+              "type": "text",
+              "id": "B2XIUW",
+              "name": "Label",
+              "fill": "$--muted-foreground",
+              "content": "채용시",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variables": {
@@ -7726,6 +8139,38 @@
     "import-db-bg": {
       "type": "color",
       "value": "#353a40"
+    },
+    "badge-red-bg": {
+      "type": "color",
+      "value": "$--color-error"
+    },
+    "badge-red-text": {
+      "type": "color",
+      "value": "$--color-error-foreground"
+    },
+    "badge-yellow-bg": {
+      "type": "color",
+      "value": "$--color-warning"
+    },
+    "badge-yellow-text": {
+      "type": "color",
+      "value": "$--color-warning-foreground"
+    },
+    "badge-green-bg": {
+      "type": "color",
+      "value": "$--color-success"
+    },
+    "badge-green-text": {
+      "type": "color",
+      "value": "$--color-success-foreground"
+    },
+    "badge-gray-bg": {
+      "type": "color",
+      "value": "#2a2a2a"
+    },
+    "badge-gray-text": {
+      "type": "color",
+      "value": "#888888"
     }
   },
   "fileToken": "49e1db10-f077-48f5-b9c5-903f25cd633a"
