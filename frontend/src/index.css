@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --font-primary: 'Inter', 'Pretendard', sans-serif;
+
+  --background:   #0f1117;
+  --foreground:   #e8eaf0;
+  --card:         #1a1d27;
+  --border:       #2a2d3a;
+  --sidebar:      #13151f;
+  --secondary:    #1e2130;
+  --muted-foreground: #6b7280;
+  --white: #ffffff;
+  --black: #000000;
+
+  --brand-primary:          #4f7cf6;
+  --brand-primary-bg:       #1a2340;
+  --brand-primary-bg-hover: #1e2845;
+  --brand-primary-glow:     #7ba4ff;
+
+  --color-error:             #3d1515;
+  --color-error-foreground:  #f87171;
+  --color-warning:           #3d2e0a;
+  --color-warning-foreground:#fbbf24;
+  --color-success:           #0d2e1a;
+  --color-success-foreground:#4ade80;
+  --color-info:              #0d1f3d;
+  --color-info-foreground:   #60a5fa;
+
+  --neutral-action:        #161923;
+  --neutral-action-border: #1c2030;
+  --import-db-bg:          #181b28;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.btn-sm {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; border: none;
+}
+.btn-error    { background: var(--color-error);   color: var(--color-error-foreground); }
+.btn-success  { background: var(--color-success); color: var(--color-success-foreground); }
+.btn-warning  { background: var(--color-warning); color: var(--color-warning-foreground); }
+.btn-info     { background: var(--color-info);    color: var(--color-info-foreground); }
+.btn-secondary{ background: var(--secondary);     color: var(--muted-foreground); border: 1px solid var(--border); text-decoration: none; }
+
+.action-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; width: 72px; height: 72px; border-radius: 50%; border: none; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.action-btn:hover { opacity: 0.85; transform: scale(1.05); }
