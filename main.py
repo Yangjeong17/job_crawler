@@ -4,7 +4,7 @@ import sys
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 _LAST_DB_FILE = os.path.join(_ROOT, ".last_db")
-DEFAULT_DB = "jobs_database.db"
+DEFAULT_DB = "jobs_before.db"
 
 
 def _load_last_db() -> str:
@@ -41,13 +41,13 @@ def main():
     _save_last_db(db_name)
     print(f"\n사용 DB: {db_name}\n")
 
-    app_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gui", "app.py")
     env = os.environ.copy()
     env["JOBHUB_DB_NAME"] = db_name
 
     subprocess.run(
-        [sys.executable, "-m", "streamlit", "run", app_path, "--server.headless", "true"],
+        [sys.executable, "-m", "uvicorn", "api.main:app", "--reload", "--port", "8000"],
         env=env,
+        cwd=_ROOT,
     )
 
 

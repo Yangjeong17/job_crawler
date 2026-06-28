@@ -11,10 +11,21 @@ import os
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 
+# db_service 임포트 전에 .last_db 읽어서 env var 설정
+_last_db_file = pathlib.Path(__file__).parent.parent / ".last_db"
+if _last_db_file.exists():
+    _saved_db = _last_db_file.read_text().strip()
+    if _saved_db:
+        os.environ.setdefault("JOBHUB_DB_NAME", _saved_db)
+
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
+
+_DIST = pathlib.Path(__file__).parent.parent / "frontend" / "dist"
 
 from services.db_service import (
     init_db, save_jobs,
@@ -25,6 +36,7 @@ from services.db_service import (
     reassign_to_saved, reassign_to_not_interested, reassign_to_favorite,
     count_all_jobs, load_search_history, list_db_files,
     migrate_swipe_decisions, update_description,
+    get_current_db, switch_db,
 )
 from services.analysis_service import analyze_job
 from services.detail_crawler import extract_job_posting
@@ -122,6 +134,9 @@ class ShortcutsBody(BaseModel):
 class MigrateRequest(BaseModel):
     db_name: str
 
+class DbSwitchRequest(BaseModel):
+    db_name: str
+
 
 # ── 통계 ─────────────────────────────────────────────────────────────────
 
@@ -189,6 +204,9 @@ def undo():
 @app.post("/api/jobs/reassign")
 def reassign(req: ReassignRequest):
     """목록 간 재분류 (ni↔saved↔favorite)"""
+    _VALID = {"ni", "saved", "favorite"}
+    if req.from_status not in _VALID:
+        raise HTTPException(400, f"지원하지 않는 from_status: {req.from_status!r}")
     _HANDLERS = {
         "ni":       reassign_to_not_interested,
         "saved":    reassign_to_saved,
@@ -236,6 +254,17 @@ def save_shortcuts(body: ShortcutsBody):
 
 
 # ── 검색기록 / DB 관리 ────────────────────────────────────────────────────
+
+@app.get("/api/db-current")
+def db_current():
+    return {"db_name": get_current_db()}
+
+@app.post("/api/db-switch")
+def db_switch(req: DbSwitchRequest):
+    if not req.db_name:
+        raise HTTPException(400, "db_name이 필요합니다")
+    path = switch_db(req.db_name)
+    return {"ok": True, "db_name": get_current_db(), "path": path}
 
 @app.get("/api/search-history")
 def get_search_history():
@@ -332,3 +361,15 @@ async def crawl_ws(ws: WebSocket):
             await ws.send_json({"type": "error", "message": str(e)})
         except Exception:
             pass
+
+
+# ── 프론트엔드 정적 파일 서빙 ──────────────────────────────────────────────
+
+if _DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(_DIST / "assets")), name="assets")
+
+@app.get("/{full_path:path}")
+async def spa(full_path: str):
+    if _DIST.exists():
+        return FileResponse(str(_DIST / "index.html"))
+    return {"message": "프론트엔드 빌드 필요: cd frontend && npm run build"}

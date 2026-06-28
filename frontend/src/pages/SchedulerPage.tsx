@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { api } from '../api/client'
+import { ListCard } from '../components/ui/ListCard'
+import { AnalysisModal } from '../components/ui/AnalysisModal'
 
 type View = 'list' | 'calendar'
 
@@ -45,9 +47,32 @@ export function SchedulerPage() {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
+  const [analysisLoading, setAnalysisLoading] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<string | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
+  const qc = useQueryClient()
 
   const { data } = useQuery({ queryKey: ['jobs-saved'], queryFn: api.jobs.saved })
   const jobs = data?.jobs ?? []
+
+  async function openAnalysis(url: string) {
+    setAnalysisResult(null)
+    setAnalysisError(null)
+    setAnalysisLoading(true)
+    try {
+      const { result } = await api.analyze(url)
+      setAnalysisResult(result)
+    } catch (e: any) {
+      setAnalysisError(e.message ?? '분석 실패')
+    } finally {
+      setAnalysisLoading(false)
+    }
+  }
+
+  async function reassign(url: string) {
+    await api.jobs.reassign(url, 'saved', 'favorite')
+    qc.invalidateQueries({ queryKey: ['jobs-saved'] })
+  }
 
   const jobsWithDeadline = jobs.filter((j) => j.deadline && parseDaysLeft(j.deadline) !== null)
   const deadlineMap: Record<string, typeof jobs> = {}
@@ -88,29 +113,21 @@ export function SchedulerPage() {
 
       {view === 'list' ? (
         <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
-          {jobsWithDeadline.length === 0 && (
+          {jobs.length === 0 && (
             <div className="flex items-center justify-center h-40 text-sm" style={{ color: 'var(--muted-foreground)' }}>
               저장된 공고가 없습니다.
             </div>
           )}
-          {jobsWithDeadline
+          {[...jobs]
             .sort((a, b) => (parseDaysLeft(a.deadline) ?? 999) - (parseDaysLeft(b.deadline) ?? 999))
-            .map((job) => {
-              const days = parseDaysLeft(job.deadline)
-              const { bg, fg } = deadlineBadgeStyle(days)
-              return (
-                <div key={job.url} className="flex items-center gap-4 px-4 rounded-lg" style={{ height: 60, background: 'var(--card)', border: '1px solid var(--border)' }}>
-                  <div className="flex flex-col gap-1 flex-1 min-w-0">
-                    <div className="text-sm font-semibold truncate" style={{ color: 'var(--foreground)' }}>{job.title}</div>
-                    <div className="text-xs truncate" style={{ color: 'var(--muted-foreground)' }}>{job.company}</div>
-                  </div>
-                  <div className="shrink-0 px-3 py-1 rounded text-xs font-bold" style={{ background: bg, color: fg }}>
-                    {days !== null && days >= 0 ? `D-${days}` : '마감'}
-                  </div>
-                  <div className="text-xs shrink-0" style={{ color: 'var(--muted-foreground)' }}>{job.deadline}</div>
-                </div>
-              )
-            })}
+            .map((job) => (
+              <ListCard
+                key={job.url}
+                job={job}
+                onFavorite={() => reassign(job.url)}
+                onAnalyze={() => openAnalysis(job.url)}
+              />
+            ))}
         </div>
       ) : (
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -194,6 +211,14 @@ export function SchedulerPage() {
             ))}
           </div>
         </div>
+      )}
+      {(analysisLoading || analysisResult !== null || analysisError !== null) && (
+        <AnalysisModal
+          loading={analysisLoading}
+          result={analysisResult}
+          error={analysisError}
+          onClose={() => { setAnalysisResult(null); setAnalysisError(null); setAnalysisLoading(false) }}
+        />
       )}
     </div>
   )

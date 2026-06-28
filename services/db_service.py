@@ -9,11 +9,29 @@ from models.job import JobPosting
 
 logger = logging.getLogger(__name__)
 
+_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_LAST_DB_FILE = os.path.join(_ROOT, ".last_db")
+
 _db_name = os.environ.get("JOBHUB_DB_NAME", "jobs_before.db")
-DB_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    _db_name
-)
+DB_PATH = os.path.join(_ROOT, _db_name)
+
+
+def get_current_db() -> str:
+    return _db_name
+
+
+def switch_db(name: str) -> str:
+    """런타임에 활성 DB를 전환하고 .last_db에 저장"""
+    global _db_name, DB_PATH
+    if not name.endswith(".db"):
+        name += ".db"
+    _db_name = name
+    DB_PATH = os.path.join(_ROOT, _db_name)
+    os.environ["JOBHUB_DB_NAME"] = name
+    with open(_LAST_DB_FILE, "w", encoding="utf-8") as f:
+        f.write(name)
+    init_db()
+    return DB_PATH
 
 
 def init_db():

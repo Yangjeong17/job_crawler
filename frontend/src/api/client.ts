@@ -58,6 +58,8 @@ export const api = {
   searchHistory: () => get<{ history: { keyword: string; count: number; last_crawled: string }[] }>('/search-history'),
   dbFiles:       () => get<{ files: string[] }>('/db-files'),
   migrate:       (db_name: string) => post('/migrate', { db_name }),
+  dbCurrent:     () => get<{ db_name: string }>('/db-current'),
+  dbSwitch:      (db_name: string) => post<{ ok: boolean; db_name: string }>('/db-switch', { db_name }),
 }
 
 export function createCrawlSocket(

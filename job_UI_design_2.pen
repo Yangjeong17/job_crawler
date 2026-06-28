@@ -643,8 +643,8 @@
                   "type": "ref",
                   "ref": "JQsQo",
                   "x": 20,
-                  "y": 82.5,
-                  "name": "Btn AI분석",
+                  "y": 83,
+                  "name": "Btn 상세분석",
                   "layout": "horizontal",
                   "justifyContent": "center",
                   "alignItems": "center",
@@ -655,7 +655,12 @@
                   "padding": [
                     6,
                     12
-                  ]
+                  ],
+                  "descendants": {
+                    "Y169A": {
+                      "content": "상세분석"
+                    }
+                  }
                 }
               ]
             }
@@ -2486,6 +2491,12 @@
                 },
                 "zMToG": {
                   "enabled": false
+                },
+                "Uft5B": {
+                  "enabled": false
+                },
+                "ij42L": {
+                  "enabled": false
                 }
               }
             },
@@ -3740,7 +3751,12 @@
               "ref": "Crzp9",
               "name": "Top Bar",
               "width": "fill_container",
-              "height": 55
+              "height": 55,
+              "descendants": {
+                "ij42L": {
+                  "enabled": false
+                }
+              }
             },
             {
               "type": "frame",
@@ -4134,7 +4150,12 @@
               "ref": "Crzp9",
               "name": "Top Bar",
               "width": "fill_container",
-              "height": 55
+              "height": 55,
+              "descendants": {
+                "ij42L": {
+                  "enabled": false
+                }
+              }
             },
             {
               "type": "frame",

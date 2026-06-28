@@ -2,6 +2,21 @@ import { ExternalLink, Heart, ThumbsDown, Bookmark, Sparkles } from 'lucide-reac
 import type { Job } from '../../types/job'
 import { DBadge } from './DBadge'
 
+function daysLeft(deadline: string): number | null {
+  const m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (!m) return null
+  const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
+  return Math.ceil((target.getTime() - Date.now()) / 86400000)
+}
+
+function ddayChipStyle(days: number | null): { bg: string; fg: string; label: string } {
+  if (days === null) return { bg: 'transparent', fg: 'transparent', label: '' }
+  if (days < 0)  return { bg: 'var(--secondary)', fg: '#555', label: '마감' }
+  if (days <= 3) return { bg: 'var(--color-error)',   fg: 'var(--color-error-foreground)',   label: `D-${days}` }
+  if (days <= 7) return { bg: 'var(--color-warning)', fg: 'var(--color-warning-foreground)', label: `D-${days}` }
+  return { bg: 'var(--color-success)', fg: 'var(--color-success-foreground)', label: `D-${days}` }
+}
+
 interface Props {
   job: Job
   onNotInterested?: () => void
@@ -11,6 +26,9 @@ interface Props {
 }
 
 export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }: Props) {
+  const days = job.deadline ? daysLeft(job.deadline) : null
+  const chip = days !== null ? ddayChipStyle(days) : null
+
   return (
     <div
       className="flex rounded-lg overflow-hidden"
@@ -19,6 +37,16 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
       <DBadge deadline={job.deadline} />
 
       <div className="flex flex-col gap-1 flex-1 p-3">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ background: 'var(--color-info)', color: 'var(--color-info-foreground)' }}>
+            {job.source}
+          </span>
+          {chip && chip.label && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: chip.bg, color: chip.fg }}>
+              {chip.label}
+            </span>
+          )}
+        </div>
         <div className="text-sm font-semibold leading-snug" style={{ color: 'var(--foreground)' }}>
           {job.title}
         </div>
@@ -51,7 +79,7 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
           )}
           {onAnalyze && (
             <button onClick={onAnalyze} className="btn-sm btn-info">
-              <Sparkles size={11} /> AI분석
+              <Sparkles size={11} /> 상세분석
             </button>
           )}
           <a
