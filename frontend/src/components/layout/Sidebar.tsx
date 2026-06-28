@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { RefreshCw, Calendar, History, FolderOpen, ChevronDown, Database, Search } from 'lucide-react'
+import { Calendar, History, FolderOpen, ChevronDown, Database, Search } from 'lucide-react'
 import { createCrawlSocket } from '../../api/client'
 import { useAppStore } from '../../store/useAppStore'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -22,11 +22,10 @@ export function Sidebar() {
   const { crawlLog, addCrawlLog, clearCrawlLog } = useAppStore()
   const qc = useQueryClient()
 
-  const { data: stats }   = useQuery({ queryKey: ['stats'],    queryFn: api.stats,            refetchInterval: 10000 })
-  const { data: niData }  = useQuery({ queryKey: ['jobs-ni'],   queryFn: api.jobs.notInterested, staleTime: 30000 })
-  const { data: savedData}= useQuery({ queryKey: ['jobs-saved'],queryFn: api.jobs.saved,          staleTime: 30000 })
-  const { data: favData } = useQuery({ queryKey: ['jobs-fav'],  queryFn: api.jobs.favorites,      staleTime: 30000 })
-  const { data: dbFiles } = useQuery({ queryKey: ['db-files'],  queryFn: api.dbFiles })
+  const { data: stats }    = useQuery({ queryKey: ['stats'],      queryFn: api.stats,          refetchInterval: 10000 })
+  const { data: savedData }= useQuery({ queryKey: ['jobs-saved'], queryFn: api.jobs.saved,     staleTime: 30000 })
+  const { data: favData }  = useQuery({ queryKey: ['jobs-fav'],   queryFn: api.jobs.favorites, staleTime: 30000 })
+  const { data: dbFiles }  = useQuery({ queryKey: ['db-files'],   queryFn: api.dbFiles })
   const { data: historyData } = useQuery({ queryKey: ['search-history'], queryFn: api.searchHistory, enabled: showHistory })
   const { data: currentDb, refetch: refetchCurrentDb } = useQuery({ queryKey: ['db-current'], queryFn: api.dbCurrent })
 
@@ -68,8 +67,8 @@ export function Sidebar() {
       style={{ width: 220, background: 'var(--sidebar)', borderRight: '1px solid var(--border)' }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2 px-5 h-16 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--brand-primary)' }}>
+      <div className="flex items-center gap-2.5 shrink-0" style={{ height: 64, padding: '0 20px', borderBottom: '1px solid var(--border)' }}>
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--brand-primary)' }}>
           <span className="text-white font-bold text-xs">J</span>
         </div>
         <div className="flex flex-col flex-1 min-w-0">
@@ -82,8 +81,8 @@ export function Sidebar() {
 
       {/* DB 전환 */}
       <div
-        className="flex items-center gap-2 px-4 h-8 text-[11px] cursor-pointer shrink-0"
-        style={{ background: 'var(--secondary)', borderBottom: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
+        className="flex items-center gap-2 h-8 text-[11px] cursor-pointer shrink-0"
+        style={{ padding: '0 16px', background: 'var(--secondary)', borderBottom: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
         onClick={() => { setShowDbSwitch((v) => !v); setSwitchTarget('') }}
       >
         <Database size={11} />
@@ -92,10 +91,10 @@ export function Sidebar() {
       </div>
 
       {showDbSwitch && (
-        <div className="flex flex-col gap-2 px-3 py-2 shrink-0" style={{ background: 'var(--secondary)', borderBottom: '1px solid var(--border)' }}>
+        <div className="flex flex-col gap-2 shrink-0" style={{ padding: '8px 16px 12px', background: 'var(--secondary)', borderBottom: '1px solid var(--border)' }}>
           <select
-            className="w-full h-8 rounded px-2 text-xs"
-            style={{ background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
+            className="w-full h-8 rounded text-xs"
+            style={{ padding: '0 8px', background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
             value={switchTarget}
             onChange={(e) => setSwitchTarget(e.target.value)}
           >
@@ -113,15 +112,15 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* Keyword */}
-      <div className="flex flex-col gap-2 p-3">
+      {/* 키워드 검색 */}
+      <div className="flex flex-col gap-2 shrink-0" style={{ padding: '12px 16px' }}>
         <label className="text-[11px] font-semibold" style={{ color: 'var(--muted-foreground)' }}>키워드</label>
-        <div className="flex items-center gap-2 rounded-md px-3 h-9 text-xs" style={{ background: 'var(--secondary)', border: '1px solid var(--brand-primary)' }}>
-          <Search size={12} style={{ color: 'var(--brand-primary)' }} />
+        <div className="flex items-center gap-2 rounded-md h-9 text-xs" style={{ padding: '0 12px', background: 'var(--secondary)', border: '1px solid var(--brand-primary)' }}>
+          <Search size={14} style={{ color: 'var(--muted-foreground)' }} />
           <input
             className="flex-1 bg-transparent outline-none"
             style={{ color: 'var(--foreground)' }}
-            placeholder="예: 백엔드 개발자"
+            placeholder="예: 백엔드 Python"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && startCrawl()}
@@ -129,8 +128,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Sites */}
-      <div className="flex flex-col gap-2 px-3 pb-3">
+      {/* 사이트 */}
+      <div className="flex flex-col gap-1.5 shrink-0" style={{ padding: '8px 16px' }}>
         <label className="text-[11px] font-semibold" style={{ color: 'var(--muted-foreground)' }}>사이트</label>
         <div className="flex gap-4">
           {[['saramin', '사람인', useSaramin, setUseSaramin], ['jobkorea', '잡코리아', useJobkorea, setUseJobkorea]].map(
@@ -149,105 +148,112 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Crawl button */}
-      <div className="px-3 pb-2">
+      {/* 검색 버튼 */}
+      <div className="shrink-0" style={{ padding: '10px 16px' }}>
         <button
           onClick={startCrawl}
           disabled={crawling || !keyword.trim()}
-          className="w-full h-9 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-opacity disabled:opacity-50"
-          style={{ background: 'var(--brand-primary)', color: '#fff' }}
+          className="w-full h-10 rounded-lg font-semibold flex items-center justify-center gap-2 transition-opacity disabled:opacity-50"
+          style={{ background: 'var(--brand-primary)', color: '#fff', fontSize: 14 }}
         >
-          <RefreshCw size={12} className={crawling ? 'animate-spin' : ''} />
-          {crawling ? '크롤링 중...' : '크롤링 시작'}
+          <Search size={14} className={crawling ? 'animate-pulse' : ''} />
+          {crawling ? '검색 중...' : '검색'}
         </button>
       </div>
 
-      {/* Crawl log */}
+      {/* 크롤 로그 */}
       {crawlLog.length > 0 && (
-        <div className="mx-3 mb-2 p-2 rounded text-[10px] leading-relaxed" style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
+        <div style={{ margin: '0 16px 8px', padding: 8, borderRadius: 6, fontSize: 10, lineHeight: 1.6, flexShrink: 0, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
           {crawlLog.map((l, i) => <div key={i}>{l}</div>)}
         </div>
       )}
 
-      {/* Scheduler shortcut */}
+      {/* 9px 스페이서 */}
+      <div className="shrink-0" style={{ height: 9 }} />
+
+      {/* 스케줄러 */}
       <div
-        className="flex items-center gap-2 px-4 h-11 text-sm cursor-pointer"
-        style={{ background: 'var(--brand-primary-bg-hover)', color: 'var(--foreground)' }}
+        className="flex items-center gap-2 shrink-0 cursor-pointer"
+        style={{ height: 45, padding: '0 16px', background: 'var(--brand-primary-bg-hover)', color: 'var(--foreground)', fontSize: 15 }}
         onClick={() => navigate('/scheduler')}
       >
         <Calendar size={14} style={{ color: 'var(--muted-foreground)' }} />
         스케줄러
       </div>
 
-      {/* Stats */}
-      <div className="flex flex-col gap-1.5 p-3" style={{ borderTop: '1px solid var(--border)' }}>
-        <div className="text-[11px] font-semibold mb-0.5" style={{ color: 'var(--muted-foreground)' }}>현황</div>
+      {/* 현황 */}
+      <div className="flex flex-col gap-2 shrink-0" style={{ padding: '12px 16px', borderTop: '1px solid var(--border)' }}>
+        <div className="text-[11px] font-semibold" style={{ color: 'var(--muted-foreground)' }}>오늘의 현황</div>
         {([
-          ['전체',    stats?.total           ?? '…', 'var(--brand-primary)'],
-          ['저장',    savedData?.jobs.length  ?? '…', 'var(--color-info-foreground)'],
-          ['즐겨찾기', favData?.jobs.length   ?? '…', 'var(--color-warning-foreground)'],
-          ['관심없음', niData?.jobs.length    ?? '…', 'var(--muted-foreground)'],
-        ] as const).map(([label, val, color]) => (
-          <div key={label} className="flex items-center justify-between h-6 text-xs">
-            <span style={{ color: 'var(--foreground)' }}>{label}</span>
-            <span className="font-semibold" style={{ color }}>{val}</span>
+          ['전체',    stats?.total            ?? '…'],
+          ['저장',    savedData?.jobs.length   ?? '…'],
+          ['즐겨찾기', favData?.jobs.length    ?? '…'],
+        ] as [string, number | string][]).map(([label, val]) => (
+          <div key={label} className="flex items-center justify-between text-xs" style={{ height: 24 }}>
+            <span style={{ color: 'var(--muted-foreground)' }}>{label}</span>
+            <span className="font-bold" style={{ color: 'var(--foreground)' }}>{val}</span>
           </div>
         ))}
       </div>
 
-      {/* History */}
+      {/* 검색 기록 */}
       <div
-        className="flex items-center gap-2 px-4 h-9 text-xs cursor-pointer"
-        style={{ border: '1px solid var(--border)', borderLeft: 'none', borderRight: 'none', color: 'var(--foreground)' }}
+        className="flex items-center gap-2 shrink-0 cursor-pointer"
+        style={{ height: 40, padding: '0 16px', border: '1px solid var(--border)', borderLeft: 'none', borderRight: 'none', color: 'var(--foreground)' }}
         onClick={() => setShowHistory((v) => !v)}
       >
         <ChevronDown size={12} style={{ color: 'var(--muted-foreground)', transform: showHistory ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }} />
         <History size={12} style={{ color: 'var(--muted-foreground)' }} />
-        검색 기록
+        <span className="text-xs">검색 기록</span>
       </div>
 
       {showHistory && (
-        <div className="flex flex-col" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="flex flex-col shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
           {(historyData?.history ?? []).length === 0 ? (
-            <div className="px-4 py-2 text-[11px]" style={{ color: 'var(--muted-foreground)' }}>기록 없음</div>
+            <div className="text-[11px]" style={{ padding: '8px 16px', color: 'var(--muted-foreground)' }}>기록 없음</div>
           ) : (
             historyData?.history.map((h) => (
-              <div key={h.keyword} className="flex items-center justify-between px-4 py-1.5 text-[11px]" style={{ color: 'var(--foreground)' }}>
+              <div key={h.keyword} className="flex items-center justify-between text-[11px]" style={{ padding: '6px 16px', color: 'var(--foreground)' }}>
                 <span className="truncate flex-1">{h.keyword}</span>
-                <span className="shrink-0 ml-2" style={{ color: 'var(--muted-foreground)' }}>{h.count}회</span>
+                <span style={{ flexShrink: 0, marginLeft: 8, color: 'var(--muted-foreground)' }}>{h.count}회</span>
               </div>
             ))
           )}
         </div>
       )}
 
-      {/* Import DB */}
+      {/* 이전 DB 스와이프 가져오기 */}
       <div
-        className="flex items-center gap-2 px-4 h-9 text-xs cursor-pointer"
-        style={{ color: 'var(--foreground)' }}
+        className="flex items-center gap-2 shrink-0 cursor-pointer"
+        style={{ height: 40, padding: '0 16px', color: 'var(--foreground)' }}
         onClick={() => setShowImport((v) => !v)}
       >
         <ChevronDown size={12} style={{ color: 'var(--muted-foreground)', transform: showImport ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }} />
         <FolderOpen size={12} style={{ color: 'var(--brand-primary)' }} />
-        이전 DB 스와이프 가져오기
+        <span className="text-xs">이전 DB 스와이프 가져오기</span>
       </div>
 
       {showImport && (
-        <div className="flex flex-col gap-2 px-3 pb-3 pt-1" style={{ background: 'var(--import-db-bg)', borderBottom: '1px solid var(--border)' }}>
-          <select
-            className="w-full h-8 rounded px-2 text-xs"
-            style={{ background: 'var(--secondary)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
-            value={selectedDb}
-            onChange={(e) => setSelectedDb(e.target.value)}
+        <div className="flex flex-col gap-2 shrink-0" style={{ padding: '8px 16px 12px', background: 'var(--import-db-bg)', borderBottom: '1px solid var(--border)' }}>
+          <div
+            className="flex items-center justify-between rounded-md h-[34px] text-xs"
+            style={{ padding: '0 12px', background: 'var(--secondary)', border: '1px solid var(--border)', cursor: 'pointer' }}
           >
-            <option value="">DB 선택...</option>
-            {dbFiles?.files.map((f) => <option key={f} value={f}>{f}</option>)}
-          </select>
+            <select
+              className="flex-1 bg-transparent outline-none"
+              style={{ color: 'var(--foreground)', cursor: 'pointer' }}
+              value={selectedDb}
+              onChange={(e) => setSelectedDb(e.target.value)}
+            >
+              <option value="">DB 선택...</option>
+              {dbFiles?.files.map((f) => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
           <button
             disabled={!selectedDb}
             onClick={() => selectedDb && api.migrate(selectedDb)}
-            className="w-full h-8 rounded text-xs font-semibold disabled:opacity-50"
-            style={{ background: 'var(--foreground)', color: 'var(--background)' }}
+            className="w-full rounded font-semibold disabled:opacity-50"
+            style={{ height: 36, background: 'var(--foreground)', color: 'var(--background)', fontSize: 13 }}
           >
             가져오기
           </button>

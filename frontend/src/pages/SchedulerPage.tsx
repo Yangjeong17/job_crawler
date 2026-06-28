@@ -87,16 +87,16 @@ export function SchedulerPage() {
   const grid = getMonthGrid(year, month)
 
   return (
-    <div className="flex flex-col h-full">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Sched top bar */}
-      <div className="flex items-center gap-4 px-6 shrink-0" style={{ height: 48, background: 'var(--neutral-action)', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0, height: 48, padding: '0 24px', background: 'var(--neutral-action)', borderBottom: '1px solid var(--border)' }}>
         <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid var(--border)' }}>
           {(['list', 'calendar'] as View[]).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
-              className="px-5 h-8 text-xs font-medium transition-colors"
               style={{
+                padding: '0 20px', height: 32, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: 'none', transition: 'background 0.15s',
                 background: view === v ? 'var(--color-info)' : 'transparent',
                 color: view === v ? 'var(--color-info-foreground)' : 'var(--muted-foreground)',
               }}
@@ -106,40 +106,44 @@ export function SchedulerPage() {
           ))}
         </div>
         <div className="flex-1" />
-        <div className="flex items-center gap-2 rounded-lg px-3 h-8" style={{ background: 'var(--secondary)', border: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '0 12px', height: 32, background: 'var(--secondary)', border: '1px solid var(--border)' }}>
           <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>공고명·회사명 검색</span>
         </div>
       </div>
 
       {view === 'list' ? (
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px', minHeight: 0 }}>
           {jobs.length === 0 && (
-            <div className="flex items-center justify-center h-40 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160, fontSize: 14, color: 'var(--muted-foreground)' }}>
               저장된 공고가 없습니다.
             </div>
           )}
-          {[...jobs]
-            .sort((a, b) => (parseDaysLeft(a.deadline) ?? 999) - (parseDaysLeft(b.deadline) ?? 999))
-            .map((job) => (
-              <ListCard
-                key={job.url}
-                job={job}
-                onFavorite={() => reassign(job.url)}
-                onAnalyze={() => openAnalysis(job.url)}
-              />
-            ))}
+          {jobs.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[...jobs]
+                .sort((a, b) => (parseDaysLeft(a.deadline) ?? 999) - (parseDaysLeft(b.deadline) ?? 999))
+                .map((job) => (
+                  <ListCard
+                    key={job.url}
+                    job={job}
+                    onFavorite={() => reassign(job.url)}
+                    onAnalyze={() => openAnalysis(job.url)}
+                  />
+                ))}
+            </div>
+          )}
         </div>
       ) : (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {/* Calendar header */}
-          <div className="flex items-center px-6 shrink-0" style={{ height: 64, borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, height: 64, padding: '0 24px', borderBottom: '1px solid var(--border)' }}>
             <div className="flex flex-col gap-1 flex-1">
               <span className="text-[11px] font-semibold" style={{ color: 'var(--muted-foreground)' }}>오늘</span>
               <div className="flex items-center gap-2">
                 <span className="text-xl font-bold" style={{ color: 'var(--brand-primary)' }}>
                   {today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일
                 </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--brand-primary)', color: '#fff' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 999, background: 'var(--brand-primary)', color: '#fff' }}>
                   {DAYS[today.getDay()]}
                 </span>
               </div>
@@ -177,8 +181,9 @@ export function SchedulerPage() {
                   return (
                     <div
                       key={di}
-                      className="flex flex-col p-2 gap-1 overflow-hidden"
+                      className="flex flex-col gap-1 overflow-hidden"
                       style={{
+                        padding: 8,
                         background: isToday ? 'var(--brand-primary-bg-hover)' : day === null ? 'var(--secondary)' : 'var(--background)',
                         minHeight: 0,
                       }}
@@ -198,7 +203,7 @@ export function SchedulerPage() {
                         const days = parseDaysLeft(j.deadline)
                         const { bg, fg } = deadlineBadgeStyle(days)
                         return (
-                          <div key={j.url} className="flex items-center gap-1 rounded px-1.5 text-[10px] font-medium overflow-hidden" style={{ height: 20, background: bg, color: fg, flexShrink: 0 }}>
+                          <div key={j.url} style={{ display: 'flex', alignItems: 'center', gap: 4, borderRadius: 4, padding: '0 6px', fontSize: 10, fontWeight: 500, overflow: 'hidden', height: 20, background: bg, color: fg, flexShrink: 0 }}>
                             <span className="truncate flex-1">{j.company}</span>
                             <span className="font-bold shrink-0">{days !== null && days >= 0 ? `D-${days}` : '마감'}</span>
                           </div>

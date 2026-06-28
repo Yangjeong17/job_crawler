@@ -32,10 +32,10 @@ export function AllJobsPage() {
   )
 
   return (
-    <div className="flex flex-col h-full">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <TopBar search={search} onSearchChange={setSearch} showLegend={false} />
 
-      <div className="flex-1 overflow-y-auto" style={{ padding: '0 24px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '16px 24px' }}>
         {/* Column header */}
         <div
           className="flex items-center gap-4 text-[11px] font-semibold sticky top-0 z-10"
@@ -73,8 +73,7 @@ export function AllJobsPage() {
               href={job.url}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 px-3 h-[28px] rounded-lg text-[12px] shrink-0"
-              style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 12px', height: 28, borderRadius: 8, fontSize: 12, flexShrink: 0, background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', textDecoration: 'none' }}
             >
               <ExternalLink size={11} /> 공고 보기
             </a>

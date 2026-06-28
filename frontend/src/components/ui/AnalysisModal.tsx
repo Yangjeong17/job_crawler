@@ -27,38 +27,44 @@ export function AnalysisModal({ loading, result, error, onClose }: Props) {
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-5 py-4 shrink-0"
-          style={{ borderBottom: '1px solid var(--border)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            flexShrink: 0,
+            borderBottom: '1px solid var(--border)',
+          }}
         >
-          <div className="flex items-center gap-2" style={{ color: 'var(--color-info-foreground)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-info-foreground)' }}>
             <Sparkles size={16} />
-            <span className="text-sm font-semibold">공고 상세분석</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>공고 상세분석</span>
           </div>
-          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)', background: 'none', border: 'none', cursor: 'pointer' }}>
             <X size={16} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
           {loading && (
-            <div className="flex flex-col items-center justify-center gap-3 py-12" style={{ color: 'var(--muted-foreground)' }}>
-              <div className="text-2xl animate-pulse">✨</div>
-              <p className="text-sm">공고를 분석하는 중입니다...</p>
-              <p className="text-xs">상세 페이지 크롤링 후 AI 분석이 진행됩니다.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '48px 0', color: 'var(--muted-foreground)' }}>
+              <div style={{ fontSize: 32 }} className="animate-pulse">✨</div>
+              <p style={{ fontSize: 14 }}>공고를 분석하는 중입니다...</p>
+              <p style={{ fontSize: 12 }}>상세 페이지 크롤링 후 AI 분석이 진행됩니다.</p>
             </div>
           )}
 
           {error && !loading && (
-            <div className="rounded-lg p-4 text-sm" style={{ background: 'var(--color-error)', color: 'var(--color-error-foreground)' }}>
+            <div style={{ borderRadius: 8, padding: 16, fontSize: 14, background: 'var(--color-error)', color: 'var(--color-error-foreground)' }}>
               {error}
             </div>
           )}
 
           {result && !loading && (
             <pre
-              className="text-sm leading-relaxed whitespace-pre-wrap"
-              style={{ color: 'var(--foreground)', fontFamily: 'inherit' }}
+              className="leading-relaxed whitespace-pre-wrap"
+              style={{ fontSize: 14, color: 'var(--foreground)', fontFamily: 'inherit' }}
             >
               {result}
             </pre>

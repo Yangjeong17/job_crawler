@@ -35,13 +35,13 @@ export function DBadge({ deadline }: Props) {
   if (skip.some((k) => deadline.includes(k))) {
     return (
       <div
-        className="flex items-center justify-center text-[11px] font-bold leading-tight text-center"
+        className="flex items-center justify-center text-[12px] font-bold leading-tight text-center shrink-0"
         style={{
-          width: 44, minHeight: 56,
+          width: 55,
+          alignSelf: 'stretch',
           background: '#2a2a2a',
           color: '#888',
-          borderRadius: '8px 0 0 8px',
-          padding: '4px',
+          borderRadius: '10px 0 0 10px',
         }}
       >
         채용시<br />마감
@@ -66,12 +66,13 @@ export function DBadge({ deadline }: Props) {
 
   return (
     <div
-      className="flex items-center justify-center text-[11px] font-bold"
+      className="flex items-center justify-center text-[14px] font-bold shrink-0"
       style={{
-        width: 44, minHeight: 56,
-        background: bg, color: fg,
-        borderRadius: '8px 0 0 8px',
-        flexShrink: 0,
+        width: 55,
+        alignSelf: 'stretch',
+        background: bg,
+        color: fg,
+        borderRadius: '10px 0 0 10px',
       }}
     >
       {label}

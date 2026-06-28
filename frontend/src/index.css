@@ -52,8 +52,8 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 .btn-sm {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; border: none;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; border: none;
 }
 .btn-error    { background: var(--color-error);   color: var(--color-error-foreground); }
 .btn-success  { background: var(--color-success); color: var(--color-success-foreground); }

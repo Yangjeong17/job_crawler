@@ -79,7 +79,7 @@ export function ScreeningPage() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--muted-foreground)' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
         불러오는 중...
       </div>
     )
@@ -87,19 +87,19 @@ export function ScreeningPage() {
 
   if (!current) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3" style={{ color: 'var(--muted-foreground)' }}>
-        <span className="text-4xl">✅</span>
-        <p className="text-sm">모든 공고를 검토했습니다.</p>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--muted-foreground)' }}>
+        <span style={{ fontSize: 36 }}>✅</span>
+        <p style={{ fontSize: 14 }}>모든 공고를 검토했습니다.</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <TopBar search="" onSearchChange={() => {}} showLegend={false} showSourceFilter={false} />
 
       {/* Stats Bar */}
-      <div className="flex items-center justify-center gap-6 px-6 shrink-0" style={{ height: 40, borderBottom: '1px solid var(--border)', background: 'var(--card)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexShrink: 0, height: 40, padding: '0 24px', borderBottom: '1px solid var(--border)', background: 'var(--card)' }}>
         {([
           ['스크리닝', pending.length - currentCardIndex, 'var(--brand-primary)'],
           ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
@@ -120,7 +120,7 @@ export function ScreeningPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center gap-6 p-6">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, padding: '16px 24px' }}>
         {/* Card deck shadow layers */}
         <div className="relative" style={{ width: 620 }}>
           {[2, 1].map((offset) => (
@@ -144,13 +144,12 @@ export function ScreeningPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -60 }}
               transition={{ duration: 0.2 }}
-              className="relative rounded-xl p-6 flex flex-col gap-3"
-              style={{ background: 'var(--card)', border: '1px solid var(--border)', zIndex: 3 }}
+              className="relative rounded-xl flex flex-col gap-3"
+              style={{ padding: '20px 24px', background: 'var(--card)', border: '1px solid var(--border)', zIndex: 3 }}
             >
               <div className="flex items-start justify-between">
                 <span
-                  className="text-[11px] px-2 py-0.5 rounded-full font-medium"
-                  style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)' }}
+                  style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 500, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}
                 >
                   {current.source}
                 </span>
@@ -180,7 +179,7 @@ export function ScreeningPage() {
               {current.tech_stack.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {current.tech_stack.map((t) => (
-                    <span key={t} className="text-[11px] px-2 py-0.5 rounded" style={{ background: 'var(--secondary)', color: 'var(--color-info-foreground)' }}>
+                    <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--secondary)', color: 'var(--color-info-foreground)' }}>
                       {t}
                     </span>
                   ))}
@@ -188,7 +187,7 @@ export function ScreeningPage() {
               )}
 
               {current.deadline && (
-                <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style={{ background: 'var(--secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '8px 12px', fontSize: 12, background: 'var(--secondary)' }}>
                   <span style={{ color: 'var(--muted-foreground)' }}>마감일</span>
                   <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{current.deadline}</span>
                   {current.salary && (
@@ -237,7 +236,7 @@ export function ScreeningPage() {
                 [shortcuts.open_url, '공고보기'],
               ] as [string, string][]).map(([key, label]) => (
                 <div key={label} className="flex items-center gap-1">
-                  <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)' }}>
                     {({ ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓' } as Record<string,string>)[key] ?? key}
                   </span>
                   <span className="text-[10px]" style={{ color: 'var(--muted-foreground)' }}>{label}</span>

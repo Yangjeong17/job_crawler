@@ -75,33 +75,37 @@ export function JobListPage({ mode }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <TopBar
         search={search}
         onSearchChange={setSearch}
         onAnalyzeAll={mode === 'favorites' ? analyzeAll : undefined}
       />
 
-      <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px', minHeight: 0 }}>
         {isLoading && (
-          <div className="flex items-center justify-center h-40 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160, fontSize: 14, color: 'var(--muted-foreground)' }}>
             불러오는 중...
           </div>
         )}
 
-        {jobs.map((job) => (
-          <ListCard
-            key={job.url}
-            job={job}
-            onNotInterested={mode !== 'not-interested' ? () => reassign(job.url, 'ni') : undefined}
-            onSave={mode !== 'saved' ? () => reassign(job.url, 'saved') : undefined}
-            onFavorite={mode !== 'favorites' ? () => reassign(job.url, 'favorite') : undefined}
-            onAnalyze={() => openAnalysis(job.url)}
-          />
-        ))}
+        {jobs.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {jobs.map((job) => (
+              <ListCard
+                key={job.url}
+                job={job}
+                onNotInterested={mode !== 'not-interested' ? () => reassign(job.url, 'ni') : undefined}
+                onSave={mode !== 'saved' ? () => reassign(job.url, 'saved') : undefined}
+                onFavorite={mode !== 'favorites' ? () => reassign(job.url, 'favorite') : undefined}
+                onAnalyze={() => openAnalysis(job.url)}
+              />
+            ))}
+          </div>
+        )}
 
         {!isLoading && jobs.length === 0 && (
-          <div className="flex items-center justify-center h-40 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160, fontSize: 14, color: 'var(--muted-foreground)' }}>
             항목이 없습니다.
           </div>
         )}

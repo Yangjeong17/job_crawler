@@ -75,28 +75,37 @@ export function ShortcutModal({ open, onClose }: Props) {
         style={{ width: 480, background: 'var(--sidebar)', border: '1px solid var(--border)', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 h-14" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 56, borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           <Keyboard size={16} style={{ color: 'var(--foreground)' }} />
-          <span className="font-semibold text-sm flex-1" style={{ color: 'var(--foreground)' }}>단축키 설정</span>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded" style={{ background: 'var(--secondary)', border: '1px solid var(--border)' }}>
+          <span style={{ fontWeight: 600, fontSize: 14, flex: 1, color: 'var(--foreground)' }}>단축키 설정</span>
+          <button
+            onClick={onClose}
+            style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, background: 'var(--secondary)', border: '1px solid var(--border)', cursor: 'pointer' }}
+          >
             <X size={13} style={{ color: 'var(--muted-foreground)' }} />
           </button>
         </div>
 
         {/* Rows */}
-        <div className="flex flex-col py-2">
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 0' }}>
           {ROWS.map(({ key, label, icon }) => (
-            <div key={key} className="flex items-center gap-3 px-5 h-11">
-              <span className="text-base w-6">{icon}</span>
-              <span className="flex-1 text-sm" style={{ color: 'var(--foreground)' }}>{label}</span>
+            <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 44 }}>
+              <span style={{ fontSize: 16, width: 24 }}>{icon}</span>
+              <span style={{ flex: 1, fontSize: 14, color: 'var(--foreground)' }}>{label}</span>
               <button
                 onClick={() => setCapturing(key)}
-                className="px-3 h-8 rounded-lg text-xs font-medium transition-colors"
                 style={{
+                  padding: '0 12px',
+                  height: 32,
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  minWidth: 100,
                   background: capturing === key ? 'var(--brand-primary)' : 'var(--secondary)',
                   color: capturing === key ? '#fff' : 'var(--foreground)',
                   border: `1px solid ${capturing === key ? 'var(--brand-primary)' : 'var(--border)'}`,
-                  minWidth: 100,
+                  cursor: 'pointer',
+                  transition: 'background 0.15s',
                 }}
               >
                 {capturing === key ? '키를 누르세요...' : displayKey(local[key])}
@@ -105,22 +114,29 @@ export function ShortcutModal({ open, onClose }: Props) {
           ))}
         </div>
 
-        <div className="h-px" style={{ background: 'var(--border)' }} />
+        <div style={{ height: 1, background: 'var(--border)' }} />
 
         {/* Footer */}
-        <div className="flex items-center gap-3 px-5 h-14">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 56, flexShrink: 0 }}>
           <button
             onClick={() => setLocal(DEFAULTS)}
-            className="flex items-center gap-1.5 px-4 h-9 rounded-lg text-xs flex-1"
-            style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)' }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '0 16px', height: 36, borderRadius: 8, fontSize: 12, flex: 1,
+              background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', cursor: 'pointer',
+            }}
           >
             <RotateCcw size={12} /> 초기화
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 px-4 h-9 rounded-lg text-xs flex-1 font-semibold disabled:opacity-50"
-            style={{ background: 'var(--color-info-foreground)', color: '#fff' }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '0 16px', height: 36, borderRadius: 8, fontSize: 12, fontWeight: 600, flex: 1,
+              background: 'var(--color-info-foreground)', color: '#fff', border: 'none', cursor: 'pointer',
+              opacity: saving ? 0.5 : 1,
+            }}
           >
             <Save size={12} /> 저장
           </button>

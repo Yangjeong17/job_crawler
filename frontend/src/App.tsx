@@ -14,13 +14,13 @@ export default function App() {
   const { toast, clearToast } = useAppStore()
 
   return (
-    <div className="flex h-full" style={{ background: 'var(--background)' }}>
+    <div style={{ display: 'flex', height: '100%', background: 'var(--background)' }}>
       <Sidebar />
 
-      <div className="flex flex-col flex-1 min-w-0 h-full">
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100%' }}>
         <TabBar onShortcutOpen={() => setShortcutOpen(true)} />
 
-        <div className="flex-1 overflow-hidden">
+        <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
           <Routes>
             <Route path="/" element={<Navigate to="/screening" replace />} />
             <Route path="/screening"      element={<ScreeningPage />} />
@@ -37,8 +37,8 @@ export default function App() {
 
       {toast && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl z-50 cursor-pointer"
-          style={{ background: 'var(--foreground)', color: 'var(--background)' }}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 rounded-xl text-sm font-medium shadow-2xl z-50 cursor-pointer"
+          style={{ padding: '12px 20px', background: 'var(--foreground)', color: 'var(--background)' }}
           onClick={clearToast}
         >
           {toast}

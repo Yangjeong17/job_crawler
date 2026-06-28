@@ -31,66 +31,76 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
 
   return (
     <div
-      className="flex rounded-lg overflow-hidden"
-      style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+      style={{
+        display: 'flex',
+        borderRadius: 10,
+        overflow: 'hidden',
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
+        minHeight: 80,
+      }}
     >
       <DBadge deadline={job.deadline} />
 
-      <div className="flex flex-col gap-1 flex-1 p-3">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ background: 'var(--color-info)', color: 'var(--color-info-foreground)' }}>
+      {/* 공고 정보 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, padding: '12px 12px', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 500, background: 'var(--color-info)', color: 'var(--color-info-foreground)' }}>
             {job.source}
           </span>
           {chip && chip.label && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: chip.bg, color: chip.fg }}>
+            <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 700, background: chip.bg, color: chip.fg }}>
               {chip.label}
             </span>
           )}
         </div>
-        <div className="text-sm font-semibold leading-snug" style={{ color: 'var(--foreground)' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.3, color: 'var(--foreground)' }}>
           {job.title}
         </div>
-        <div className="text-xs" style={{ color: 'var(--brand-primary)' }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--brand-primary)' }}>
           {job.company}
         </div>
-        <div className="flex gap-3 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--muted-foreground)' }}>
           {job.location && <span>{job.location}</span>}
           {job.experience && <span>{job.experience}</span>}
           {job.deadline && <span>마감: {job.deadline}</span>}
         </div>
       </div>
 
-      <div className="flex flex-col items-end justify-center gap-2 p-3 shrink-0">
-        <div className="flex gap-2">
+      {/* 액션 영역 */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 16px', flexShrink: 0 }}>
+        {/* 버튼 1줄: 관심없음 → 저장 → 즐겨찾기 → 공고보기 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {onNotInterested && (
             <button onClick={onNotInterested} className="btn-sm btn-error">
-              <ThumbsDown size={11} /> 관심없음
-            </button>
-          )}
-          {onFavorite && (
-            <button onClick={onFavorite} className="btn-sm btn-success">
-              <Heart size={11} /> 즐겨찾기
+              <ThumbsDown size={12} /> 관심없음
             </button>
           )}
           {onSave && (
             <button onClick={onSave} className="btn-sm btn-warning">
-              <Bookmark size={11} /> 저장
+              <Bookmark size={12} /> 저장
             </button>
           )}
-          {onAnalyze && (
-            <button onClick={onAnalyze} className="btn-sm btn-info">
-              <Sparkles size={11} /> 상세분석
+          {onFavorite && (
+            <button onClick={onFavorite} className="btn-sm btn-success">
+              <Heart size={12} /> 즐겨찾기
             </button>
           )}
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-sm btn-secondary"
-          >
-            <ExternalLink size={11} /> 공고 보기
+          <a href={job.url} target="_blank" rel="noreferrer" className="btn-sm btn-secondary">
+            <ExternalLink size={12} /> 공고 보기
           </a>
         </div>
+
+        {/* 상세분석 — 별도 줄 */}
+        {onAnalyze && (
+          <button
+            onClick={onAnalyze}
+            className="btn-sm btn-info"
+            style={{ width: '100%', justifyContent: 'center' }}
+          >
+            <Sparkles size={12} /> 상세분석
+          </button>
+        )}
       </div>
     </div>
   )

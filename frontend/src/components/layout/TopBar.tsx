@@ -28,22 +28,36 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
 
   return (
     <div
-      className="flex items-center gap-3 px-6 shrink-0"
-      style={{ height: 55, borderBottom: '1px solid var(--border)' }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        flexShrink: 0,
+        height: 55,
+        padding: '0 24px',
+        borderBottom: '1px solid var(--border)',
+      }}
     >
-      {/* Source filter chips */}
+      {/* 소스 필터 칩 */}
       {showSourceFilter && (
-        <div className="flex gap-1">
+        <div style={{ display: 'flex', gap: 4 }}>
           {SOURCES.map(({ value, label }) => {
             const active = sourceFilter === value
             return (
               <button
                 key={value}
                 onClick={() => setSourceFilter(value)}
-                className="px-3 h-[30px] rounded-full text-xs font-medium transition-colors"
                 style={{
+                  padding: '5px 14px',
+                  height: 30,
+                  borderRadius: 16,
+                  fontSize: 13,
+                  fontWeight: active ? 600 : 400,
                   background: active ? 'var(--brand-primary)' : 'var(--secondary)',
                   color: active ? '#fff' : 'var(--muted-foreground)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background 0.15s, color 0.15s',
                 }}
               >
                 {label}
@@ -53,40 +67,76 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
         </div>
       )}
 
-      {/* Search */}
+      {/* 검색창 */}
       <div
-        className="flex items-center gap-2 rounded-lg px-3 h-[34px]"
-        style={{ background: 'var(--secondary)', border: '1px solid var(--border)', width: 240 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '0 12px',
+          height: 34,
+          width: 240,
+          borderRadius: 8,
+          background: 'var(--secondary)',
+          border: '1px solid var(--border)',
+          flexShrink: 0,
+        }}
       >
-        <Search size={12} style={{ color: 'var(--muted-foreground)' }} />
+        <Search size={13} style={{ color: 'var(--muted-foreground)', flexShrink: 0 }} />
         <input
-          className="flex-1 bg-transparent outline-none text-xs"
-          style={{ color: 'var(--foreground)' }}
+          style={{
+            flex: 1,
+            background: 'transparent',
+            outline: 'none',
+            border: 'none',
+            fontSize: 12,
+            color: 'var(--foreground)',
+          }}
           placeholder="공고명·회사명 검색"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
 
-      {/* D Badge legend */}
+      {/* D Badge 범례 */}
       {showLegend && (
-        <div className="flex items-center gap-4 rounded-lg px-3 py-2" style={{ background: 'var(--secondary)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            padding: '8px 14px',
+            borderRadius: 8,
+            background: 'var(--secondary)',
+          }}
+        >
           {LEGEND.map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-              <span className="text-[11px]" style={{ color: 'var(--muted-foreground)' }}>{label}</span>
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+              <span style={{ fontSize: 11, color: 'var(--muted-foreground)' }}>{label}</span>
             </div>
           ))}
         </div>
       )}
 
-      <div className="flex-1" />
+      <div style={{ flex: 1 }} />
 
       {onReassign && (
         <button
           onClick={onReassign}
-          className="flex items-center gap-1.5 px-3 h-[30px] rounded-lg text-xs"
-          style={{ background: 'var(--secondary)', border: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            height: 30,
+            borderRadius: 8,
+            fontSize: 12,
+            background: 'var(--secondary)',
+            border: '1px solid var(--border)',
+            color: 'var(--muted-foreground)',
+            cursor: 'pointer',
+          }}
         >
           <RefreshCw size={12} /> 재분류
         </button>
@@ -95,8 +145,19 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
       {onAnalyzeAll && (
         <button
           onClick={onAnalyzeAll}
-          className="flex items-center gap-1.5 px-3 h-[30px] rounded-lg text-xs"
-          style={{ background: 'var(--color-info)', color: 'var(--color-info-foreground)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            height: 30,
+            borderRadius: 8,
+            fontSize: 12,
+            background: 'var(--color-info)',
+            color: 'var(--color-info-foreground)',
+            border: 'none',
+            cursor: 'pointer',
+          }}
         >
           <Sparkles size={12} /> AI 전체분석
         </button>

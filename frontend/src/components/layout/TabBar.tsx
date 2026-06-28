@@ -1,13 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import { Layers, LayoutList, ThumbsDown, Bookmark, Heart, Calendar, Keyboard } from 'lucide-react'
+import { Keyboard } from 'lucide-react'
 
 const TABS = [
-  { to: '/screening',     icon: Layers,      label: '스크리닝' },
-  { to: '/all',           icon: LayoutList,  label: '전체 공고' },
-  { to: '/not-interested',icon: ThumbsDown,  label: '관심없음' },
-  { to: '/saved',         icon: Bookmark,    label: '저장' },
-  { to: '/favorites',     icon: Heart,       label: '즐겨찾기' },
-  { to: '/scheduler',     icon: Calendar,    label: '스케줄러' },
+  { to: '/screening',      label: '스크리닝' },
+  { to: '/all',            label: '전체 공고' },
+  { to: '/not-interested', label: '관심없음' },
+  { to: '/saved',          label: '저장' },
+  { to: '/favorites',      label: '즐겨찾기' },
+  { to: '/scheduler',      label: '스케줄러' },
 ]
 
 interface Props {
@@ -17,37 +17,58 @@ interface Props {
 export function TabBar({ onShortcutOpen }: Props) {
   return (
     <div
-      className="flex items-end gap-1 shrink-0 px-2"
-      style={{ height: 64, background: 'var(--sidebar)', borderBottom: '1px solid var(--border)' }}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: 4,
+        flexShrink: 0,
+        height: 64,
+        padding: '0 8px',
+        background: 'var(--sidebar)',
+        borderBottom: '1px solid var(--border)',
+      }}
     >
-      {TABS.map(({ to, icon: Icon, label }) => (
+      {TABS.map(({ to, label }) => (
         <NavLink
           key={to}
           to={to}
-          className={({ isActive }) =>
-            `flex items-center gap-1.5 px-5 text-[13px] rounded-t-md transition-colors`
-            + (isActive
-              ? ' font-semibold'
-              : ' font-normal')
-          }
           style={({ isActive }) => ({
+            display: 'flex',
+            alignItems: 'center',
             height: 48,
+            padding: '0 20px',
+            fontSize: 13,
+            fontWeight: isActive ? 600 : 400,
+            borderRadius: '6px 6px 0 0',
             background: isActive ? 'var(--brand-primary)' : 'transparent',
             color: isActive ? '#fff' : 'var(--muted-foreground)',
+            textDecoration: 'none',
+            transition: 'background 0.15s, color 0.15s',
+            whiteSpace: 'nowrap',
           })}
         >
-          <Icon size={13} />
           {label}
         </NavLink>
       ))}
 
-      <div className="flex-1" />
+      <div style={{ flex: 1 }} />
 
-      <div className="flex items-center" style={{ height: 64 }}>
+      <div style={{ display: 'flex', alignItems: 'center', height: 64 }}>
         <button
           onClick={onShortcutOpen}
-          className="flex items-center gap-1.5 px-3 h-[34px] rounded-lg text-xs"
-          style={{ background: 'var(--secondary)', border: '1px solid var(--border)', color: 'var(--muted-foreground)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '0 12px',
+            height: 34,
+            borderRadius: 8,
+            fontSize: 12,
+            background: 'var(--secondary)',
+            border: '1px solid var(--border)',
+            color: 'var(--muted-foreground)',
+            cursor: 'pointer',
+          }}
         >
           <Keyboard size={12} />
           단축키
