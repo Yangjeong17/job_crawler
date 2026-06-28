@@ -1,4 +1,5 @@
 import logging
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
@@ -58,6 +59,8 @@ class JobPosting:
         ]
 
         deadline_str = self.deadline.replace("~", "").replace("까지", "").strip()
+        # (월)~(일) 같은 요일 표기 제거: "07/15(화)" → "07/15"
+        deadline_str = re.sub(r'\([가-힣]+\)', '', deadline_str).strip()
 
         for fmt in date_formats:
             try:

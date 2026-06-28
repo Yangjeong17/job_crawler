@@ -122,15 +122,22 @@ class SaraminCrawler(BaseCrawler):
 
             try:
                 self.driver.get(page_url)
-                time.sleep(2)
+                time.sleep(3)
 
                 # 채용공고 목록 대기
                 items = self.wait_for_elements(
-                    By.CSS_SELECTOR, ".item_recruit", timeout=10
+                    By.CSS_SELECTOR, ".item_recruit", timeout=15
                 )
-
+                # 대체 선택자 시도
                 if not items:
-                    logger.info(f"[사람인] 페이지 {page}: 결과 없음, 종료")
+                    items = self.driver.find_elements(
+                        By.CSS_SELECTOR,
+                        ".list_item_wrap .list_item, .box_item, [data-position-id], "
+                        ".job-item, .recruit-item, li[class*='item']"
+                    )
+                if not items:
+                    logger.info(f"[사람인] 페이지 {page}: 결과 없음, 종료. "
+                                f"현재 URL: {self.driver.current_url}")
                     break
 
                 for item in items:
@@ -183,8 +190,15 @@ class SaraminCrawler(BaseCrawler):
         education  = cond_parts[2] if len(cond_parts) > 2 else ""
         job_type   = cond_parts[3] if len(cond_parts) > 3 else ""
 
-        # 마감일
-        deadline = self.safe_get_text(item, ".job_date .date")
+        # 마감일 — 여러 선택자 순서대로 시도
+        deadline = (
+            self.safe_get_text(item, ".job_date .date")
+            or self.safe_get_text(item, ".job_date span")
+            or self.safe_get_text(item, ".date")
+            or ""
+        )
+        # (월)~(일) 요일 표기 및 ~ 제거 → 저장 형태 통일 e.g. "07/15"
+        deadline = re.sub(r'\([가-힣]+\)', '', deadline).replace("~", "").strip()
 
         # 직무 분야 (카테고리 태그 + 기술스택 추출에 사용)
         sector_raw = self.safe_get_text(item, ".job_sector") or ""

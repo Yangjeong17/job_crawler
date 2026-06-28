@@ -17,6 +17,8 @@ export function Sidebar() {
   const [showHistory, setShowHistory] = useState(false)
   const [showDbSwitch, setShowDbSwitch] = useState(false)
   const [switchTarget, setSwitchTarget] = useState('')
+  const [newDbName, setNewDbName] = useState('')
+  const [dbCreateMode, setDbCreateMode] = useState(false)
   const [switching, setSwitching] = useState(false)
 
   const { crawlLog, addCrawlLog, clearCrawlLog } = useAppStore()
@@ -30,14 +32,16 @@ export function Sidebar() {
   const { data: currentDb, refetch: refetchCurrentDb } = useQuery({ queryKey: ['db-current'], queryFn: api.dbCurrent })
 
   async function handleDbSwitch() {
-    if (!switchTarget || switching) return
+    const target = dbCreateMode ? newDbName.trim() : switchTarget
+    if (!target || switching) return
     setSwitching(true)
     try {
-      await api.dbSwitch(switchTarget)
+      await api.dbSwitch(target)
       await refetchCurrentDb()
       qc.invalidateQueries()
       setShowDbSwitch(false)
       setSwitchTarget('')
+      setNewDbName('')
     } finally {
       setSwitching(false)
     }
@@ -53,6 +57,7 @@ export function Sidebar() {
         addCrawlLog(`완료: ${msg.total}개 수집, ${msg.filtered}개 표시`)
         setCrawling(false)
         ws.close()
+        qc.invalidateQueries({ queryKey: ['jobs-screening'] })
       }
       if (msg.type === 'error') {
         addCrawlLog(`오류: ${msg.message}`)
@@ -92,22 +97,55 @@ export function Sidebar() {
 
       {showDbSwitch && (
         <div className="flex flex-col gap-2 shrink-0" style={{ padding: '8px 16px 12px', background: 'var(--secondary)', borderBottom: '1px solid var(--border)' }}>
-          <select
-            className="w-full h-8 rounded text-xs"
-            style={{ padding: '0 8px', background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
-            value={switchTarget}
-            onChange={(e) => setSwitchTarget(e.target.value)}
-          >
-            <option value="">DB 선택...</option>
-            {dbFiles?.files.map((f) => <option key={f} value={f}>{f}</option>)}
-          </select>
+          {/* 탭 */}
+          <div className="flex rounded overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+            {(['기존 선택', '새로 만들기'] as const).map((label, i) => {
+              const active = dbCreateMode === (i === 1)
+              return (
+                <button
+                  key={label}
+                  onClick={() => setDbCreateMode(i === 1)}
+                  className="flex-1 text-[11px] font-medium"
+                  style={{
+                    height: 26, border: 'none', cursor: 'pointer',
+                    background: active ? 'var(--brand-primary)' : 'transparent',
+                    color: active ? '#fff' : 'var(--muted-foreground)',
+                  }}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+
+          {dbCreateMode ? (
+            <input
+              className="w-full h-8 rounded text-xs"
+              style={{ padding: '0 8px', background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)', outline: 'none' }}
+              placeholder="새 DB 이름 (예: jobs_2.db)"
+              value={newDbName}
+              onChange={(e) => setNewDbName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleDbSwitch()}
+            />
+          ) : (
+            <select
+              className="w-full h-8 rounded text-xs"
+              style={{ padding: '0 8px', background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
+              value={switchTarget}
+              onChange={(e) => setSwitchTarget(e.target.value)}
+            >
+              <option value="">DB 선택...</option>
+              {dbFiles?.files.map((f) => <option key={f} value={f}>{f}</option>)}
+            </select>
+          )}
+
           <button
-            disabled={!switchTarget || switching}
+            disabled={dbCreateMode ? !newDbName.trim() || switching : !switchTarget || switching}
             onClick={handleDbSwitch}
             className="w-full h-8 rounded text-xs font-semibold disabled:opacity-50"
             style={{ background: 'var(--brand-primary)', color: '#fff' }}
           >
-            {switching ? '전환 중...' : '전환'}
+            {switching ? (dbCreateMode ? '생성 중...' : '전환 중...') : (dbCreateMode ? '생성 후 전환' : '전환')}
           </button>
         </div>
       )}

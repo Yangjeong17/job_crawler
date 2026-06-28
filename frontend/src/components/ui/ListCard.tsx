@@ -3,10 +3,21 @@ import type { Job } from '../../types/job'
 import { DBadge } from './DBadge'
 
 function daysLeft(deadline: string): number | null {
-  const m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
-  if (!m) return null
-  const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
-  return Math.ceil((target.getTime() - Date.now()) / 86400000)
+  // YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD
+  let m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (m) {
+    const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
+    return Math.ceil((target.getTime() - Date.now()) / 86400000)
+  }
+  // MM/DD 또는 MM.DD (사람인 단형 포맷 — 올해 또는 내년으로 해석)
+  m = deadline.match(/^(\d{1,2})[\/.](\d{1,2})$/)
+  if (m) {
+    const now = new Date()
+    const target = new Date(now.getFullYear(), parseInt(m[1]) - 1, parseInt(m[2]))
+    if (target.getTime() < now.getTime()) target.setFullYear(now.getFullYear() + 1)
+    return Math.ceil((target.getTime() - now.getTime()) / 86400000)
+  }
+  return null
 }
 
 function ddayChipStyle(days: number | null): { bg: string; fg: string; label: string } {

@@ -6,8 +6,7 @@ const TABS = [
   { to: '/all',            label: '전체 공고' },
   { to: '/not-interested', label: '관심없음' },
   { to: '/saved',          label: '저장' },
-  { to: '/favorites',      label: '즐겨찾기' },
-  { to: '/scheduler',      label: '스케줄러' },
+  { to: '/scheduler',      label: '즐겨찾기' },
 ]
 
 interface Props {

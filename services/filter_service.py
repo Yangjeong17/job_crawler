@@ -87,7 +87,9 @@ class FilterService:
             return sorted(jobs, key=lambda j: j.source)
         elif sort_by == "deadline":
             def _deadline_key(j: JobPosting):
+                import re as _re
                 s = (j.deadline or "").replace("~", "").replace("까지", "").strip()
+                s = _re.sub(r'\([가-힣]+\)', '', s).strip()
                 for fmt in ["%Y-%m-%d", "%Y.%m.%d", "%Y/%m/%d", "%m/%d", "%m.%d"]:
                     try:
                         d = datetime.strptime(s, fmt)

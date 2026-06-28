@@ -1,5 +1,14 @@
-import { Search, RefreshCw, Sparkles } from 'lucide-react'
+import { useRef, useState, useEffect } from 'react'
+import { Search, RefreshCw, Sparkles, ArrowUpDown, Check } from 'lucide-react'
 import { useAppStore, type SourceFilter } from '../../store/useAppStore'
+
+export type SortBy = 'deadline' | 'recent' | 'ongoing'
+
+const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+  { value: 'deadline', label: '마감일순' },
+  { value: 'recent',   label: '최근 저장순' },
+  { value: 'ongoing',  label: '상시채용' },
+]
 
 interface Props {
   search: string
@@ -8,6 +17,8 @@ interface Props {
   onAnalyzeAll?: () => void
   showLegend?: boolean
   showSourceFilter?: boolean
+  sort?: SortBy
+  onSortChange?: (s: SortBy) => void
 }
 
 const LEGEND = [
@@ -23,8 +34,19 @@ const SOURCES: { value: SourceFilter; label: string }[] = [
   { value: 'jobkorea', label: '잡코리아' },
 ]
 
-export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showLegend = true, showSourceFilter = true }: Props) {
+export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showLegend = true, showSourceFilter = true, sort, onSortChange }: Props) {
   const { sourceFilter, setSourceFilter } = useAppStore()
+  const [sortOpen, setSortOpen] = useState(false)
+  const sortRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!sortOpen) return
+    function handleClick(e: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) setSortOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [sortOpen])
 
   return (
     <div
@@ -120,6 +142,50 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
       )}
 
       <div style={{ flex: 1 }} />
+
+      {onSortChange && (
+        <div ref={sortRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setSortOpen((v) => !v)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 12px', height: 30, borderRadius: 8, fontSize: 12,
+              background: sort && sort !== 'recent' ? 'var(--brand-primary-bg)' : 'var(--secondary)',
+              border: sort && sort !== 'recent' ? '1px solid var(--brand-primary)' : '1px solid var(--border)',
+              color: sort && sort !== 'recent' ? 'var(--brand-primary)' : 'var(--muted-foreground)',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowUpDown size={12} />
+            {SORT_OPTIONS.find((o) => o.value === (sort ?? 'recent'))?.label}
+          </button>
+          {sortOpen && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50,
+              background: 'var(--card)', border: '1px solid var(--border)',
+              borderRadius: 8, overflow: 'hidden', minWidth: 130,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+            }}>
+              {SORT_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => { onSortChange(value); setSortOpen(false) }}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', padding: '8px 14px', fontSize: 12, border: 'none',
+                    background: sort === value ? 'var(--brand-primary-bg)' : 'transparent',
+                    color: sort === value ? 'var(--brand-primary)' : 'var(--foreground)',
+                    cursor: 'pointer', textAlign: 'left',
+                  }}
+                >
+                  {label}
+                  {sort === value && <Check size={11} />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {onReassign && (
         <button

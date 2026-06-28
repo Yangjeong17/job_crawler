@@ -43,7 +43,8 @@ function deadlineBadgeStyle(days: number | null) {
 }
 
 export function SchedulerPage() {
-  const [view, setView] = useState<View>('list')
+  const [view, setView] = useState<View>('calendar')
+  const [search, setSearch] = useState('')
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
@@ -74,7 +75,10 @@ export function SchedulerPage() {
     qc.invalidateQueries({ queryKey: ['jobs-saved'] })
   }
 
-  const jobsWithDeadline = jobs.filter((j) => j.deadline && parseDaysLeft(j.deadline) !== null)
+  const filteredJobs = search.trim()
+    ? jobs.filter((j) => j.title.includes(search) || j.company.includes(search))
+    : jobs
+  const jobsWithDeadline = filteredJobs.filter((j) => j.deadline && parseDaysLeft(j.deadline) !== null)
   const deadlineMap: Record<string, typeof jobs> = {}
   for (const j of jobsWithDeadline) {
     const m = j.deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
@@ -91,7 +95,7 @@ export function SchedulerPage() {
       {/* Sched top bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0, height: 48, padding: '0 24px', background: 'var(--neutral-action)', borderBottom: '1px solid var(--border)' }}>
         <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-          {(['list', 'calendar'] as View[]).map((v) => (
+          {(['calendar', 'list'] as View[]).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
@@ -101,26 +105,32 @@ export function SchedulerPage() {
                 color: view === v ? 'var(--color-info-foreground)' : 'var(--muted-foreground)',
               }}
             >
-              {v === 'list' ? '리스트' : '캘린더'}
+              {v === 'list' ? '리스트' : '스케줄러'}
             </button>
           ))}
         </div>
         <div className="flex-1" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '0 12px', height: 32, background: 'var(--secondary)', border: '1px solid var(--border)' }}>
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>공고명·회사명 검색</span>
+          <input
+            className="bg-transparent outline-none text-xs"
+            style={{ color: 'var(--foreground)', width: 180 }}
+            placeholder="공고명·회사명 검색"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
       {view === 'list' ? (
         <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px', minHeight: 0 }}>
-          {jobs.length === 0 && (
+          {filteredJobs.length === 0 && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160, fontSize: 14, color: 'var(--muted-foreground)' }}>
-              저장된 공고가 없습니다.
+              {search.trim() ? '검색 결과가 없습니다.' : '저장된 공고가 없습니다.'}
             </div>
           )}
-          {jobs.length > 0 && (
+          {filteredJobs.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {[...jobs]
+              {[...filteredJobs]
                 .sort((a, b) => (parseDaysLeft(a.deadline) ?? 999) - (parseDaysLeft(b.deadline) ?? 999))
                 .map((job) => (
                   <ListCard
