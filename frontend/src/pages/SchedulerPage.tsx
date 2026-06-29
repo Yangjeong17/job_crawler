@@ -35,8 +35,8 @@ function parseDaysLeft(deadline: string): number | null {
 }
 
 function deadlineBadgeStyle(days: number | null) {
-  if (days === null) return { bg: 'var(--secondary)', fg: '#888' }
-  if (days < 0)  return { bg: 'var(--secondary)', fg: '#555' }
+  if (days === null) return { bg: 'var(--secondary)', fg: 'var(--badge-gray-text)' }
+  if (days < 0)  return { bg: 'var(--secondary)', fg: 'var(--muted-foreground)' }
   if (days <= 3) return { bg: 'var(--color-error)',   fg: 'var(--color-error-foreground)' }
   if (days <= 7) return { bg: 'var(--color-warning)', fg: 'var(--color-warning-foreground)' }
   return { bg: 'var(--color-success)', fg: 'var(--color-success-foreground)' }

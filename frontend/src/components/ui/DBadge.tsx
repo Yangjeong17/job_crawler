@@ -39,8 +39,8 @@ export function DBadge({ deadline }: Props) {
         style={{
           width: 55,
           alignSelf: 'stretch',
-          background: '#2a2a2a',
-          color: '#888',
+          background: 'var(--badge-gray-bg)',
+          color: 'var(--badge-gray-text)',
           borderRadius: '10px 0 0 10px',
         }}
       >
@@ -57,7 +57,7 @@ export function DBadge({ deadline }: Props) {
   let label = `D-${days}`
 
   if (days < 0) {
-    bg = '#1a1a1a'; fg = '#555'; label = '마감'
+    bg = 'var(--secondary)'; fg = 'var(--muted-foreground)'; label = '마감'
   } else if (days <= 3) {
     bg = 'var(--color-error)'; fg = 'var(--color-error-foreground)'
   } else if (days <= 7) {

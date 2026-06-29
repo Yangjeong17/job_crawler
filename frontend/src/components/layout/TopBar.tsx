@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
-import { Search, RefreshCw, Sparkles, ArrowUpDown, Check } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
+import { Search, RefreshCw, Sparkles, ArrowUpDown, Check, ThumbsDown, Bookmark, Heart } from 'lucide-react'
 import { useAppStore, type SourceFilter } from '../../store/useAppStore'
 
 export type SortBy = 'deadline' | 'recent' | 'ongoing'
@@ -17,6 +18,7 @@ interface Props {
   onAnalyzeAll?: () => void
   showLegend?: boolean
   showSourceFilter?: boolean
+  showTabNav?: boolean
   sort?: SortBy
   onSortChange?: (s: SortBy) => void
 }
@@ -25,7 +27,7 @@ const LEGEND = [
   { color: 'var(--color-error-foreground)',   label: 'D-3' },
   { color: 'var(--color-warning-foreground)', label: 'D-7' },
   { color: 'var(--color-success-foreground)', label: 'D-30' },
-  { color: '#888',                            label: '채용시' },
+  { color: 'var(--badge-gray-text)',           label: '채용시' },
 ]
 
 const SOURCES: { value: SourceFilter; label: string }[] = [
@@ -34,7 +36,7 @@ const SOURCES: { value: SourceFilter; label: string }[] = [
   { value: 'jobkorea', label: '잡코리아' },
 ]
 
-export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showLegend = true, showSourceFilter = true, sort, onSortChange }: Props) {
+export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showLegend = true, showSourceFilter = true, showTabNav = false, sort, onSortChange }: Props) {
   const { sourceFilter, setSourceFilter } = useAppStore()
   const [sortOpen, setSortOpen] = useState(false)
   const sortRef = useRef<HTMLDivElement>(null)
@@ -142,6 +144,30 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
       )}
 
       <div style={{ flex: 1 }} />
+
+      {showTabNav && (
+        <div style={{ display: 'flex', gap: 6 }}>
+          {([
+            { to: '/not-interested', label: '관심없음', icon: ThumbsDown, bg: 'var(--color-error)',     fg: 'var(--color-error-foreground)' },
+            { to: '/saved',          label: '저장',     icon: Bookmark,   bg: 'var(--color-success)',   fg: 'var(--color-success-foreground)' },
+            { to: '/favorites',      label: '즐겨찾기', icon: Heart,      bg: 'var(--brand-primary-bg)', fg: 'var(--brand-primary)' },
+          ] as const).map(({ to, label, icon: Icon, bg, fg }) => (
+            <NavLink
+              key={to}
+              to={to}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '5px 12px', height: 30, borderRadius: 8, fontSize: 12,
+                background: bg, color: fg, border: '1px solid var(--border)',
+                textDecoration: 'none', whiteSpace: 'nowrap',
+              }}
+            >
+              <Icon size={12} />
+              {label}
+            </NavLink>
+          ))}
+        </div>
+      )}
 
       {onSortChange && (
         <div ref={sortRef} style={{ position: 'relative' }}>

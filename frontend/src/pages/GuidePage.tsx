@@ -1,5 +1,5 @@
 import {
-  Database, Search, Globe, Calendar, History, FolderOpen,
+  Database, Search, Calendar, History, FolderOpen,
   ThumbsDown, Bookmark, Heart, Undo2, ExternalLink, Sparkles,
   Keyboard, ArrowLeft, ArrowRight, ArrowUp, List, LayoutGrid,
 } from 'lucide-react'

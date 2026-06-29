@@ -10,7 +10,7 @@ function daysLeft(deadline: string): number | null {
     return Math.ceil((target.getTime() - Date.now()) / 86400000)
   }
   // MM/DD 또는 MM.DD (사람인 단형 포맷 — 올해 또는 내년으로 해석)
-  m = deadline.match(/^(\d{1,2})[\/.](\d{1,2})$/)
+  m = deadline.match(/^(\d{1,2})[/.](\d{1,2})$/)
   if (m) {
     const now = new Date()
     const target = new Date(now.getFullYear(), parseInt(m[1]) - 1, parseInt(m[2]))
@@ -22,7 +22,7 @@ function daysLeft(deadline: string): number | null {
 
 function ddayChipStyle(days: number | null): { bg: string; fg: string; label: string } {
   if (days === null) return { bg: 'transparent', fg: 'transparent', label: '' }
-  if (days < 0)  return { bg: 'var(--secondary)', fg: '#555', label: '마감' }
+  if (days < 0)  return { bg: 'var(--secondary)', fg: 'var(--muted-foreground)', label: '마감' }
   if (days <= 3) return { bg: 'var(--color-error)',   fg: 'var(--color-error-foreground)',   label: `D-${days}` }
   if (days <= 7) return { bg: 'var(--color-warning)', fg: 'var(--color-warning-foreground)', label: `D-${days}` }
   return { bg: 'var(--color-success)', fg: 'var(--color-success-foreground)', label: `D-${days}` }
@@ -57,11 +57,16 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, padding: '12px 12px', minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 500, background: 'var(--color-info)', color: 'var(--color-info-foreground)' }}>
-            {job.source}
+            {{ saramin: '사람인', jobkorea: '잡코리아' }[job.source] ?? job.source}
           </span>
           {chip && chip.label && (
             <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 700, background: chip.bg, color: chip.fg }}>
               {chip.label}
+            </span>
+          )}
+          {job.job_type?.includes('헤드헌터') && (
+            <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, fontWeight: 600, background: 'var(--brand-primary-subtle)', color: 'var(--brand-primary)' }}>
+              헤드헌터
             </span>
           )}
         </div>
@@ -76,6 +81,20 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
           {job.experience && <span>{job.experience}</span>}
           {job.deadline && <span>마감: {job.deadline}</span>}
         </div>
+        {(job.categories?.length > 0 || job.tech_stack?.length > 0) && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+            {job.categories?.map((c) => (
+              <span key={c} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
+                {c}
+              </span>
+            ))}
+            {job.tech_stack?.map((t) => (
+              <span key={t} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'var(--brand-primary-subtle)', color: 'var(--color-info-foreground)' }}>
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 액션 영역 */}

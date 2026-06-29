@@ -1,14 +1,30 @@
 import { NavLink } from 'react-router-dom'
-import { Keyboard } from 'lucide-react'
+import { Keyboard, BookOpen, Layers, LayoutList, ThumbsDown, Bookmark, Heart } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const TABS = [
-  { to: '/screening',      label: '스크리닝' },
-  { to: '/all',            label: '전체 공고' },
-  { to: '/not-interested', label: '관심없음' },
-  { to: '/saved',          label: '저장' },
-  { to: '/scheduler',      label: '즐겨찾기' },
-  { to: '/guide',          label: '사용법' },
+const TABS: { to: string; label: string; icon: LucideIcon }[] = [
+  { to: '/screening',      label: '스크리닝',  icon: Layers },
+  { to: '/all',            label: '전체 공고', icon: LayoutList },
+  { to: '/not-interested', label: '관심없음',  icon: ThumbsDown },
+  { to: '/saved',          label: '저장',      icon: Bookmark },
+  { to: '/favorites',      label: '즐겨찾기',  icon: Heart },
 ]
+
+const AUX_BTN_BASE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '0 12px',
+  height: 34,
+  borderRadius: 'var(--radius-sm)',
+  fontSize: 12,
+  background: 'var(--secondary)',
+  border: '1px solid var(--border)',
+  color: 'var(--muted-foreground)',
+  cursor: 'pointer',
+  textDecoration: 'none',
+  whiteSpace: 'nowrap',
+}
 
 interface Props {
   onShortcutOpen?: () => void
@@ -28,15 +44,16 @@ export function TabBar({ onShortcutOpen }: Props) {
         borderBottom: '1px solid var(--border)',
       }}
     >
-      {TABS.map(({ to, label }) => (
+      {TABS.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}
           to={to}
           style={({ isActive }) => ({
             display: 'flex',
             alignItems: 'center',
+            gap: 6,
             height: 48,
-            padding: '0 20px',
+            padding: '0 16px',
             fontSize: 13,
             fontWeight: isActive ? 600 : 400,
             borderRadius: '6px 6px 0 0',
@@ -47,29 +64,30 @@ export function TabBar({ onShortcutOpen }: Props) {
             whiteSpace: 'nowrap',
           })}
         >
+          <Icon size={14} />
           {label}
         </NavLink>
       ))}
 
       <div style={{ flex: 1 }} />
 
-      <div style={{ display: 'flex', alignItems: 'center', height: 64 }}>
-        <button
-          onClick={onShortcutOpen}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '0 12px',
-            height: 34,
-            borderRadius: 8,
-            fontSize: 12,
-            background: 'var(--secondary)',
-            border: '1px solid var(--border)',
-            color: 'var(--muted-foreground)',
-            cursor: 'pointer',
-          }}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 64 }}>
+        <NavLink
+          to="/guide"
+          style={({ isActive }) => ({
+            ...AUX_BTN_BASE,
+            ...(isActive ? {
+              background: 'var(--brand-primary-bg)',
+              color: 'var(--brand-primary)',
+              borderColor: 'var(--brand-primary)',
+            } : {}),
+          })}
         >
+          <BookOpen size={12} />
+          사용법
+        </NavLink>
+
+        <button onClick={onShortcutOpen} style={AUX_BTN_BASE}>
           <Keyboard size={12} />
           단축키
         </button>

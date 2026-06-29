@@ -22,6 +22,7 @@ export function AnalysisModal({ loading, result, error, onClose }: Props) {
           width: 640,
           maxWidth: '90vw',
           maxHeight: '80vh',
+          boxShadow: 'var(--shadow-modal)',
         }}
         onClick={(e) => e.stopPropagation()}
       >

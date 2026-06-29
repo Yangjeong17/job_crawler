@@ -58,22 +58,31 @@
   /* 상태 색상 */
   --color-error:             #3B1212;
   --color-error-foreground:  #F87171;
-  --color-warning:           #3B2208;
-  --color-warning-foreground:#F59E0B;
+  --color-warning:           #3B2208;  /* Btn 저장 bg, D Badge 노랑 bg */
+  --color-warning-foreground:#F59E0B;  /* D Badge 노랑 text 전용 — Btn 저장 text는 --primary 사용 */
   --color-success:           #0B341C;
   --color-success-foreground:#4ADE80;
   --color-info:              #1F3B5D;
   --color-info-foreground:   #57A6FF;
   --destructive:             #F87171;
 
-  /* 기본 primary (주황) */
+  /* 기본 primary (주황) — Btn 저장 text/icon 색상 */
   --primary:             #FF8400;
   --primary-foreground:  #111111;
 
   /* Border radius */
   --radius-none: 0px;
-  --radius-m:    16px;
+  --radius-xs:   6px;   /* 입력창, Key Badge, DB Dropdown */
+  --radius-sm:   8px;   /* 버튼 전반, 모달 하단 버튼 */
+  --radius-md:   10px;  /* List Card, D Badge 기준 반경 */
+  --radius-lg:   12px;  /* 단축키 모달, 팝업 */
+  --radius-m:    16px;  /* 스와이프 카드 */
   --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-modal:         0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-swipe-circle:  0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-superlike:     0 0 40px 16px rgba(59, 130, 246, 0.31);
 
   /* 스와이프 오버레이 색상 */
   --swipe-left:         #66373a;

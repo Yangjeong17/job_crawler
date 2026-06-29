@@ -5,19 +5,39 @@ import { api } from '../api/client'
 import { TopBar } from '../components/layout/TopBar'
 import { useAppStore } from '../store/useAppStore'
 
+function deadlineDays(deadline: string): number | null {
+  if (!deadline) return null
+  const skip = ['상시', '채용시', '수시', '채용 시']
+  if (skip.some((k) => deadline.includes(k))) return null
+
+  // YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD
+  let m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (m) {
+    const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
+    return Math.ceil((target.getTime() - Date.now()) / 86400000)
+  }
+  // MM/DD 또는 MM.DD (사람인 단형)
+  m = deadline.match(/^(\d{1,2})[/.](\d{1,2})$/)
+  if (m) {
+    const now = new Date()
+    const target = new Date(now.getFullYear(), parseInt(m[1]) - 1, parseInt(m[2]))
+    if (target.getTime() < now.getTime()) target.setFullYear(now.getFullYear() + 1)
+    return Math.ceil((target.getTime() - now.getTime()) / 86400000)
+  }
+  return null
+}
+
 function deadlineColor(deadline: string): string {
   if (!deadline) return 'var(--muted-foreground)'
-  const skip = ['상시', '채용시', '수시']
-  if (skip.some((k) => deadline.includes(k))) return '#888'
+  const skip = ['상시', '채용시', '수시', '채용 시']
+  if (skip.some((k) => deadline.includes(k))) return 'var(--badge-gray-text)'
 
-  const m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
-  if (!m) return 'var(--muted-foreground)'
-  const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
-  const days = Math.ceil((target.getTime() - Date.now()) / 86400000)
-  if (days < 0) return '#555'
-  if (days <= 3) return 'var(--color-error-foreground)'
-  if (days <= 7) return 'var(--color-warning-foreground)'
-  return 'var(--color-success-foreground)'
+  const days = deadlineDays(deadline)
+  if (days === null) return 'var(--muted-foreground)'
+  if (days < 0)  return 'var(--badge-gray-text)'
+  if (days <= 3) return 'var(--badge-red-text)'
+  if (days <= 7) return 'var(--badge-yellow-text)'
+  return 'var(--badge-green-text)'
 }
 
 export function AllJobsPage() {
@@ -33,7 +53,7 @@ export function AllJobsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <TopBar search={search} onSearchChange={setSearch} showLegend={false} />
+      <TopBar search={search} onSearchChange={setSearch} showLegend={false} showTabNav />
 
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '16px 24px' }}>
         {/* Column header */}

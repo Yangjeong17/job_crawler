@@ -11,7 +11,6 @@ export function Sidebar() {
   const [keyword, setKeyword] = useState('')
   const [useSaramin, setUseSaramin] = useState(true)
   const [useJobkorea, setUseJobkorea] = useState(true)
-  const [crawling, setCrawling] = useState(false)
   const [showImport, setShowImport] = useState(false)
   const [selectedDb, setSelectedDb] = useState('')
   const [showHistory, setShowHistory] = useState(false)
@@ -21,7 +20,7 @@ export function Sidebar() {
   const [dbCreateMode, setDbCreateMode] = useState(false)
   const [switching, setSwitching] = useState(false)
 
-  const { crawlLog, addCrawlLog, clearCrawlLog } = useAppStore()
+  const { crawling, setCrawling, crawlLog, addCrawlLog, clearCrawlLog } = useAppStore()
   const qc = useQueryClient()
 
   const { data: stats }    = useQuery({ queryKey: ['stats'],      queryFn: api.stats,          refetchInterval: 10000 })
@@ -251,7 +250,12 @@ export function Sidebar() {
             <div className="text-[11px]" style={{ padding: '8px 16px', color: 'var(--muted-foreground)' }}>기록 없음</div>
           ) : (
             historyData?.history.map((h) => (
-              <div key={h.keyword} className="flex items-center justify-between text-[11px]" style={{ padding: '6px 16px', color: 'var(--foreground)' }}>
+              <div
+                key={h.keyword}
+                className="flex items-center justify-between text-[11px] cursor-pointer"
+                style={{ padding: '6px 16px', color: 'var(--foreground)' }}
+                onClick={() => { setKeyword(h.keyword); setShowHistory(false) }}
+              >
                 <span className="truncate flex-1">{h.keyword}</span>
                 <span style={{ flexShrink: 0, marginLeft: 8, color: 'var(--muted-foreground)' }}>{h.count}회</span>
               </div>
@@ -278,8 +282,8 @@ export function Sidebar() {
             style={{ padding: '0 12px', background: 'var(--secondary)', border: '1px solid var(--border)', cursor: 'pointer' }}
           >
             <select
-              className="flex-1 bg-transparent outline-none"
-              style={{ color: 'var(--foreground)', cursor: 'pointer' }}
+              className="flex-1 outline-none"
+              style={{ background: 'var(--card)', color: 'var(--foreground)', cursor: 'pointer', fontSize: 12 }}
               value={selectedDb}
               onChange={(e) => setSelectedDb(e.target.value)}
             >

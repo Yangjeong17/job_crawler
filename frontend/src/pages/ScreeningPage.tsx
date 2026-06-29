@@ -1,35 +1,46 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import type { PanInfo } from 'framer-motion'
-import { ThumbsDown, Heart, Bookmark, Undo2, Sparkles, ExternalLink } from 'lucide-react'
+import { ThumbsDown, Heart, Bookmark, Undo2, ExternalLink } from 'lucide-react'
 import { api } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { TopBar } from '../components/layout/TopBar'
 import { useShortcuts } from '../hooks/useShortcuts'
-import { AnalysisModal } from '../components/ui/AnalysisModal'
 import { GuidePage } from './GuidePage'
 import type { SwipeAction } from '../types/job'
 
+const CRAWL_EMOJIS = ['🔍', '🌐', '📋', '⚡', '🤖', '💫']
+
 export function ScreeningPage() {
   const qc = useQueryClient()
+  const navigate = useNavigate()
   const {
     screeningJobs, notInterestedUrls, savedUrls, favoriteUrls,
     setScreeningData, currentCardIndex, advanceCard, undoCard,
-    sourceFilter,
+    sourceFilter, crawling, crawlLog,
   } = useAppStore()
 
-  const [analysisLoading, setAnalysisLoading] = useState(false)
-  const [analysisResult, setAnalysisResult] = useState<string | null>(null)
-  const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [isExiting, setIsExiting] = useState(false)
+  const [emojiIdx, setEmojiIdx] = useState(0)
+  const emojiTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    if (crawling) {
+      emojiTimer.current = setInterval(() => setEmojiIdx((i) => (i + 1) % CRAWL_EMOJIS.length), 700)
+    } else {
+      if (emojiTimer.current) clearInterval(emojiTimer.current)
+    }
+    return () => { if (emojiTimer.current) clearInterval(emojiTimer.current) }
+  }, [crawling])
 
   const { data: shortcuts } = useQuery({ queryKey: ['shortcuts'], queryFn: api.shortcuts.get, staleTime: Infinity })
   const { data, isLoading } = useQuery({ queryKey: ['jobs-screening'], queryFn: api.jobs.search })
 
   useEffect(() => {
     if (data) setScreeningData(data.jobs, data.not_interested_urls, data.saved_urls, data.favorite_urls)
-  }, [data])
+  }, [data, setScreeningData])
 
   const pending = screeningJobs.filter(
     (j) =>
@@ -100,21 +111,6 @@ export function ScreeningPage() {
     }
   }
 
-  async function openAnalysis() {
-    if (!current) return
-    setAnalysisResult(null)
-    setAnalysisError(null)
-    setAnalysisLoading(true)
-    try {
-      const { result } = await api.analyze(current.url)
-      setAnalysisResult(result)
-    } catch (e: any) {
-      setAnalysisError(e.message ?? '분석 실패')
-    } finally {
-      setAnalysisLoading(false)
-    }
-  }
-
   async function undo() {
     try {
       await api.jobs.undo()
@@ -132,6 +128,35 @@ export function ScreeningPage() {
 
   const totalProcessed = screeningJobs.length - pending.length + currentCardIndex
 
+  // 검색 중 화면
+  if (crawling) {
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, padding: '0 40px' }}>
+        <div style={{ fontSize: 72, lineHeight: 1, transition: 'opacity 0.3s' }}>
+          {CRAWL_EMOJIS[emojiIdx]}
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--foreground)', marginBottom: 8 }}>
+            공고 검색 중...
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>
+            검색이 완료되면 자동으로 스크리닝 화면으로 전환됩니다
+          </div>
+        </div>
+        {crawlLog.length > 0 && (
+          <div style={{
+            width: '100%', maxWidth: 480, padding: '12px 16px', borderRadius: 10,
+            background: 'var(--card)', border: '1px solid var(--border)',
+            fontSize: 11, lineHeight: 1.8, color: 'var(--muted-foreground)',
+            maxHeight: 160, overflowY: 'auto',
+          }}>
+            {crawlLog.map((l, i) => <div key={i}>{l}</div>)}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
@@ -145,11 +170,40 @@ export function ScreeningPage() {
     return <GuidePage />
   }
 
+  // 스와이프 완료 화면 (Screen 1-2)
   if (!current) {
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, color: 'var(--muted-foreground)' }}>
-        <span style={{ fontSize: 36 }}>✅</span>
-        <p style={{ fontSize: 14 }}>모든 공고를 검토했습니다.</p>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+        <div style={{ fontSize: 60 }}>🎉</div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--foreground)', marginBottom: 6 }}>
+            스크리닝 완료!
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>
+            모든 공고를 검토했습니다.
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 24 }}>
+          {([
+            ['저장', savedUrls.size, 'var(--color-warning-foreground)'],
+            ['즐겨찾기', favoriteUrls.size, 'var(--brand-primary)'],
+            ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
+          ] as [string, number, string][]).map(([label, count, color]) => (
+            <div key={label} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 30, fontWeight: 700, color }}>{count}</div>
+              <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 2 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={() => navigate('/saved')}
+          style={{
+            padding: '10px 24px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+            background: 'var(--brand-primary)', color: '#fff', border: 'none', cursor: 'pointer',
+          }}
+        >
+          저장 공고 확인하기 →
+        </button>
       </div>
     )
   }
@@ -182,16 +236,19 @@ export function ScreeningPage() {
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '16px 24px', overflow: 'hidden' }}>
 
-        {/* Progress Area (zc177) */}
+        {/* Progress Area */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted-foreground)' }}>진행중</span>
           <span style={{ fontSize: 28, fontWeight: 700, color: 'var(--foreground)', lineHeight: 1 }}>
             {totalProcessed} / {screeningJobs.length}
           </span>
+          <span style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>
+            {pending.length - currentCardIndex}개 남음
+          </span>
         </div>
 
         {/* Card deck */}
-        <div style={{ position: 'relative', width: 620, flexShrink: 0 }}>
+        <div style={{ position: 'relative', width: 520, flexShrink: 0 }}>
           {/* Shadow layers */}
           {[2, 1].map((offset) => (
             <div
@@ -232,32 +289,32 @@ export function ScreeningPage() {
             {/* 관심없음 overlay */}
             <motion.div style={{
               position: 'absolute', inset: 0, zIndex: 10,
-              background: 'var(--color-error)',
+              background: 'var(--swipe-left)',
               opacity: notInterestedOpacity,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               pointerEvents: 'none',
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--color-error-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ThumbsDown size={32} color="var(--background)" />
+                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--swipe-left-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ThumbsDown size={32} color="var(--swipe-left-text)" />
                 </div>
-                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-error-foreground)' }}>관심없음</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--swipe-left-text)' }}>관심없음</span>
               </div>
             </motion.div>
 
             {/* 저장 overlay */}
             <motion.div style={{
               position: 'absolute', inset: 0, zIndex: 10,
-              background: 'var(--color-success)',
+              background: 'var(--swipe-right)',
               opacity: saveOpacity,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               pointerEvents: 'none',
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--color-success-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Bookmark size={32} color="var(--background)" />
+                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--swipe-right-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Bookmark size={32} color="var(--swipe-right-text)" />
                 </div>
-                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-success-foreground)' }}>저장</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--swipe-right-text)' }}>저장</span>
               </div>
             </motion.div>
 
@@ -274,7 +331,7 @@ export function ScreeningPage() {
                   width: 80, height: 80, borderRadius: '50%',
                   background: 'var(--brand-primary)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 0 40px 16px rgba(79,124,246,0.3)',
+                  boxShadow: 'var(--shadow-superlike)',
                 }}>
                   <Heart size={32} color="#fff" />
                 </div>
@@ -283,78 +340,70 @@ export function ScreeningPage() {
             </motion.div>
 
             {/* Card content */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
+            {/* Header row: source(left) | deadline + link(right) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
               <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 500, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
-                {current.source}
+                {{ saramin: '사람인', jobkorea: '잡코리아' }[current.source] ?? current.source}
               </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <button onClick={openAnalysis} style={{ color: 'var(--color-info-foreground)', background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
-                  <Sparkles size={14} />
-                </button>
-                <a href={current.url} target="_blank" rel="noreferrer">
-                  <ExternalLink size={14} style={{ color: 'var(--muted-foreground)' }} />
-                </a>
-              </div>
+              {current.job_type?.includes('헤드헌터') && (
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 600, background: 'var(--brand-primary-subtle)', color: 'var(--brand-primary)' }}>
+                  헤드헌터
+                </span>
+              )}
+              <div style={{ flex: 1 }} />
+              {current.deadline && (
+                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, fontWeight: 700, background: 'var(--color-warning)', color: 'var(--color-warning-foreground)', flexShrink: 0 }}>
+                  마감 {current.deadline}
+                </span>
+              )}
             </div>
 
-            <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.3, color: 'var(--foreground)', marginBottom: 4 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.3, color: 'var(--foreground)', marginBottom: 6 }}>
               {current.title}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-primary)', marginBottom: 12 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--brand-primary)', marginBottom: 12 }}>
               {current.company}
             </div>
 
-            <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap', color: 'var(--muted-foreground)', marginBottom: 8 }}>
+            <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap', color: 'var(--muted-foreground)', marginBottom: 12 }}>
               {current.location && <span>{current.location}</span>}
               {current.experience && <span>{current.experience}</span>}
-              {current.job_type && <span>{current.job_type}</span>}
+              {current.job_type && !current.job_type.includes('헤드헌터') && <span>{current.job_type}</span>}
             </div>
 
-            {current.tech_stack.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+            {(current.categories.length > 0 || current.tech_stack.length > 0) && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {current.categories.map((c) => (
+                  <span key={c} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
+                    {c}
+                  </span>
+                ))}
                 {current.tech_stack.map((t) => (
-                  <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--secondary)', color: 'var(--color-info-foreground)' }}>
+                  <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--brand-primary-subtle)', color: 'var(--color-info-foreground)' }}>
                     {t}
                   </span>
                 ))}
               </div>
             )}
-
-            {current.deadline && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '8px 12px', fontSize: 12, background: 'var(--secondary)', marginBottom: 8 }}>
-                <span style={{ color: 'var(--muted-foreground)' }}>마감일</span>
-                <span style={{ fontWeight: 600, color: 'var(--foreground)' }}>{current.deadline}</span>
-                {current.salary && (
-                  <>
-                    <span style={{ color: 'var(--border)' }}>·</span>
-                    <span style={{ color: 'var(--color-success-foreground)' }}>{current.salary}</span>
-                  </>
-                )}
-              </div>
-            )}
-
-            <div style={{ fontSize: 11, color: 'var(--muted-foreground)' }}>
-              {pending.length - currentCardIndex}개 남음
-            </div>
           </motion.div>
         </div>
 
         {/* Action buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <button onClick={() => triggerSwipe('not_interested')} disabled={isExiting} className="action-btn" style={{ background: 'var(--color-error)', color: 'var(--color-error-foreground)', width: 56, height: 56 }}>
+            <button aria-label="관심없음" onClick={() => triggerSwipe('not_interested')} disabled={isExiting} className="action-btn" style={{ background: 'var(--color-error)', color: 'var(--color-error-foreground)', width: 56, height: 56 }}>
               <ThumbsDown size={20} />
             </button>
-            <button onClick={() => triggerSwipe('save')} disabled={isExiting} className="action-btn" style={{ background: 'var(--color-success)', color: 'var(--color-success-foreground)', width: 56, height: 56 }}>
+            <button aria-label="저장" onClick={() => triggerSwipe('save')} disabled={isExiting} className="action-btn" style={{ background: 'var(--color-success)', color: 'var(--color-success-foreground)', width: 56, height: 56 }}>
               <Bookmark size={20} />
             </button>
-            <button onClick={() => triggerSwipe('favorite')} disabled={isExiting} className="action-btn" style={{ background: 'var(--brand-primary)', color: '#fff', width: 72, height: 72 }}>
+            <button aria-label="즐겨찾기" onClick={() => triggerSwipe('favorite')} disabled={isExiting} className="action-btn" style={{ background: 'var(--brand-primary)', color: '#fff', width: 72, height: 72 }}>
               <Heart size={26} />
             </button>
-            <button onClick={undo} disabled={isExiting} className="action-btn" style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', width: 56, height: 56 }}>
+            <button aria-label="실행취소" onClick={undo} disabled={isExiting} className="action-btn" style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', width: 56, height: 56 }}>
               <Undo2 size={20} />
             </button>
-            <button onClick={() => current && window.open(current.url, '_blank')} className="action-btn" style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', width: 56, height: 56 }}>
+            <button aria-label="공고 보기" onClick={() => current && window.open(current.url, '_blank')} className="action-btn" style={{ background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', width: 56, height: 56 }}>
               <ExternalLink size={20} />
             </button>
           </div>
@@ -380,20 +429,6 @@ export function ScreeningPage() {
         </div>
       </div>
 
-      {(analysisLoading || analysisResult !== null || analysisError !== null) && (
-        <AnalysisModal
-          loading={analysisLoading}
-          result={analysisResult}
-          error={analysisError}
-          onClose={closeAnalysis}
-        />
-      )}
     </div>
   )
-
-  function closeAnalysis() {
-    setAnalysisResult(null)
-    setAnalysisError(null)
-    setAnalysisLoading(false)
-  }
 }

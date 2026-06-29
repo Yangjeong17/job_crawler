@@ -17,6 +17,9 @@ interface AppStore {
   sourceFilter: SourceFilter
   setSourceFilter: (f: SourceFilter) => void
 
+  crawling: boolean
+  setCrawling: (v: boolean) => void
+
   crawlLog: string[]
   addCrawlLog: (msg: string) => void
   clearCrawlLog: () => void
@@ -47,6 +50,9 @@ export const useAppStore = create<AppStore>((set) => ({
 
   sourceFilter: '',
   setSourceFilter: (f) => set({ sourceFilter: f }),
+
+  crawling: false,
+  setCrawling: (v) => set({ crawling: v }),
 
   crawlLog: [],
   addCrawlLog: (msg) => set((s) => ({ crawlLog: [...s.crawlLog, msg] })),
