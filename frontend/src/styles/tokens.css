@@ -1,0 +1,101 @@
+/* tokens.css — Pencil 디자인 시스템 토큰 (job_UI_design_2.pen 기준) */
+:root {
+  /* 폰트 */
+  --font-primary: 'Pretendard', sans-serif;
+
+  /* 기본 배경·텍스트 */
+  --background:        #0D1116;
+  --foreground:        #E6ECF3;
+  --overlay:           #0C1015;
+
+  /* 카드 */
+  --card:              #1C2129;
+  --card-foreground:   #FFFFFF;
+
+  /* 사이드바 */
+  --sidebar:                    #161C23;
+  --sidebar-accent:             #2a2a30;
+  --sidebar-accent-foreground:  #fafafa;
+  --sidebar-border:             #ffffff1a;
+  --sidebar-foreground:         #fafafa;
+  --sidebar-primary:            #18181b;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-ring:               #71717a;
+
+  /* 보조 배경 */
+  --secondary:         #20262D;
+  --secondary-foreground: #FFFFFF;
+
+  /* 경계선 */
+  --border:            #303741;
+
+  /* 텍스트 */
+  --muted-foreground:  #8A949F;
+  --muted:             #2E2E2E;
+
+  /* 브랜드 (파랑) */
+  --brand-primary:          #57A6FF;
+  --brand-primary-bg:       #1F3B5D;
+  --brand-primary-bg-hover: #25486F;
+  --brand-primary-foreground: #FFFFFF;
+  --brand-primary-glow:     #3B82F6;
+  --brand-primary-subtle:   #1A2A3B;
+
+  /* 중립 액션 버튼 */
+  --neutral-action:            #20262D;
+  --neutral-action-border:     #303741;
+  --neutral-action-foreground: #8A949F;
+
+  /* 기타 배경 */
+  --import-db-bg: #353a40;
+  --accent:       #111111;
+  --accent-foreground: #F2F3F0;
+  --popover:      #1A1A1A;
+  --popover-foreground: #FFFFFF;
+  --input:        #2E2E2E;
+  --ring:         #666666;
+
+  /* 상태 색상 */
+  --color-error:             #3B1212;
+  --color-error-foreground:  #F87171;
+  --color-warning:           #3B2208;
+  --color-warning-foreground:#F59E0B;
+  --color-success:           #0B341C;
+  --color-success-foreground:#4ADE80;
+  --color-info:              #1F3B5D;
+  --color-info-foreground:   #57A6FF;
+  --destructive:             #F87171;
+
+  /* 기본 primary (주황) */
+  --primary:             #FF8400;
+  --primary-foreground:  #111111;
+
+  /* Border radius */
+  --radius-none: 0px;
+  --radius-m:    16px;
+  --radius-pill: 999px;
+
+  /* 스와이프 오버레이 색상 */
+  --swipe-left:         #66373a;
+  --swipe-left-sub:     #9e6369;
+  --swipe-left-surface: #7a4448;
+  --swipe-left-text:    #f4c0c4;
+  --swipe-right:        #2c784b;
+  --swipe-right-sub:    #5fa87a;
+  --swipe-right-surface:#3d8a5c;
+  --swipe-right-text:   #a8f0c6;
+
+  /* D-Badge 색상 */
+  --badge-red-bg:    #3B1212;
+  --badge-red-text:  #F87171;
+  --badge-yellow-bg: #3B2208;
+  --badge-yellow-text: #F59E0B;
+  --badge-green-bg:  #0B341C;
+  --badge-green-text:#4ADE80;
+  --badge-gray-bg:   #2a2a2a;
+  --badge-gray-text: #888888;
+
+  /* 공통 */
+  --white: #FFFFFF;
+  --black: #000000;
+}

@@ -977,7 +977,7 @@
               "id": "I9VDU",
               "name": "Logo Text",
               "fill": "$--foreground",
-              "content": "JobHub",
+              "content": "Career Pilot",
               "fontFamily": "$--font-primary",
               "fontSize": 16,
               "fontWeight": "700"
@@ -5111,7 +5111,7 @@
       "id": "cpron",
       "x": 4009,
       "y": -980,
-      "name": "Screen 2 – 관심없음",
+      "name": "Screen 3 – 관심없음",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -5471,7 +5471,7 @@
       "id": "ENYQY",
       "x": 5613,
       "y": -980,
-      "name": "Screen 3 – 저장 목록",
+      "name": "Screen 4 – 저장 목록",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -5829,9 +5829,9 @@
     {
       "type": "frame",
       "id": "srajY",
-      "x": 8760,
+      "x": 7236,
       "y": -980,
-      "name": "Screen 5 – 스케줄러 리스트",
+      "name": "Screen 5 – 즐겨찾기 리스트",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -6311,9 +6311,9 @@
     {
       "type": "frame",
       "id": "sImM9",
-      "x": 7180,
-      "y": -980,
-      "name": "Screen 5B – 스케줄러 캘린더",
+      "x": 8853,
+      "y": -928,
+      "name": "Screen 5B – 즐겨찾기 캘린더",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -10622,7 +10622,7 @@
       "id": "U8wzsf",
       "x": 2472,
       "y": -980,
-      "name": "Screen – 전체공고",
+      "name": "Screen 2 – 전체공고",
       "clip": true,
       "width": 1440,
       "height": 900,
@@ -10925,6 +10925,9 @@
                   "enabled": true
                 },
                 "zMToG": {
+                  "enabled": false
+                },
+                "ij42L": {
                   "enabled": false
                 }
               }
@@ -11613,369 +11616,6 @@
           "fontFamily": "$--font-primary",
           "fontSize": 15,
           "fontWeight": "normal"
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "FHiUi",
-      "x": 10280,
-      "y": -980,
-      "name": "Screen – 즐겨찾기",
-      "clip": true,
-      "width": 1440,
-      "height": 900,
-      "fill": "$--background",
-      "children": [
-        {
-          "id": "f1ZJBp",
-          "type": "ref",
-          "ref": "qTHQm",
-          "name": "Sidebar",
-          "width": 220,
-          "height": 900
-        },
-        {
-          "type": "frame",
-          "id": "Sn0tb",
-          "name": "Main Area",
-          "width": "fill_container",
-          "height": "fill_container",
-          "layout": "vertical",
-          "children": [
-            {
-              "type": "frame",
-              "id": "h0IcE",
-              "name": "Tab Bar",
-              "width": "fill_container",
-              "height": 64,
-              "fill": "$--sidebar",
-              "padding": [
-                0,
-                8
-              ],
-              "alignItems": "end",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "u5kWJj",
-                  "name": "Tab 스크리닝",
-                  "height": 48,
-                  "fill": "#00000000",
-                  "cornerRadius": [
-                    6,
-                    6,
-                    0,
-                    0
-                  ],
-                  "gap": 6,
-                  "padding": [
-                    8,
-                    20
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "V6S2N0",
-                      "width": 13,
-                      "height": 13,
-                      "icon": "layers",
-                      "library": "lucide",
-                      "fill": "$--muted-foreground"
-                    },
-                    {
-                      "type": "text",
-                      "id": "KXj7u",
-                      "fill": "$--muted-foreground",
-                      "content": "스크리닝",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "tPUSb",
-                  "name": "Tab 전체 공고",
-                  "height": 48,
-                  "fill": "#00000000",
-                  "cornerRadius": [
-                    6,
-                    6,
-                    0,
-                    0
-                  ],
-                  "gap": 6,
-                  "padding": [
-                    8,
-                    20
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "ztLGg",
-                      "width": 13,
-                      "height": 13,
-                      "icon": "layout-list",
-                      "library": "lucide",
-                      "fill": "$--muted-foreground"
-                    },
-                    {
-                      "type": "text",
-                      "id": "bsxmY",
-                      "fill": "$--muted-foreground",
-                      "content": "전체 공고",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "PPAJt",
-                  "name": "Tab 관심없음",
-                  "height": 48,
-                  "fill": "#00000000",
-                  "cornerRadius": [
-                    6,
-                    6,
-                    0,
-                    0
-                  ],
-                  "gap": 6,
-                  "padding": [
-                    8,
-                    20
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "p7TJYC",
-                      "width": 13,
-                      "height": 13,
-                      "icon": "thumbs-down",
-                      "library": "lucide",
-                      "fill": "$--muted-foreground"
-                    },
-                    {
-                      "type": "text",
-                      "id": "FlVIE",
-                      "fill": "$--muted-foreground",
-                      "content": "관심없음",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "Z6Yde",
-                  "name": "Tab 저장",
-                  "height": 48,
-                  "fill": "#00000000",
-                  "cornerRadius": [
-                    6,
-                    6,
-                    0,
-                    0
-                  ],
-                  "gap": 6,
-                  "padding": [
-                    8,
-                    20
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "tstsh",
-                      "width": 13,
-                      "height": 13,
-                      "icon": "bookmark",
-                      "library": "lucide",
-                      "fill": "$--muted-foreground"
-                    },
-                    {
-                      "type": "text",
-                      "id": "I7Ynp",
-                      "fill": "$--muted-foreground",
-                      "content": "저장",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "CpDuA",
-                  "name": "Tab 즐겨찾기",
-                  "height": 48,
-                  "fill": "$--brand-primary",
-                  "cornerRadius": [
-                    6,
-                    6,
-                    0,
-                    0
-                  ],
-                  "gap": 6,
-                  "padding": [
-                    8,
-                    20
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon",
-                      "id": "G89F1",
-                      "width": 13,
-                      "height": 13,
-                      "icon": "heart",
-                      "library": "lucide",
-                      "fill": "$--white"
-                    },
-                    {
-                      "type": "text",
-                      "id": "AX0Dp",
-                      "fill": "$--white",
-                      "content": "즐겨찾기",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "600"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "V2wH0z",
-                  "name": "Spacer",
-                  "width": "fill_container",
-                  "height": 1
-                },
-                {
-                  "type": "frame",
-                  "id": "K1OYIt",
-                  "name": "단축키 Btn Wrapper",
-                  "height": "fill_container",
-                  "layout": "vertical",
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "lBgEZ",
-                      "name": "단축키 Btn",
-                      "height": 34,
-                      "fill": "$--secondary",
-                      "cornerRadius": 8,
-                      "stroke": "$--border",
-                      "strokeWidth": 1,
-                      "gap": 6,
-                      "padding": [
-                        0,
-                        12
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "oQZGX",
-                          "fill": "$--foreground",
-                          "content": "⌨️",
-                          "fontFamily": "$--font-primary",
-                          "fontSize": 13,
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "text",
-                          "id": "ulRHn",
-                          "fill": "$--muted-foreground",
-                          "content": "단축키",
-                          "fontFamily": "$--font-primary",
-                          "fontSize": 12,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": "x0b6Y",
-              "type": "ref",
-              "ref": "Crzp9",
-              "name": "Top Bar",
-              "width": "fill_container",
-              "height": 55,
-              "descendants": {
-                "Uft5B": {
-                  "enabled": false
-                },
-                "ij42L": {
-                  "enabled": true
-                }
-              }
-            },
-            {
-              "type": "frame",
-              "id": "O17fJL",
-              "name": "List Content",
-              "width": "fill_container",
-              "height": "fill_container",
-              "fill": "$--background",
-              "layout": "vertical",
-              "gap": 12,
-              "padding": [
-                16,
-                24
-              ],
-              "children": [
-                {
-                  "id": "Qe4XC",
-                  "type": "ref",
-                  "ref": "PIM6f",
-                  "name": "List Card",
-                  "width": "fill_container",
-                  "descendants": {
-                    "oiUTB": {
-                      "enabled": false
-                    }
-                  }
-                },
-                {
-                  "id": "JdCpM",
-                  "type": "ref",
-                  "ref": "PIM6f",
-                  "name": "List Card",
-                  "width": "fill_container",
-                  "descendants": {
-                    "oiUTB": {
-                      "enabled": false
-                    }
-                  }
-                },
-                {
-                  "id": "q5GUf",
-                  "type": "ref",
-                  "ref": "PIM6f",
-                  "name": "List Card",
-                  "width": "fill_container",
-                  "descendants": {
-                    "oiUTB": {
-                      "enabled": false
-                    }
-                  }
-                }
-              ]
-            }
-          ]
         }
       ]
     }

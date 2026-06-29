@@ -130,7 +130,7 @@ export function GuidePage() {
           </div>
           <div>
             <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--foreground)', margin: 0, lineHeight: 1.2 }}>
-              JobHub에 오신 것을 환영합니다
+              Career Pilot에 오신 것을 환영합니다
             </h1>
             <p style={{ fontSize: 12, color: 'var(--muted-foreground)', margin: '4px 0 0' }}>
               새 DB가 생성되었습니다. 아래에서 주요 기능을 확인하세요.

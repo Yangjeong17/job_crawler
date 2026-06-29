@@ -77,7 +77,7 @@ export function Sidebar() {
           <span className="text-white font-bold text-xs">J</span>
         </div>
         <div className="flex flex-col flex-1 min-w-0">
-          <span className="font-bold text-base leading-tight" style={{ color: 'var(--foreground)' }}>JobHub</span>
+          <span className="font-bold text-base leading-tight" style={{ color: 'var(--foreground)' }}>Career Pilot</span>
           <span className="text-[10px] truncate" style={{ color: 'var(--muted-foreground)' }}>
             {currentDb?.db_name ?? '…'}
           </span>
