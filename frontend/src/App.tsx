@@ -7,6 +7,7 @@ import { ScreeningPage } from './pages/ScreeningPage'
 import { AllJobsPage } from './pages/AllJobsPage'
 import { JobListPage } from './pages/JobListPage'
 import { SchedulerPage } from './pages/SchedulerPage'
+import { GuidePage } from './pages/GuidePage'
 import { useAppStore } from './store/useAppStore'
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/saved"          element={<JobListPage mode="saved" />} />
             <Route path="/favorites"      element={<JobListPage mode="favorites" />} />
             <Route path="/scheduler"      element={<SchedulerPage />} />
+            <Route path="/guide"          element={<GuidePage />} />
           </Routes>
         </div>
       </div>
