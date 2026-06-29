@@ -78,7 +78,7 @@ npm install
 
 ```env
 ANTHROPIC_API_KEY=your_api_key   # AI 분석 기능에 필요 (없으면 분석 버튼만 비활성)
-JOBHUB_DB_NAME=jobs_before.db    # 기본 DB 파일명 (생략 가능)
+JOB_CRAWLER_DB_NAME=jobs_before.db    # 기본 DB 파일명 (생략 가능)
 ```
 
 ### 5. 실행

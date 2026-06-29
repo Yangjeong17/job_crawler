@@ -100,7 +100,7 @@
       "Bash(wsl -e *)",
       "Bash(wsl -d Ubuntu -e bash -c 'pkill -f uvicorn 2>/dev/null; sleep 1 *)",
       "Bash(wsl -d Ubuntu -e bash -c \"cat /tmp/uvicorn.log\")",
-      "Bash(wsl -d Ubuntu -e bash -c 'cd /home/yj/Base/Dev/mini_project/JobHub && JOBHUB_DB_NAME=jobs_swipe.db .venv/bin/uvicorn api.main:app --port 8000 > /tmp/uvicorn2.log 2>&1 & *)",
+      "Bash(wsl -d Ubuntu -e bash -c 'cd /home/yj/Base/Dev/mini_project/JobHub && JOB_CRAWLER_DB_NAME=jobs_swipe.db .venv/bin/uvicorn api.main:app --port 8000 > /tmp/uvicorn2.log 2>&1 & *)",
       "Bash(wsl -d Ubuntu -e bash -c 'curl -s --max-time 90 -X POST http://localhost:8000/api/analyze   -H '\\\\''Content-Type: application/json'\\\\''   -d '\\\\''{\"url\": \"https://www.jobkorea.co.kr/Recruit/GI_Read/49429518\"}'\\\\''')",
       "Bash(wsl -d Ubuntu -e bash -c \"cat /tmp/uvicorn2.log\")",
       "Bash(wsl -d *)",

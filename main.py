@@ -42,7 +42,7 @@ def main():
     print(f"\n사용 DB: {db_name}\n")
 
     env = os.environ.copy()
-    env["JOBHUB_DB_NAME"] = db_name
+    env["JOB_CRAWLER_DB_NAME"] = db_name
 
     subprocess.run(
         [sys.executable, "-m", "uvicorn", "api.main:app", "--reload", "--port", "8000"],

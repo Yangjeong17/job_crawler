@@ -1,5 +1,5 @@
 """
-JobHub FastAPI 백엔드
+Job_Crawler FastAPI 백엔드
 실행: uvicorn api.main:app --reload --port 8000
 """
 import asyncio
@@ -16,7 +16,7 @@ _last_db_file = pathlib.Path(__file__).parent.parent / ".last_db"
 if _last_db_file.exists():
     _saved_db = _last_db_file.read_text().strip()
     if _saved_db:
-        os.environ.setdefault("JOBHUB_DB_NAME", _saved_db)
+        os.environ.setdefault("JOB_CRAWLER_DB_NAME", _saved_db)
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,7 +46,7 @@ from models.job import JobPosting
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="JobHub API", version="1.0.0")
+app = FastAPI(title="Job_Crawler API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,

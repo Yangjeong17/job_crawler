@@ -15,7 +15,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 import asyncio
 
 TEST_URL = "https://www.jobkorea.co.kr/Recruit/GI_Read/49429518"
-os.environ.setdefault("JOBHUB_DB_NAME", "jobs_swipe.db")
+os.environ.setdefault("JOB_CRAWLER_DB_NAME", "jobs_swipe.db")
 
 os.chdir(pathlib.Path(__file__).parent.parent)
 
