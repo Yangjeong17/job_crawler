@@ -169,6 +169,48 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
         </div>
       )}
 
+      {onAnalyzeAll && (
+        <button
+          onClick={onAnalyzeAll}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            height: 30,
+            borderRadius: 8,
+            fontSize: 12,
+            background: 'var(--color-info)',
+            color: 'var(--color-info-foreground)',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          <Sparkles size={12} /> AI 전체분석
+        </button>
+      )}
+
+      {onReassign && (
+        <button
+          onClick={onReassign}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            height: 30,
+            borderRadius: 8,
+            fontSize: 12,
+            background: 'var(--secondary)',
+            border: '1px solid var(--border)',
+            color: 'var(--muted-foreground)',
+            cursor: 'pointer',
+          }}
+        >
+          <RefreshCw size={12} /> 재분류
+        </button>
+      )}
+
       {onSortChange && (
         <div ref={sortRef} style={{ position: 'relative' }}>
           <button
@@ -211,48 +253,6 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
             </div>
           )}
         </div>
-      )}
-
-      {onReassign && (
-        <button
-          onClick={onReassign}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '6px 12px',
-            height: 30,
-            borderRadius: 8,
-            fontSize: 12,
-            background: 'var(--secondary)',
-            border: '1px solid var(--border)',
-            color: 'var(--muted-foreground)',
-            cursor: 'pointer',
-          }}
-        >
-          <RefreshCw size={12} /> 재분류
-        </button>
-      )}
-
-      {onAnalyzeAll && (
-        <button
-          onClick={onAnalyzeAll}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '6px 12px',
-            height: 30,
-            borderRadius: 8,
-            fontSize: 12,
-            background: 'var(--color-info)',
-            color: 'var(--color-info-foreground)',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          <Sparkles size={12} /> AI 전체분석
-        </button>
       )}
     </div>
   )

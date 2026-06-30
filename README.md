@@ -44,7 +44,7 @@ JobHub/
 ├── utils/
 │   ├── url_utils.py          # URL 정규화, job_id 추출
 │   └── hash_utils.py         # 공고 변경 감지
-└── jobs_before.db            # SQLite DB (기본)
+└── jobs_list.db            # SQLite DB (기본)
 ```
 
 ## 설치 및 실행

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
@@ -10,6 +11,7 @@ import { TopBar } from '../components/layout/TopBar'
 import { useShortcuts } from '../hooks/useShortcuts'
 import { GuidePage } from './GuidePage'
 import type { SwipeAction } from '../types/job'
+import { DeadlineMiniBadge } from '../components/ui/DBadge'
 
 const CRAWL_EMOJIS = ['🔍', '🌐', '📋', '⚡', '🤖', '💫']
 
@@ -128,10 +130,22 @@ export function ScreeningPage() {
 
   const totalProcessed = screeningJobs.length - pending.length + currentCardIndex
 
+  const centeredStateStyle: CSSProperties = {
+    flex: 1,
+    minHeight: 'calc(100vh - 154px)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 24,
+    padding: '24px 40px',
+    boxSizing: 'border-box',
+  }
+
   // 검색 중 화면
   if (crawling) {
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, padding: '0 40px' }}>
+      <div style={{ ...centeredStateStyle, gap: 28 }}>
         <div style={{ fontSize: 72, lineHeight: 1, transition: 'opacity 0.3s' }}>
           {CRAWL_EMOJIS[emojiIdx]}
         </div>
@@ -159,7 +173,7 @@ export function ScreeningPage() {
 
   if (isLoading) {
     return (
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
+      <div style={{ ...centeredStateStyle, color: 'var(--muted-foreground)' }}>
         불러오는 중...
       </div>
     )
@@ -173,7 +187,7 @@ export function ScreeningPage() {
   // 스와이프 완료 화면 (Screen 1-2)
   if (!current) {
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+      <div style={centeredStateStyle}>
         <div style={{ fontSize: 60 }}>🎉</div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--foreground)', marginBottom: 6 }}>
@@ -350,12 +364,26 @@ export function ScreeningPage() {
                   헤드헌터
                 </span>
               )}
-              <div style={{ flex: 1 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
               {current.deadline && (
-                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, fontWeight: 700, background: 'var(--color-warning)', color: 'var(--color-warning-foreground)', flexShrink: 0 }}>
-                  마감 {current.deadline}
-                </span>
+                <DeadlineMiniBadge
+                  deadline={current.deadline}
+                  onlyUrgent
+                  fallback={
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: 'var(--muted-foreground)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      마감일: {current.deadline}
+                    </span>
+                  }
+                />
               )}
+            </div>
             </div>
 
             <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.3, color: 'var(--foreground)', marginBottom: 6 }}>

@@ -121,7 +121,7 @@ export function ShortcutModal({ open, onClose }: Props) {
           <button
             onClick={() => setLocal(DEFAULTS)}
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               padding: '0 16px', height: 36, borderRadius: 8, fontSize: 12, flex: 1,
               background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', cursor: 'pointer',
             }}
@@ -132,7 +132,7 @@ export function ShortcutModal({ open, onClose }: Props) {
             onClick={handleSave}
             disabled={saving}
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               padding: '0 16px', height: 36, borderRadius: 8, fontSize: 12, fontWeight: 600, flex: 1,
               background: 'var(--color-info-foreground)', color: '#fff', border: 'none', cursor: 'pointer',
               opacity: saving ? 0.5 : 1,
