@@ -282,7 +282,7 @@ class JobKoreaCrawler(BaseCrawler):
             categories=categories,
             deadline=normalize_date(deadline),
             deadline_date=normalize_deadline(deadline),
-            posted_date=normalize_date(posted_date),
+            posted_date=normalize_date(posted_date, allow_past=True),
             description="",
             job_id=extract_job_id(url) or "",
         )

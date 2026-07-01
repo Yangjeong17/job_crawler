@@ -36,10 +36,12 @@ _FULL_DATE = re.compile(r"(\d{4})[-./](\d{1,2})[-./](\d{1,2})")
 _N_DAYS = re.compile(r"(\d+)\s*일\s*후")
 
 
-def normalize_date(raw: str, ref: Optional[datetime] = None) -> str:
+def normalize_date(raw: str, ref: Optional[datetime] = None, allow_past: bool = False) -> str:
     """
     날짜 문자열만 YYYY-MM-DD로 정규화. 상시채용/빈값 등은 그대로 반환.
     주로 deadline·posted_date의 raw 저장값을 통일할 때 사용.
+
+    allow_past=True: MM/DD가 올해 기준 과거여도 내년으로 보정하지 않음 (등록일 등에 사용).
     """
     if not raw:
         return ""
@@ -64,7 +66,7 @@ def normalize_date(raw: str, ref: Optional[datetime] = None) -> str:
         mo, d = int(m.group(1)), int(m.group(2))
         try:
             candidate = datetime(ref.year, mo, d)
-            if candidate.date() < ref.date():
+            if not allow_past and candidate.date() < ref.date():
                 candidate = candidate.replace(year=ref.year + 1)
             return candidate.strftime("%Y-%m-%d")
         except ValueError:

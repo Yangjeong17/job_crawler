@@ -13343,6 +13343,44 @@
     },
     {
       "type": "frame",
+      "id": "hDkom",
+      "x": -1351,
+      "y": 48,
+      "name": "D Badge – 빨강 (오늘마감)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "$--color-error",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "stroke": "$--color-warning-foreground",
+      "strokeWidth": 1,
+      "strokeAlignment": "inner",
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "LdgR0",
+          "name": "D Day",
+          "fill": "$--color-error-foreground",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "오늘\n마감",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
       "id": "iyg8s",
       "x": -1281,
       "y": -60,
@@ -13414,9 +13452,79 @@
     {
       "type": "frame",
       "id": "ptEh6",
-      "x": -1131,
+      "x": -1141,
+      "y": 48,
+      "name": "D Badge – 흰색 (미확인)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "#949494ff",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "s95v7",
+          "name": "D Day",
+          "fill": "$--black",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "마감일\n미확인",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Wgi2H",
+      "x": -1211,
+      "y": 48,
+      "name": "D Badge – 파랑 (채용시마감)",
+      "reusable": true,
+      "width": 55,
+      "height": 88,
+      "fill": "$--brand-primary-bg",
+      "cornerRadius": [
+        10,
+        0,
+        0,
+        10
+      ],
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "text",
+          "id": "y6uah",
+          "name": "D Day",
+          "fill": "#888888",
+          "textGrowth": "fixed-width",
+          "width": 45,
+          "content": "채용시\n마감",
+          "textAlign": "center",
+          "fontFamily": "$--font-primary",
+          "fontSize": 12,
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "lY4hQ",
+      "x": -1141,
       "y": -60,
-      "name": "D Badge – 회색 (채용시마감)",
+      "name": "D Badge – 회색 (공고마감)",
       "reusable": true,
       "width": 55,
       "height": 88,
@@ -13433,12 +13541,12 @@
       "children": [
         {
           "type": "text",
-          "id": "s95v7",
+          "id": "x4t98M",
           "name": "D Day",
           "fill": "#888888",
           "textGrowth": "fixed-width",
           "width": 45,
-          "content": "채용시\n마감",
+          "content": "공고\n마감",
           "textAlign": "center",
           "fontFamily": "$--font-primary",
           "fontSize": 12,
