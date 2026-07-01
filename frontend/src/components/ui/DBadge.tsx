@@ -1,9 +1,5 @@
 import type { ReactNode } from 'react';
 
-type Props = {
-  deadline_date?: string | null
-  deadline?: string | null
-}
 
 interface DBadgeProps {
   deadline_date?: string | null;
@@ -29,16 +25,6 @@ interface DeadlineBadgeMeta {
   isToday: boolean;
 }
 
-const miniBaseStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: 22,
-  lineHeight: 1,
-  whiteSpace: 'nowrap',
-  flexShrink: 0,
-  boxSizing: 'border-box',
-} as const;
 
 function isOpenUntilFilled(val: string): boolean {
   const skip = ['상시', '채용시', '수시', '마감시'];
@@ -176,126 +162,11 @@ function getDeadlineBadgeMeta(
   return { days, bg, fg, label, isToday };
 }
 
-function DeadlineFallbackText({ val }: { val: string }) {
-  return (
-    <span
-      style={{
-        ...miniBaseStyle,
-        fontSize: 11,
-        fontWeight: 600,
-        color: 'var(--muted-foreground)',
-      }}
-    >
-      마감일: {val}
-    </span>
-  );
-}
 
-function renderMiniFallback(
-  val: string,
-  fallback: ReactNode | undefined,
-  showFallbackText: boolean
-) {
-  if (fallback !== undefined) return <>{fallback}</>;
-  if (showFallbackText) return <DeadlineFallbackText val={val} />;
-  return null;
-}
 
-function renderMiniBadge(
-  val: string,
-  meta: DeadlineBadgeMeta | null,
-  onlyUrgent: boolean,
-  fallback: ReactNode | undefined,
-  showFallbackText: boolean
-) {
-  if (!meta) return renderMiniFallback(val, fallback, showFallbackText);
 
-  if (onlyUrgent && (meta.days < 0 || meta.days > 7)) {
-    return renderMiniFallback(val, fallback, showFallbackText);
-  }
 
-  const borderColor = meta.isToday
-    ? 'var(--color-warning-foreground)'
-    : meta.fg;
-
-  return (
-    <span
-      style={{
-        ...miniBaseStyle,
-        fontSize: 11,
-        padding: '0 10px',
-        borderRadius: 6,
-        fontWeight: meta.isToday ? 800 : 700,
-        background: 'transparent',
-        color: meta.fg,
-        border: `0.5px solid ${borderColor}`,
-      }}
-    >
-      {meta.label}
-    </span>
-  );
-}
-
-function renderDefaultBadge(val: string, meta: DeadlineBadgeMeta | null) {
-  if (!meta) {
-    if (isOpenUntilFilled(val)) {
-      return (
-        <div
-          className="flex items-center justify-center text-[12px] font-bold leading-tight text-center shrink-0"
-          style={{
-            width: 55,
-            alignSelf: 'stretch',
-            background: 'var(--brand-primary-bg)',
-            color: '#888888',
-            borderRadius: '10px 0 0 10px',
-          }}
-        >
-          채용시
-          <br />
-          마감
-        </div>
-      );
-    }
-
-    return null;
-  }
-
-  return (
-    <div
-      className="flex items-center justify-center text-[14px] font-bold shrink-0"
-      style={{
-        width: 55,
-        alignSelf: 'stretch',
-        background: meta.bg,
-        color: meta.fg,
-        borderRadius: '10px 0 0 10px',
-        border: meta.isToday
-          ? '0.5px solid var(--color-warning-foreground)'
-          : 'none',
-        boxSizing: 'border-box',
-        fontWeight: meta.isToday ? 800 : 700,
-      }}
-    >
-      {meta.isToday ? (
-        <>
-          오늘
-          <br />
-          마감
-        </>
-      ) : meta.days < 0 ? (
-        <>
-          공고
-          <br />
-          마감
-        </>
-      ) : (
-        meta.label
-      )}
-    </div>
-  );
-}
-
-export function DBadge({ deadline_date, deadline }: Props) {
+export function DBadge({ deadline_date, deadline }: DBadgeProps) {
   const val = getDeadlineValue(deadline_date, deadline);
 
   if (!val) {

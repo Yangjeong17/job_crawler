@@ -116,7 +116,9 @@
       "Bash(grep -n \"DB_PATH\\\\|_db_name\\\\|Config\\\\.\" //wsl.localhost/ubuntu/home/yj/Base/Dev/mini_project/Career_Pilot/Job_Crawler/services/db_service.py | head -30)",
       "Bash(grep -n \"_init_state\\\\|switch_db\\\\|active_db\\\\|db_select\\\\|DB 선택\\\\|db_name\" //wsl.localhost/ubuntu/home/yj/Base/Dev/mini_project/Career_Pilot/Job_Crawler/gui/app.py | head -40)",
       "Read(///wsl.localhost/ubuntu/home/yj/Base/Dev/mini_project/Career_Pilot/Job_Crawler/**)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(npx oxlint *)",
+      "Bash(npx tsc *)"
     ]
   }
 }

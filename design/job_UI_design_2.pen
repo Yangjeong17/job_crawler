@@ -808,6 +808,22 @@
           ]
         },
         {
+          "type": "frame",
+          "id": "lkVLJ",
+          "name": "Frame 8",
+          "children": [
+            {
+              "type": "text",
+              "id": "W2TuiJ",
+              "fill": "#ffffff",
+              "content": "77 / 127",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
           "id": "zMToG",
           "type": "ref",
           "ref": "RNxVq",
@@ -8245,6 +8261,9 @@
               "width": "fill_container",
               "height": 55,
               "descendants": {
+                "L45gC": {
+                  "enabled": false
+                },
                 "ij42L": {
                   "enabled": false
                 }
@@ -8643,6 +8662,9 @@
               "width": "fill_container",
               "height": 55,
               "descendants": {
+                "L45gC": {
+                  "enabled": false
+                },
                 "ij42L": {
                   "enabled": false
                 }
@@ -14722,15 +14744,6 @@
           "fontWeight": "normal"
         }
       ]
-    },
-    {
-      "type": "ellipse",
-      "id": "NL7P6",
-      "x": -1296,
-      "y": -655,
-      "fill": "#CCCCCC",
-      "width": 167,
-      "height": 167
     },
     {
       "type": "frame",
