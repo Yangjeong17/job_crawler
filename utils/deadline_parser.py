@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 
-_ALWAYS_OPEN = re.compile(r"상시|수시|채용시|채용 시|마감없|rolling", re.I)
+_ALWAYS_OPEN = re.compile(r"상시|수시|채용시|채용 시|마감없|진행예정|rolling", re.I)
 
 _RELATIVE = [
     (re.compile(r"오늘\s*마감|당일\s*마감"),   0),
