@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import { api } from '../api/client'
-import { TopBar } from '../components/layout/TopBar'
+import { TopBar, type SortBy } from '../components/layout/TopBar'
 import { useAppStore } from '../store/useAppStore'
 
 function deadlineDays(deadline_date: string, deadline?: string): number | null {
@@ -17,6 +17,15 @@ function deadlineDays(deadline_date: string, deadline?: string): number | null {
     return Math.ceil((target.getTime() - Date.now()) / 86400000)
   }
   return null
+}
+
+// 표시 전용: "YYYY-MM-DD" 등을 "MM/DD"로 축약 (정렬·D-day 계산에는 영향 없음)
+function formatDeadlineDisplay(deadline_date: string, deadline?: string): string {
+  const val = deadline_date || deadline || ''
+  if (!val) return '—'
+  const m = val.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (m) return `${m[2].padStart(2, '0')}/${m[3].padStart(2, '0')}`
+  return val
 }
 
 function deadlineColor(deadline_date: string, deadline?: string): string {
@@ -35,18 +44,41 @@ function deadlineColor(deadline_date: string, deadline?: string): string {
 
 export function AllJobsPage() {
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<SortBy>('recent')
   const { sourceFilter } = useAppStore()
   const { data, isLoading } = useQuery({ queryKey: ['jobs-all'], queryFn: api.jobs.all })
 
-  const jobs = (data?.jobs ?? []).filter(
+  const filtered = (data?.jobs ?? []).filter(
     (j) =>
       (!sourceFilter || j.source === sourceFilter) &&
       (!search || j.title.includes(search) || j.company.includes(search))
   )
 
+  const jobs = (() => {
+    if (sort === 'ongoing') return filtered.filter((j) => !j.deadline_date && !j.deadline)
+    if (sort === 'deadline') return [...filtered].sort((a, b) => {
+      const da = deadlineDays(a.deadline_date, a.deadline)
+      const db = deadlineDays(b.deadline_date, b.deadline)
+      if (da === null && db === null) return 0
+      if (da === null) return 1
+      if (db === null) return -1
+      return da - db
+    })
+    return filtered
+  })()
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <TopBar search={search} onSearchChange={setSearch} showLegend={false} showTabNav />
+      <TopBar
+        search={search}
+        onSearchChange={setSearch}
+        resultCount={jobs.length}
+        totalCount={data?.jobs.length ?? 0}
+        sort={sort}
+        onSortChange={setSort}
+        showLegend={false}
+        showTabNav
+      />
 
       <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, padding: '16px 24px' }}>
         {/* Column header */}
@@ -80,7 +112,7 @@ export function AllJobsPage() {
               </div>
             </div>
             <div className="text-[13px] font-bold text-center shrink-0" style={{ width: 90, color: deadlineColor(job.deadline_date, job.deadline) }}>
-              {job.deadline_date || job.deadline || '—'}
+              {formatDeadlineDisplay(job.deadline_date, job.deadline)}
             </div>
             <a
               href={job.url}

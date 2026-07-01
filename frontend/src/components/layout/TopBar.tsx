@@ -2,6 +2,10 @@ import { useRef, useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Search, RefreshCw, Sparkles, ArrowUpDown, Check, ThumbsDown, Bookmark, Heart } from 'lucide-react'
 import { useAppStore, type SourceFilter } from '../../store/useAppStore'
+import { useViewportWidth } from '../../hooks/useViewportWidth'
+
+const COMPACT_BREAKPOINT = 1020
+const MINI_BREAKPOINT = 600
 
 export type SortBy = 'deadline' | 'recent' | 'ongoing'
 
@@ -14,6 +18,8 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
 interface Props {
   search: string
   onSearchChange: (v: string) => void
+  resultCount?: number
+  totalCount?: number
   onReassign?: () => void
   onAnalyzeAll?: () => void
   showLegend?: boolean
@@ -36,10 +42,13 @@ const SOURCES: { value: SourceFilter; label: string }[] = [
   { value: 'jobkorea', label: '잡코리아' },
 ]
 
-export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showLegend = true, showSourceFilter = true, showTabNav = false, sort, onSortChange }: Props) {
+export function TopBar({ search, onSearchChange, resultCount, totalCount, onReassign, onAnalyzeAll, showLegend = true, showSourceFilter = true, showTabNav = false, sort, onSortChange }: Props) {
   const { sourceFilter, setSourceFilter } = useAppStore()
   const [sortOpen, setSortOpen] = useState(false)
   const sortRef = useRef<HTMLDivElement>(null)
+  const viewportWidth = useViewportWidth()
+  const isCompact = viewportWidth <= COMPACT_BREAKPOINT
+  const isMini = viewportWidth <= MINI_BREAKPOINT
 
   useEffect(() => {
     if (!sortOpen) return
@@ -63,7 +72,7 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
       }}
     >
       {/* 소스 필터 칩 */}
-      {showSourceFilter && (
+      {showSourceFilter && !isCompact && (
         <div style={{ display: 'flex', gap: 4 }}>
           {SOURCES.map(({ value, label }) => {
             const active = sourceFilter === value
@@ -99,7 +108,7 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
           gap: 8,
           padding: '0 12px',
           height: 34,
-          width: 240,
+          width: isMini ? 90 : 240,
           borderRadius: 8,
           background: 'var(--secondary)',
           border: '1px solid var(--border)',
@@ -116,14 +125,21 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
             fontSize: 12,
             color: 'var(--foreground)',
           }}
-          placeholder="공고명·회사명 검색"
+          placeholder={isMini ? '검색' : '공고명·회사명 검색'}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
 
+      {/* 검색된 공고 수 / 전체 공고 수 */}
+      {resultCount !== undefined && totalCount !== undefined && (
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--foreground)', flexShrink: 0 }}>
+          {resultCount} / {totalCount}
+        </span>
+      )}
+
       {/* D Badge 범례 */}
-      {showLegend && (
+      {showLegend && !isCompact && (
         <div
           style={{
             display: 'flex',
@@ -145,7 +161,7 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
 
       <div style={{ flex: 1 }} />
 
-      {showTabNav && (
+      {showTabNav && !isCompact && (
         <div style={{ display: 'flex', gap: 6 }}>
           {([
             { to: '/not-interested', label: '관심없음', icon: ThumbsDown, bg: 'var(--color-error)',     fg: 'var(--color-error-foreground)' },
@@ -169,7 +185,7 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
         </div>
       )}
 
-      {onAnalyzeAll && (
+      {onAnalyzeAll && !isCompact && (
         <button
           onClick={onAnalyzeAll}
           style={{
@@ -207,7 +223,7 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
             cursor: 'pointer',
           }}
         >
-          <RefreshCw size={12} /> 재분류
+          <RefreshCw size={12} /> {!isMini && '재분류'}
         </button>
       )}
 
@@ -225,7 +241,7 @@ export function TopBar({ search, onSearchChange, onReassign, onAnalyzeAll, showL
             }}
           >
             <ArrowUpDown size={12} />
-            {SORT_OPTIONS.find((o) => o.value === (sort ?? 'recent'))?.label}
+            {!isMini && SORT_OPTIONS.find((o) => o.value === (sort ?? 'recent'))?.label}
           </button>
           {sortOpen && (
             <div style={{

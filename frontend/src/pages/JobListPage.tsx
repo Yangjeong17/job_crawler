@@ -515,6 +515,8 @@ export function JobListPage({ mode }: Props) {
       <TopBar
         search={search}
         onSearchChange={setSearch}
+        resultCount={jobs.length}
+        totalCount={data?.jobs.length ?? 0}
         sort={sort}
         onSortChange={setSort}
         onAnalyzeAll={mode === 'favorites' ? analyzeAll : undefined}

@@ -11,6 +11,14 @@ interface Props {
   onAnalyze?: () => void
 }
 
+// 표시 전용: "YYYY-MM-DD" 등을 "MM/DD"로 축약
+function formatDeadlineDisplay(deadline_date?: string, deadline?: string): string {
+  const val = deadline_date || deadline || ''
+  const m = val.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (m) return `${m[2].padStart(2, '0')}/${m[3].padStart(2, '0')}`
+  return val
+}
+
 export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }: Props) {
 
   return (
@@ -21,7 +29,7 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
         overflow: 'hidden',
         background: 'var(--card)',
         border: '1px solid var(--border)',
-        minHeight: 80,
+        minHeight: 100,
       }}
     >
       <DBadge deadline_date={job.deadline_date} deadline={job.deadline} />
@@ -48,7 +56,7 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
         <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--muted-foreground)' }}>
           {job.location && <span>{job.location}</span>}
           {job.experience && <span>{job.experience}</span>}
-          {(job.deadline_date || job.deadline) && <span>마감일: {job.deadline_date || job.deadline}</span>}
+          {(job.deadline_date || job.deadline) && <span>마감일: {formatDeadlineDisplay(job.deadline_date, job.deadline)}</span>}
         </div>
         {(job.categories?.length > 0 || job.tech_stack?.length > 0) && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
@@ -67,7 +75,7 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
       </div>
 
       {/* 액션 영역 */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 16px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 15, padding: '10px 16px', flexShrink: 0 }}>
         {/* 버튼 1줄: 관심없음 → 저장 → 즐겨찾기 → 공고보기 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {onNotInterested && (
