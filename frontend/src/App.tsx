@@ -32,7 +32,7 @@ export default function App() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100%' }}>
         <TabBar onShortcutOpen={() => setShortcutOpen(true)} />
 
-        <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+        <div style={{ flex: 1, overflowX: 'auto', overflowY: 'hidden', minHeight: 0, minWidth: 0 }}>
           <Routes>
             <Route path="/" element={<Navigate to="/screening" replace />} />
             <Route path="/screening"      element={<ScreeningPage />} />
