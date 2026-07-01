@@ -10,10 +10,13 @@ from models.job import JobPosting
 logger = logging.getLogger(__name__)
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_DB_DIR = os.path.join(_ROOT, "db_joblist")
 _LAST_DB_FILE = os.path.join(_ROOT, ".last_db")
 
+os.makedirs(_DB_DIR, exist_ok=True)
+
 _db_name = os.environ.get("JOB_CRAWLER_DB_NAME", "jobs_before.db")
-DB_PATH = os.path.join(_ROOT, _db_name)
+DB_PATH = os.path.join(_DB_DIR, _db_name)
 
 
 def get_current_db() -> str:
@@ -26,7 +29,7 @@ def switch_db(name: str) -> str:
     if not name.endswith(".db"):
         name += ".db"
     _db_name = name
-    DB_PATH = os.path.join(_ROOT, _db_name)
+    DB_PATH = os.path.join(_DB_DIR, _db_name)
     os.environ["JOB_CRAWLER_DB_NAME"] = name
     with open(_LAST_DB_FILE, "w", encoding="utf-8") as f:
         f.write(name)
@@ -38,31 +41,32 @@ def init_db():
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS job_postings (
-                url               TEXT PRIMARY KEY,
+                search_keyword    TEXT,
                 title             TEXT,
                 company           TEXT,
-                source            TEXT,
                 location          TEXT,
-                experience        TEXT,
-                education         TEXT,
-                salary            TEXT,
+                categories        TEXT,
                 tech_stack        TEXT,
                 job_type          TEXT,
-                deadline          TEXT,
-                posted_date       TEXT,
+                experience        TEXT,
+                education         TEXT,
                 description       TEXT,
+                salary            TEXT,
+                deadline_date     TEXT,
+                posted_date       TEXT,
+                is_modified       INTEGER DEFAULT 0,
+                updated_at        TEXT,
                 crawled_at        TEXT,
-                search_keyword    TEXT,
                 is_not_interested INTEGER DEFAULT 0,
                 is_saved          INTEGER DEFAULT 0,
                 saved_at          TEXT,
                 is_favorite       INTEGER DEFAULT 0,
                 favorited_at      TEXT,
+                deadline          TEXT,
+                url               TEXT PRIMARY KEY,
+                source            TEXT,
                 job_id            TEXT,
-                content_hash      TEXT,
-                updated_at        TEXT,
-                is_modified       INTEGER DEFAULT 0,
-                categories        TEXT
+                content_hash      TEXT
             )
         """)
         # 기존 테이블에 컬럼 없으면 추가 (순차 마이그레이션)
@@ -78,6 +82,7 @@ def init_db():
             ("updated_at",        "TEXT"),
             ("is_modified",       "INTEGER DEFAULT 0"),
             ("categories",        "TEXT"),
+            ("deadline_date",     "TEXT"),
         ]:
             if col not in existing:
                 conn.execute(f"ALTER TABLE job_postings ADD COLUMN {col} {typedef}")
@@ -114,15 +119,15 @@ def save_jobs(jobs: List[JobPosting], keyword: str = ""):
                         conn.execute("""
                             UPDATE job_postings SET
                                 title=?, company=?, location=?, experience=?, education=?,
-                                salary=?, tech_stack=?, job_type=?, deadline=?, posted_date=?,
-                                description=?, content_hash=?, updated_at=?, is_modified=1,
-                                crawled_at=?, search_keyword=?, categories=?
+                                salary=?, tech_stack=?, job_type=?, deadline=?, deadline_date=?,
+                                posted_date=?, description=?, content_hash=?, updated_at=?,
+                                is_modified=1, crawled_at=?, search_keyword=?, categories=?
                             WHERE source=? AND job_id=?
                         """, (
                             job.title, job.company, job.location, job.experience,
                             job.education, job.salary,
                             json.dumps(job.tech_stack, ensure_ascii=False),
-                            job.job_type, job.deadline, job.posted_date,
+                            job.job_type, job.deadline, job.deadline_date, job.posted_date,
                             job.description, job.content_hash, now,
                             job.crawled_at.isoformat(), keyword,
                             json.dumps(job.categories, ensure_ascii=False),
@@ -137,15 +142,15 @@ def save_jobs(jobs: List[JobPosting], keyword: str = ""):
             cur = conn.execute("""
                 INSERT OR IGNORE INTO job_postings
                 (url, title, company, source, location, experience, education,
-                 salary, tech_stack, job_type, deadline, posted_date,
+                 salary, tech_stack, job_type, deadline, deadline_date, posted_date,
                  description, crawled_at, search_keyword, job_id, content_hash,
                  categories)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 job.url, job.title, job.company, job.source,
                 job.location, job.experience, job.education, job.salary,
                 json.dumps(job.tech_stack, ensure_ascii=False),
-                job.job_type, job.deadline, job.posted_date,
+                job.job_type, job.deadline, job.deadline_date, job.posted_date,
                 job.description, job.crawled_at.isoformat(), keyword,
                 job.job_id, job.content_hash,
                 json.dumps(job.categories, ensure_ascii=False),
@@ -279,7 +284,7 @@ def load_latest_jobs() -> List[JobPosting]:
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
                        posted_date, description, crawled_at,
-                       job_id, content_hash, is_modified, updated_at, categories
+                       job_id, content_hash, is_modified, updated_at, categories, deadline_date
                 FROM job_postings
                 WHERE crawled_at >= datetime(?, '-1 hour')
                 ORDER BY rowid ASC
@@ -300,7 +305,7 @@ def get_job_by_url(url: str):
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
                        posted_date, description, crawled_at,
-                       job_id, content_hash, is_modified, updated_at, categories
+                       job_id, content_hash, is_modified, updated_at, categories, deadline_date
                 FROM job_postings WHERE url=?
             """, (url,)).fetchone()
         return _row_to_job(row) if row else None
@@ -317,7 +322,7 @@ def load_all_jobs() -> List[JobPosting]:
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
                        posted_date, description, crawled_at,
-                       job_id, content_hash, is_modified, updated_at, categories
+                       job_id, content_hash, is_modified, updated_at, categories, deadline_date
                 FROM job_postings
                 ORDER BY crawled_at DESC
             """).fetchall()
@@ -351,7 +356,7 @@ def _load_by_flag(col: str) -> List[JobPosting]:
                 SELECT url, title, company, source, location, experience,
                        education, salary, tech_stack, job_type, deadline,
                        posted_date, description, crawled_at,
-                       job_id, content_hash, is_modified, updated_at, categories
+                       job_id, content_hash, is_modified, updated_at, categories, deadline_date
                 FROM job_postings
                 WHERE {col}=1
                 ORDER BY rowid DESC
@@ -389,10 +394,9 @@ def load_search_history():
 
 
 def list_db_files() -> list:
-    """같은 디렉토리 내 .db 파일 목록 반환 (현재 DB 제외)."""
-    db_dir = os.path.dirname(DB_PATH)
+    """db_joblist/ 내 .db 파일 목록 반환 (현재 DB 제외)."""
     return sorted(
-        f for f in os.listdir(db_dir)
+        f for f in os.listdir(_DB_DIR)
         if f.endswith(".db") and f != _db_name
     )
 
@@ -498,4 +502,5 @@ def _row_to_job(r) -> JobPosting:
         is_modified=bool(r[16]) if len(r) > 16 and r[16] else False,
         updated_at=updated_at,
         categories=json.loads(r[18]) if len(r) > 18 and r[18] else [],
+        deadline_date=r[19] if len(r) > 19 and r[19] else "",
     )

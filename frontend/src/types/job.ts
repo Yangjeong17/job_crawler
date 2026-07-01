@@ -11,6 +11,7 @@ export interface Job {
   categories: string[]
   job_type: string
   deadline: string
+  deadline_date: string
   posted_date: string
   description: string
   crawled_at: string

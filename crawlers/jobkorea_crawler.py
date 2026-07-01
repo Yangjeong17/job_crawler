@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from crawlers.base_crawler import BaseCrawler
 from models.job import JobPosting
 from utils.url_utils import normalize_job_url, extract_job_id
+from utils.deadline_parser import normalize_deadline, normalize_date
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -279,8 +280,9 @@ class JobKoreaCrawler(BaseCrawler):
             education=education,
             salary=salary,
             categories=categories,
-            deadline=deadline,
-            posted_date=posted_date,
+            deadline=normalize_date(deadline),
+            deadline_date=normalize_deadline(deadline),
+            posted_date=normalize_date(posted_date),
             description="",
             job_id=extract_job_id(url) or "",
         )

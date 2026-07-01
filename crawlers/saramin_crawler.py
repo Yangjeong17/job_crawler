@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from crawlers.base_crawler import BaseCrawler
 from models.job import JobPosting
 from utils.url_utils import normalize_job_url, extract_job_id
+from utils.deadline_parser import normalize_deadline, normalize_date
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -245,8 +246,9 @@ class SaraminCrawler(BaseCrawler):
             tech_stack=tech_stack,
             categories=categories,
             job_type=job_type,
-            deadline=deadline,
-            posted_date=posted_date,
+            deadline=normalize_date(deadline),
+            deadline_date=normalize_deadline(deadline),
+            posted_date=posted_date,  # 이미 YYYY-MM-DD 형식으로 추출됨
             description="",
             job_id=extract_job_id(url) or "",
         )

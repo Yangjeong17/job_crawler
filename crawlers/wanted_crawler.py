@@ -306,7 +306,8 @@ class WantedCrawler(BaseCrawler):
                 location=location or "위치 미제공",
                 experience=experience,  # ← 여기 추가!
                 tech_stack=tech_stack,
-                deadline="상시채용"
+                deadline="상시채용",
+                deadline_date="상시채용"
             )
             
         except Exception as e:

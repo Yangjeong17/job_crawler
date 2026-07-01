@@ -1,22 +1,20 @@
 import type { ReactNode } from 'react'
 
 interface Props {
-  deadline?: string | null
+  deadline_date?: string | null
+  deadline?: string | null  // fallback
 }
 
-function isOpenUntilFilled(deadline: string): boolean {
+function isOpenUntilFilled(val: string): boolean {
   const skip = ['상시', '채용시', '수시', '마감시']
-  return skip.some((k) => deadline.includes(k))
+  return skip.some((k) => val.includes(k))
 }
 
-function parseDays(deadline: string): number | null {
-  if (!deadline) return null
+function parseDays(val: string): number | null {
+  if (!val) return null
 
-  if (deadline.includes('오늘마감') || deadline.includes('오늘 마감')) {
-    return 0
-  }
-
-  const clean = deadline.replace(/[~까지\s]/g, '')
+  // deadline_date는 항상 YYYY-MM-DD이므로 바로 파싱
+  const clean = val.replace(/[~까지\s]/g, '')
   const formats = [
     /(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/,
     /(\d{1,2})[.\-/](\d{1,2})/,
@@ -45,10 +43,11 @@ interface DeadlineBadgeMeta {
   isToday: boolean
 }
 
-function getDeadlineBadgeMeta(deadline?: string | null): DeadlineBadgeMeta | null {
-  if (!deadline) return null
+function getDeadlineBadgeMeta(deadline_date?: string | null, deadline?: string | null): DeadlineBadgeMeta | null {
+  const val = deadline_date || deadline
+  if (!val) return null
 
-  const days = parseDays(deadline)
+  const days = parseDays(val)
   if (days === null) return null
 
   const isToday = days === 0
@@ -73,13 +72,14 @@ function getDeadlineBadgeMeta(deadline?: string | null): DeadlineBadgeMeta | nul
 }
 
 interface DeadlineMiniBadgeProps {
-  deadline?: string | null
+  deadline_date?: string | null
+  deadline?: string | null  // fallback
   onlyUrgent?: boolean
   fallback?: ReactNode
 }
 
-export function DeadlineMiniBadge({ deadline, onlyUrgent = false, fallback = null }: DeadlineMiniBadgeProps) {
-  const meta = getDeadlineBadgeMeta(deadline)
+export function DeadlineMiniBadge({ deadline_date, deadline, onlyUrgent = false, fallback = null }: DeadlineMiniBadgeProps) {
+  const meta = getDeadlineBadgeMeta(deadline_date, deadline)
 
   if (!meta) return <>{fallback}</>
 
@@ -108,13 +108,14 @@ export function DeadlineMiniBadge({ deadline, onlyUrgent = false, fallback = nul
   )
 }
 
-export function DBadge({ deadline }: Props) {
-  if (!deadline) return null
+export function DBadge({ deadline_date, deadline }: Props) {
+  const val = deadline_date || deadline
+  if (!val) return null
 
-  const meta = getDeadlineBadgeMeta(deadline)
+  const meta = getDeadlineBadgeMeta(deadline_date, deadline)
 
   if (!meta) {
-    if (isOpenUntilFilled(deadline)) {
+    if (isOpenUntilFilled(val)) {
       return (
         <div
           className="flex items-center justify-center text-[12px] font-bold leading-tight text-center shrink-0"

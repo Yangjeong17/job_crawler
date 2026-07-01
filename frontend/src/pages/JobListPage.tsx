@@ -25,19 +25,13 @@ interface ReassignHistoryEntry {
   to: ReassignTo | null
 }
 
-function parseDeadlineDays(deadline?: string): number | null {
-  if (!deadline) return null
-  let m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+function parseDeadlineDays(deadline_date?: string, deadline?: string): number | null {
+  const val = deadline_date || deadline
+  if (!val) return null
+  const m = val.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
   if (m) {
     const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
     return Math.ceil((target.getTime() - Date.now()) / 86400000)
-  }
-  m = deadline.match(/^(\d{1,2})[/.](\d{1,2})$/)
-  if (m) {
-    const now = new Date()
-    const target = new Date(now.getFullYear(), parseInt(m[1]) - 1, parseInt(m[2]))
-    if (target.getTime() < now.getTime()) target.setFullYear(now.getFullYear() + 1)
-    return Math.ceil((target.getTime() - now.getTime()) / 86400000)
   }
   return null
 }
@@ -124,10 +118,10 @@ export function JobListPage({ mode }: Props) {
   )
 
   const jobs = (() => {
-    if (sort === 'ongoing') return filtered.filter((j) => !j.deadline || j.deadline === '')
+    if (sort === 'ongoing') return filtered.filter((j) => !j.deadline_date && !j.deadline)
     if (sort === 'deadline') return [...filtered].sort((a, b) => {
-      const da = parseDeadlineDays(a.deadline)
-      const db = parseDeadlineDays(b.deadline)
+      const da = parseDeadlineDays(a.deadline_date, a.deadline)
+      const db = parseDeadlineDays(b.deadline_date, b.deadline)
       if (da === null && db === null) return 0
       if (da === null) return 1
       if (db === null) return -1
@@ -414,10 +408,10 @@ export function JobListPage({ mode }: Props) {
                     </span>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-                    {rCard.deadline && (
+                    {(rCard.deadline_date || rCard.deadline) && (
                       <DeadlineMiniBadge
+                        deadline_date={rCard.deadline_date}
                         deadline={rCard.deadline}
-
                         fallback={
                           <span
                             style={{
@@ -431,7 +425,7 @@ export function JobListPage({ mode }: Props) {
                               flexShrink: 0,
                             }}
                           >
-                            마감일: {rCard.deadline}
+                            마감일: {rCard.deadline_date || rCard.deadline}
                           </span>
                         }
                       />

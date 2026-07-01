@@ -22,7 +22,8 @@ class JobPosting:
     tech_stack: List[str] = field(default_factory=list)
     categories: List[str] = field(default_factory=list)
     job_type: str = ""  # 정규직, 계약직 등
-    deadline: str = ""
+    deadline: str = ""       # 원본 텍스트 (크롤러 raw)
+    deadline_date: str = ""  # 정규화된 날짜 "YYYY-MM-DD" | "상시채용" | ""
     posted_date: str = ""
     description: str = ""
 
@@ -40,37 +41,39 @@ class JobPosting:
             self.content_hash = generate_content_hash(self)
 
     def is_expired(self) -> bool:
-        """마감일이 지났는지 확인"""
-        if not self.deadline:
-            return False
-
+        """마감일이 지났는지 확인. deadline_date(정규화값)를 우선 사용."""
         now = datetime.now()
 
-        # "상시채용", "채용시 마감" 등은 만료되지 않음
-        skip_keywords = ["상시", "채용시", "수시", "마감시", "상시채용"]
-        for kw in skip_keywords:
-            if kw in self.deadline:
-                return False
+        # 정규화된 날짜가 있으면 그걸로 판단
+        date_str = self.deadline_date or self.deadline
+        if not date_str:
+            return False
 
-        # 날짜 파싱 시도
-        date_formats = [
-            "%Y-%m-%d", "%Y.%m.%d", "%Y/%m/%d",
-            "%m/%d", "%m.%d",
-        ]
+        if date_str == "상시채용":
+            return False
 
-        deadline_str = self.deadline.replace("~", "").replace("까지", "").strip()
-        # (월)~(일) 같은 요일 표기 제거: "07/15(화)" → "07/15"
-        deadline_str = re.sub(r'\([가-힣]+\)', '', deadline_str).strip()
+        # 상시/수시 계열 raw 텍스트 fallback
+        skip_keywords = ["상시", "채용시", "수시", "마감시"]
+        if any(kw in date_str for kw in skip_keywords):
+            return False
 
+        # YYYY-MM-DD 형식 (deadline_date의 표준 출력)
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d") < now
+        except ValueError:
+            pass
+
+        # 레거시 raw 텍스트 fallback 파싱
+        date_formats = ["%Y.%m.%d", "%Y/%m/%d", "%m/%d", "%m.%d"]
+        cleaned = re.sub(r'\([가-힣]+\)', '', date_str).replace("~", "").replace("까지", "").strip()
         for fmt in date_formats:
             try:
-                deadline_date = datetime.strptime(deadline_str, fmt)
-                # 연도가 없는 경우 올해로 설정
-                if deadline_date.year == 1900:
-                    deadline_date = deadline_date.replace(year=now.year)
-                    if deadline_date < now:
-                        deadline_date = deadline_date.replace(year=now.year + 1)
-                return deadline_date < now
+                d = datetime.strptime(cleaned, fmt)
+                if d.year == 1900:
+                    d = d.replace(year=now.year)
+                    if d < now:
+                        d = d.replace(year=now.year + 1)
+                return d < now
             except ValueError:
                 continue
 
@@ -133,6 +136,7 @@ class JobPosting:
             "categories": self.categories,
             "job_type": self.job_type,
             "deadline": self.deadline,
+            "deadline_date": self.deadline_date,
             "posted_date": self.posted_date,
             "description": self.description,
             "crawled_at": self.crawled_at.isoformat(),

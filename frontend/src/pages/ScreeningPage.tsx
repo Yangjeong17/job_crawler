@@ -365,8 +365,9 @@ export function ScreeningPage() {
                 </span>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-              {current.deadline && (
+              {(current.deadline_date || current.deadline) && (
                 <DeadlineMiniBadge
+                  deadline_date={current.deadline_date}
                   deadline={current.deadline}
                   onlyUrgent
                   fallback={
@@ -378,7 +379,7 @@ export function ScreeningPage() {
                         flexShrink: 0,
                       }}
                     >
-                      마감일: {current.deadline}
+                      마감일: {current.deadline_date || current.deadline}
                     </span>
                   }
                 />

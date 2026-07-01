@@ -27,8 +27,10 @@ function getMonthGrid(year: number, month: number): (number | null)[][] {
   return weeks
 }
 
-function parseDaysLeft(deadline: string): number | null {
-  const m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+function parseDaysLeft(deadline_date?: string, deadline?: string): number | null {
+  const val = deadline_date || deadline
+  if (!val) return null
+  const m = val.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
   if (!m) return null
   const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
   return Math.ceil((target.getTime() - Date.now()) / 86400000)
@@ -78,10 +80,12 @@ export function SchedulerPage() {
   const filteredJobs = search.trim()
     ? jobs.filter((j) => j.title.includes(search) || j.company.includes(search))
     : jobs
-  const jobsWithDeadline = filteredJobs.filter((j) => j.deadline && parseDaysLeft(j.deadline) !== null)
+  const jobsWithDeadline = filteredJobs.filter((j) => parseDaysLeft(j.deadline_date, j.deadline) !== null)
   const deadlineMap: Record<string, typeof jobs> = {}
   for (const j of jobsWithDeadline) {
-    const m = j.deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+    const val = j.deadline_date || j.deadline
+    if (!val) continue
+    const m = val.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
     if (!m) continue
     const key = `${parseInt(m[1])}-${parseInt(m[2]) - 1}-${parseInt(m[3])}`
     if (!deadlineMap[key]) deadlineMap[key] = []
@@ -131,7 +135,7 @@ export function SchedulerPage() {
           {filteredJobs.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[...filteredJobs]
-                .sort((a, b) => (parseDaysLeft(a.deadline) ?? 999) - (parseDaysLeft(b.deadline) ?? 999))
+                .sort((a, b) => (parseDaysLeft(a.deadline_date, a.deadline) ?? 999) - (parseDaysLeft(b.deadline_date, b.deadline) ?? 999))
                 .map((job) => (
                   <ListCard
                     key={job.url}
@@ -210,7 +214,7 @@ export function SchedulerPage() {
                         )
                       )}
                       {events.map((j) => {
-                        const days = parseDaysLeft(j.deadline)
+                        const days = parseDaysLeft(j.deadline_date, j.deadline)
                         const { bg, fg } = deadlineBadgeStyle(days)
                         return (
                           <div key={j.url} style={{ display: 'flex', alignItems: 'center', gap: 4, borderRadius: 4, padding: '0 6px', fontSize: 10, fontWeight: 500, overflow: 'hidden', height: 20, background: bg, color: fg, flexShrink: 0 }}>

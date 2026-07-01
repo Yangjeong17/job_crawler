@@ -5,34 +5,27 @@ import { api } from '../api/client'
 import { TopBar } from '../components/layout/TopBar'
 import { useAppStore } from '../store/useAppStore'
 
-function deadlineDays(deadline: string): number | null {
-  if (!deadline) return null
+function deadlineDays(deadline_date: string, deadline?: string): number | null {
+  const val = deadline_date || deadline || ''
+  if (!val) return null
   const skip = ['상시', '채용시', '수시', '채용 시']
-  if (skip.some((k) => deadline.includes(k))) return null
+  if (skip.some((k) => val.includes(k))) return null
 
-  // YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD
-  let m = deadline.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  const m = val.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
   if (m) {
     const target = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]))
     return Math.ceil((target.getTime() - Date.now()) / 86400000)
   }
-  // MM/DD 또는 MM.DD (사람인 단형)
-  m = deadline.match(/^(\d{1,2})[/.](\d{1,2})$/)
-  if (m) {
-    const now = new Date()
-    const target = new Date(now.getFullYear(), parseInt(m[1]) - 1, parseInt(m[2]))
-    if (target.getTime() < now.getTime()) target.setFullYear(now.getFullYear() + 1)
-    return Math.ceil((target.getTime() - now.getTime()) / 86400000)
-  }
   return null
 }
 
-function deadlineColor(deadline: string): string {
-  if (!deadline) return 'var(--muted-foreground)'
+function deadlineColor(deadline_date: string, deadline?: string): string {
+  const val = deadline_date || deadline || ''
+  if (!val) return 'var(--muted-foreground)'
   const skip = ['상시', '채용시', '수시', '채용 시']
-  if (skip.some((k) => deadline.includes(k))) return 'var(--badge-gray-text)'
+  if (skip.some((k) => val.includes(k))) return 'var(--badge-gray-text)'
 
-  const days = deadlineDays(deadline)
+  const days = deadlineDays(deadline_date, deadline)
   if (days === null) return 'var(--muted-foreground)'
   if (days < 0)  return 'var(--badge-gray-text)'
   if (days <= 3) return 'var(--badge-red-text)'
@@ -86,8 +79,8 @@ export function AllJobsPage() {
                 {job.company}
               </div>
             </div>
-            <div className="text-[13px] font-bold text-center shrink-0" style={{ width: 90, color: deadlineColor(job.deadline) }}>
-              {job.deadline || '—'}
+            <div className="text-[13px] font-bold text-center shrink-0" style={{ width: 90, color: deadlineColor(job.deadline_date, job.deadline) }}>
+              {job.deadline_date || job.deadline || '—'}
             </div>
             <a
               href={job.url}

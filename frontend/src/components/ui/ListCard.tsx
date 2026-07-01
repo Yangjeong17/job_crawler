@@ -24,7 +24,7 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
         minHeight: 80,
       }}
     >
-      <DBadge deadline={job.deadline} />
+      <DBadge deadline_date={job.deadline_date} deadline={job.deadline} />
 
       {/* 공고 정보 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, padding: '12px 12px', minWidth: 0 }}>
@@ -48,7 +48,7 @@ export function ListCard({ job, onNotInterested, onSave, onFavorite, onAnalyze }
         <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--muted-foreground)' }}>
           {job.location && <span>{job.location}</span>}
           {job.experience && <span>{job.experience}</span>}
-          {job.deadline && <span>마감일: {job.deadline}</span>}
+          {(job.deadline_date || job.deadline) && <span>마감일: {job.deadline_date || job.deadline}</span>}
         </div>
         {(job.categories?.length > 0 || job.tech_stack?.length > 0) && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
