@@ -10,7 +10,7 @@ import { TopBar, type SortBy } from '../components/layout/TopBar'
 import { ListCard } from '../components/ui/ListCard'
 import { AnalysisModal } from '../components/ui/AnalysisModal'
 import { useShortcuts } from '../hooks/useShortcuts'
-import { DeadlineMiniBadge } from '../components/ui/DBadge'
+import { JobCardInfo } from '../components/ui/JobCardInfo'
 
 interface BatchResult {
   title: string
@@ -398,61 +398,7 @@ export function JobListPage({ mode }: Props) {
                 </motion.div>
 
                 {/* 카드 내용 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 500, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
-                    {{ saramin: '사람인', jobkorea: '잡코리아' }[rCard.source] ?? rCard.source}
-                  </span>
-                  {rCard.job_type?.includes('헤드헌터') && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 600, background: 'var(--brand-primary-subtle)', color: 'var(--brand-primary)' }}>
-                      헤드헌터
-                    </span>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-                    {(rCard.deadline_date || rCard.deadline) && (
-                      <DeadlineMiniBadge
-                        deadline_date={rCard.deadline_date}
-                        deadline={rCard.deadline}
-                        fallback={
-                          <span
-                            style={{
-                              fontSize: 11,
-                              padding: '3px 10px',
-                              borderRadius: 6,
-                              fontWeight: 600,
-                              color: 'var(--muted-foreground)',
-                              border: '0.5px solid var(--border)',
-                              boxSizing: 'border-box',
-                              flexShrink: 0,
-                            }}
-                          >
-                            마감일: {rCard.deadline_date || rCard.deadline}
-                          </span>
-                        }
-                      />
-                    )}
-                  </div>
-                </div>
-                <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.3, color: 'var(--foreground)', marginBottom: 6 }}>
-                  {rCard.title}
-                </div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--brand-primary)', marginBottom: 12 }}>
-                  {rCard.company}
-                </div>
-                <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap', color: 'var(--muted-foreground)', marginBottom: 12 }}>
-                  {rCard.location && <span>{rCard.location}</span>}
-                  {rCard.experience && <span>{rCard.experience}</span>}
-                  {rCard.job_type && !rCard.job_type.includes('헤드헌터') && <span>{rCard.job_type}</span>}
-                </div>
-                {(rCard.categories?.length > 0 || rCard.tech_stack?.length > 0) && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {rCard.categories?.map((c: string) => (
-                      <span key={c} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>{c}</span>
-                    ))}
-                    {rCard.tech_stack?.map((t: string) => (
-                      <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--brand-primary-subtle)', color: 'var(--color-info-foreground)' }}>{t}</span>
-                    ))}
-                  </div>
-                )}
+                <JobCardInfo job={rCard} detailed />
               </motion.div>
             </div>
 

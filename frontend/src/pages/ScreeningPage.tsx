@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +11,7 @@ import { TopBar } from '../components/layout/TopBar'
 import { useShortcuts } from '../hooks/useShortcuts'
 import { GuidePage } from './GuidePage'
 import type { SwipeAction } from '../types/job'
-import { DeadlineMiniBadge } from '../components/ui/DBadge'
+import { JobCardInfo } from '../components/ui/JobCardInfo'
 
 const CRAWL_EMOJIS = ['🔍', '🌐', '📋', '⚡', '🤖', '💫']
 
@@ -140,6 +140,22 @@ export function ScreeningPage() {
 
   const totalProcessed = screeningJobs.length - remainingAll.length
 
+  // 현황바 실측 오버플로우 감지 — 라벨 포함 폭이 실제 컨테이너에 안 들어가면 숫자만 표시
+  const statsContainerRef = useRef<HTMLDivElement>(null)
+  const statsMeasureRef = useRef<HTMLDivElement>(null)
+  const [statsOverflowing, setStatsOverflowing] = useState(false)
+
+  useLayoutEffect(() => {
+    function check() {
+      if (!statsContainerRef.current || !statsMeasureRef.current) return
+      setStatsOverflowing(statsMeasureRef.current.scrollWidth > statsContainerRef.current.clientWidth)
+    }
+    check()
+    const ro = new ResizeObserver(check)
+    if (statsContainerRef.current) ro.observe(statsContainerRef.current)
+    return () => ro.disconnect()
+  }, [pending.length, notInterestedUrls.size, savedUrls.size, favoriteUrls.size, totalProcessed, screeningJobs.length])
+
   const centeredStateStyle: CSSProperties = {
     flex: 1,
     minHeight: 'calc(100vh - 154px)',
@@ -237,24 +253,84 @@ export function ScreeningPage() {
       <TopBar search={search} onSearchChange={setSearch} resultCount={pending.length} totalCount={remainingAll.length} showLegend={false} showSourceFilter />
 
       {/* Stats Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexShrink: 0, height: 40, padding: '0 24px', borderBottom: '1px solid var(--border)', background: 'var(--card)' }}>
-        {([
-          ['스크리닝', pending.length, 'var(--brand-primary)'],
-          ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
-          ['저장', savedUrls.size, 'var(--color-warning-foreground)'],
-          ['즐겨찾기', favoriteUrls.size, 'var(--color-success-foreground)'],
-        ] as [string, number, string][]).map(([label, count, color]) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
-            <span style={{ color: 'var(--muted-foreground)' }}>{label}</span>
-            <span style={{ fontWeight: 700, color }}>{count}</span>
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        {/* 측정 전용 숨김 복제본 — 라벨 항상 표시된 상태로 필요한 실제 폭을 잰다 */}
+        <div
+          ref={statsMeasureRef}
+          aria-hidden
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, height: 40, padding: '0 24px', position: 'absolute', top: 0, left: 0, visibility: 'hidden', pointerEvents: 'none', overflow: 'hidden' }}
+        >
+          {([
+            ['스크리닝', pending.length, 'var(--brand-primary)'],
+            ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
+            ['저장', savedUrls.size, 'var(--color-warning-foreground)'],
+            ['즐겨찾기', favoriteUrls.size, 'var(--color-success-foreground)'],
+          ] as [string, number, string][]).map(([label, count, color]) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, whiteSpace: 'nowrap' }}>
+              <span>{label}</span>
+              <span style={{ fontWeight: 700, color }}>{count}</span>
+            </div>
+          ))}
+          <div style={{ width: 1, height: 14, background: 'var(--border)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, whiteSpace: 'nowrap' }}>
+            <span>진행중</span>
+            <span style={{ fontWeight: 700 }}>{totalProcessed} / {screeningJobs.length}</span>
           </div>
-        ))}
-        <div style={{ width: 1, height: 14, background: 'var(--border)' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
-          <span style={{ color: 'var(--muted-foreground)' }}>진행중</span>
-          <span style={{ fontWeight: 700, color: 'var(--foreground)' }}>
-            {totalProcessed} / {screeningJobs.length}
-          </span>
+        </div>
+
+        <div
+          ref={statsContainerRef}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: statsOverflowing ? 'flex-start' : 'center',
+            gap: statsOverflowing ? 14 : 24,
+            height: 40,
+            padding: '0 24px',
+            borderBottom: '1px solid var(--border)',
+            background: 'var(--card)',
+            overflowX: 'auto',
+          }}
+        >
+          {statsOverflowing ? (
+            <>
+              {([
+                ['스크리닝', pending.length, 'var(--brand-primary)'],
+                ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
+                ['저장', savedUrls.size, 'var(--color-warning-foreground)'],
+                ['즐겨찾기', favoriteUrls.size, 'var(--color-success-foreground)'],
+              ] as [string, number, string][]).map(([label, count, color]) => (
+                <span key={label} style={{ fontSize: 12, fontWeight: 700, color, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                  {count}
+                </span>
+              ))}
+              <div style={{ width: 1, height: 14, background: 'var(--border)', flexShrink: 0 }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--foreground)', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                {totalProcessed} / {screeningJobs.length}
+              </span>
+            </>
+          ) : (
+            <>
+              {([
+                ['스크리닝', pending.length, 'var(--brand-primary)'],
+                ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
+                ['저장', savedUrls.size, 'var(--color-warning-foreground)'],
+                ['즐겨찾기', favoriteUrls.size, 'var(--color-success-foreground)'],
+              ] as [string, number, string][]).map(([label, count, color]) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                  <span style={{ color: 'var(--muted-foreground)' }}>{label}</span>
+                  <span style={{ fontWeight: 700, color }}>{count}</span>
+                </div>
+              ))}
+              <div style={{ width: 1, height: 14, background: 'var(--border)', flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                <span style={{ color: 'var(--muted-foreground)' }}>진행중</span>
+                <span style={{ fontWeight: 700, color: 'var(--foreground)' }}>
+                  {totalProcessed} / {screeningJobs.length}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -371,69 +447,7 @@ export function ScreeningPage() {
             </motion.div>
 
             {/* Card content */}
-            {/* Header row: source(left) | deadline + link(right) */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 500, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
-                {{ saramin: '사람인', jobkorea: '잡코리아' }[current.source] ?? current.source}
-              </span>
-              {current.job_type?.includes('헤드헌터') && (
-                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, fontWeight: 600, background: 'var(--brand-primary-subtle)', color: 'var(--brand-primary)' }}>
-                  헤드헌터
-                </span>
-              )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-                {(current.deadline_date || current.deadline) && (
-                  <DeadlineMiniBadge
-                    deadline_date={current.deadline_date}
-                    deadline={current.deadline}
-                    fallback={
-                      <span
-                        style={{
-                          fontSize: 11,
-                          padding: '3px 10px',
-                          borderRadius: 6,
-                          fontWeight: 600,
-                          color: 'var(--muted-foreground)',
-                          border: '0.5px solid var(--border)',
-                          boxSizing: 'border-box',
-                          flexShrink: 0,
-                        }}
-                      >
-                        마감일: {current.deadline_date || current.deadline}
-                      </span>
-                    }
-                  />
-                )}
-              </div>
-            </div>
-
-            <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.3, color: 'var(--foreground)', marginBottom: 6 }}>
-              {current.title}
-            </div>
-            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--brand-primary)', marginBottom: 12 }}>
-              {current.company}
-            </div>
-
-            <div style={{ display: 'flex', gap: 16, fontSize: 12, flexWrap: 'wrap', color: 'var(--muted-foreground)', marginBottom: 12 }}>
-              {current.location && <span>{current.location}</span>}
-              {current.experience && <span>{current.experience}</span>}
-              {current.job_type && !current.job_type.includes('헤드헌터') && <span>{current.job_type}</span>}
-            </div>
-
-            {(current.categories.length > 0 || current.tech_stack.length > 0) && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {current.categories.map((c) => (
-                  <span key={c} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--secondary)', color: 'var(--muted-foreground)' }}>
-                    {c}
-                  </span>
-                ))}
-                {current.tech_stack.map((t) => (
-                  <span key={t} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: 'var(--brand-primary-subtle)', color: 'var(--color-info-foreground)' }}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
+            <JobCardInfo job={current} />
           </motion.div>
         </div>
 
