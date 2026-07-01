@@ -1,4 +1,4 @@
-import re
+﻿import re
 import time
 import logging
 from typing import List
@@ -229,10 +229,8 @@ class SaraminCrawler(BaseCrawler):
             and not any(k in s for k in Config.BENEFIT_KEYWORDS)
         ]
 
-        # 연봉 ("합격 시 N만원" 형태는 채용 보상금이므로 제거)
-        salary = self.safe_get_text(item, ".area_job .job_salary") or ""
-        if "합격 시" in salary:
-            salary = ""
+        # 사람인 목록 페이지에는 급여 정보가 노출되지 않음 (상세 페이지에서만 제공)
+        salary = ""
 
         return JobPosting(
             title=title,
