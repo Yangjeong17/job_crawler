@@ -4,6 +4,9 @@ import { ExternalLink } from 'lucide-react'
 import { api } from '../api/client'
 import { TopBar, type SortBy } from '../components/layout/TopBar'
 import { useAppStore } from '../store/useAppStore'
+import { useViewportWidth } from '../hooks/useViewportWidth'
+
+const COMPACT_BREAKPOINT = 1020
 
 function deadlineDays(deadline_date: string, deadline?: string): number | null {
   const val = deadline_date || deadline || ''
@@ -46,6 +49,8 @@ export function AllJobsPage() {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortBy>('recent')
   const { sourceFilter } = useAppStore()
+  const viewportWidth = useViewportWidth()
+  const isCompact = viewportWidth <= COMPACT_BREAKPOINT
   const { data, isLoading } = useQuery({ queryKey: ['jobs-all'], queryFn: api.jobs.all })
 
   const filtered = (data?.jobs ?? []).filter(
@@ -118,9 +123,10 @@ export function AllJobsPage() {
               href={job.url}
               target="_blank"
               rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 12px', height: 28, borderRadius: 8, fontSize: 12, flexShrink: 0, background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', textDecoration: 'none' }}
+              aria-label="공고 보기"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: isCompact ? '0 8px' : '0 12px', height: 28, borderRadius: 8, fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap', background: 'var(--secondary)', color: 'var(--muted-foreground)', border: '1px solid var(--border)', textDecoration: 'none' }}
             >
-              <ExternalLink size={11} /> 공고 보기
+              <ExternalLink size={11} /> {!isCompact && '공고 보기'}
             </a>
           </div>
         ))}
