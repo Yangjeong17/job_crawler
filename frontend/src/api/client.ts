@@ -41,7 +41,7 @@ export const api = {
     swipe: (url: string, action: SwipeAction) =>
       post('/jobs/swipe', { url, action }),
 
-    undo: () => post<{ ok: boolean; url: string; action: string }>('/jobs/undo'),
+    undo: () => post<{ ok: boolean; url: string; action: SwipeAction }>('/jobs/undo'),
 
     reassign: (url: string, from_status: ReassignFrom, to_status: ReassignTo) =>
       post('/jobs/reassign', { url, from_status, to_status }),

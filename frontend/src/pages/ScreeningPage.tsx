@@ -20,10 +20,11 @@ export function ScreeningPage() {
   const navigate = useNavigate()
   const {
     screeningJobs, notInterestedUrls, savedUrls, favoriteUrls,
-    setScreeningData, currentCardIndex, advanceCard, undoCard,
+    setScreeningData, applySwipe, revertSwipe,
     sourceFilter, crawling, crawlLog,
   } = useAppStore()
 
+  const [search, setSearch] = useState('')
   const [isExiting, setIsExiting] = useState(false)
   const [emojiIdx, setEmojiIdx] = useState(0)
   const emojiTimer = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -44,12 +45,16 @@ export function ScreeningPage() {
     if (data) setScreeningData(data.jobs, data.not_interested_urls, data.saved_urls, data.favorite_urls)
   }, [data, setScreeningData])
 
-  const pending = screeningJobs.filter(
-    (j) =>
-      !notInterestedUrls.has(j.url) && !savedUrls.has(j.url) && !favoriteUrls.has(j.url) &&
-      (!sourceFilter || j.source === sourceFilter)
+  // 검색어/소스 필터와 무관하게 실제로 아직 스와이프하지 않은 공고 (완료 판정용)
+  const remainingAll = screeningJobs.filter(
+    (j) => !notInterestedUrls.has(j.url) && !savedUrls.has(j.url) && !favoriteUrls.has(j.url)
   )
-  const current = pending[currentCardIndex]
+  const pending = remainingAll.filter(
+    (j) =>
+      (!sourceFilter || j.source === sourceFilter) &&
+      (!search || j.title.includes(search) || j.company.includes(search))
+  )
+  const current = pending[0]
 
   // Motion values for drag & exit animation
   const x = useMotionValue(0)
@@ -89,10 +94,11 @@ export function ScreeningPage() {
     ])
 
     await api.jobs.swipe(current.url, action)
-    advanceCard()
+    applySwipe(current.url, action)
     qc.invalidateQueries({ queryKey: ['stats'] })
     qc.invalidateQueries({ queryKey: ['jobs-saved'] })
     qc.invalidateQueries({ queryKey: ['jobs-fav'] })
+    qc.invalidateQueries({ queryKey: ['jobs-ni'] })
 
     // Reset position while invisible, then fade in new card
     x.set(0)
@@ -115,8 +121,12 @@ export function ScreeningPage() {
 
   async function undo() {
     try {
-      await api.jobs.undo()
-      undoCard()
+      const { url, action } = await api.jobs.undo()
+      revertSwipe(url, action)
+      qc.invalidateQueries({ queryKey: ['stats'] })
+      qc.invalidateQueries({ queryKey: ['jobs-saved'] })
+      qc.invalidateQueries({ queryKey: ['jobs-fav'] })
+      qc.invalidateQueries({ queryKey: ['jobs-ni'] })
     } catch { /* nothing to undo */ }
   }
 
@@ -128,7 +138,7 @@ export function ScreeningPage() {
     onOpenUrl:       () => current && window.open(current.url, '_blank'),
   }, !!current && !isExiting)
 
-  const totalProcessed = screeningJobs.length - pending.length + currentCardIndex
+  const totalProcessed = screeningJobs.length - remainingAll.length
 
   const centeredStateStyle: CSSProperties = {
     flex: 1,
@@ -184,8 +194,8 @@ export function ScreeningPage() {
     return <GuidePage />
   }
 
-  // 스와이프 완료 화면 (Screen 1-2)
-  if (!current) {
+  // 스와이프 완료 화면 (Screen 1-2) — 검색/소스 필터로 목록이 비어 보이는 것과는 구분
+  if (remainingAll.length === 0) {
     return (
       <div style={centeredStateStyle}>
         <div style={{ fontSize: 60 }}>🎉</div>
@@ -224,12 +234,12 @@ export function ScreeningPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <TopBar search="" onSearchChange={() => {}} showLegend={false} showSourceFilter />
+      <TopBar search={search} onSearchChange={setSearch} resultCount={pending.length} totalCount={remainingAll.length} showLegend={false} showSourceFilter />
 
       {/* Stats Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexShrink: 0, height: 40, padding: '0 24px', borderBottom: '1px solid var(--border)', background: 'var(--card)' }}>
         {([
-          ['스크리닝', pending.length - currentCardIndex, 'var(--brand-primary)'],
+          ['스크리닝', pending.length, 'var(--brand-primary)'],
           ['관심없음', notInterestedUrls.size, 'var(--muted-foreground)'],
           ['저장', savedUrls.size, 'var(--color-warning-foreground)'],
           ['즐겨찾기', favoriteUrls.size, 'var(--color-success-foreground)'],
@@ -257,10 +267,17 @@ export function ScreeningPage() {
             {totalProcessed} / {screeningJobs.length}
           </span>
           <span style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>
-            {pending.length - currentCardIndex}개 남음
+            {pending.length}개 남음
           </span>
         </div>
 
+        {!current ? (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted-foreground)' }}>
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>검색 결과가 없습니다</div>
+            <div style={{ fontSize: 12 }}>다른 검색어나 필터를 시도해보세요</div>
+          </div>
+        ) : (
+        <>
         {/* Card deck */}
         <div style={{ position: 'relative', width: 520, flexShrink: 0 }}>
           {/* Shadow layers */}
@@ -459,6 +476,8 @@ export function ScreeningPage() {
             </div>
           )}
         </div>
+        </>
+        )}
       </div>
 
     </div>

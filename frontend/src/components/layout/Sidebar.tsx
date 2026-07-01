@@ -19,8 +19,9 @@ export function Sidebar() {
   const [newDbName, setNewDbName] = useState('')
   const [dbCreateMode, setDbCreateMode] = useState(false)
   const [switching, setSwitching] = useState(false)
+  const [migrating, setMigrating] = useState(false)
 
-  const { crawling, setCrawling, crawlLog, addCrawlLog, clearCrawlLog } = useAppStore()
+  const { crawling, setCrawling, crawlLog, addCrawlLog, clearCrawlLog, sidebarOpen } = useAppStore()
   const qc = useQueryClient()
 
   const { data: stats }    = useQuery({ queryKey: ['stats'],      queryFn: api.stats,          refetchInterval: 10000 })
@@ -46,6 +47,17 @@ export function Sidebar() {
     }
   }
 
+  async function handleMigrate() {
+    if (!selectedDb || migrating) return
+    setMigrating(true)
+    try {
+      await api.migrate(selectedDb)
+      qc.invalidateQueries()
+    } finally {
+      setMigrating(false)
+    }
+  }
+
   function startCrawl() {
     if (!keyword.trim() || crawling) return
     clearCrawlLog()
@@ -67,9 +79,15 @@ export function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col shrink-0 overflow-y-auto"
-      style={{ width: 220, background: 'var(--sidebar)', borderRight: '1px solid var(--border)' }}
+      className="shrink-0 overflow-hidden"
+      style={{
+        width: sidebarOpen ? 220 : 0,
+        background: 'var(--sidebar)',
+        borderRight: sidebarOpen ? '1px solid var(--border)' : 'none',
+        transition: 'width 0.2s ease',
+      }}
     >
+    <div className="flex flex-col overflow-y-auto" style={{ width: 220, height: '100%' }}>
       {/* Logo */}
       <div className="flex items-center gap-2.5 shrink-0" style={{ height: 64, padding: '0 20px', borderBottom: '1px solid var(--border)' }}>
         <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--brand-primary)' }}>
@@ -292,15 +310,16 @@ export function Sidebar() {
             </select>
           </div>
           <button
-            disabled={!selectedDb}
-            onClick={() => selectedDb && api.migrate(selectedDb)}
+            disabled={!selectedDb || migrating}
+            onClick={handleMigrate}
             className="w-full rounded font-semibold disabled:opacity-50"
             style={{ height: 36, background: 'var(--foreground)', color: 'var(--background)', fontSize: 13 }}
           >
-            가져오기
+            {migrating ? '가져오는 중...' : '가져오기'}
           </button>
         </div>
       )}
+    </div>
     </aside>
   )
 }
