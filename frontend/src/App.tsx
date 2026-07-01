@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Sidebar } from './components/layout/Sidebar'
 import { TabBar } from './components/layout/TabBar'
@@ -10,9 +10,20 @@ import { SchedulerPage } from './pages/SchedulerPage'
 import { GuidePage } from './pages/GuidePage'
 import { useAppStore } from './store/useAppStore'
 
+const SIDEBAR_BREAKPOINT = 1280
+
 export default function App() {
   const [shortcutOpen, setShortcutOpen] = useState(false)
-  const { toast, clearToast } = useAppStore()
+  const { toast, clearToast, setSidebarOpen } = useAppStore()
+
+  useEffect(() => {
+    function syncToWidth() {
+      setSidebarOpen(window.innerWidth > SIDEBAR_BREAKPOINT)
+    }
+    syncToWidth()
+    window.addEventListener('resize', syncToWidth)
+    return () => window.removeEventListener('resize', syncToWidth)
+  }, [setSidebarOpen])
 
   return (
     <div style={{ display: 'flex', height: '100%', background: 'var(--background)' }}>
