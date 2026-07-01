@@ -198,6 +198,7 @@ class JobKoreaCrawler(BaseCrawler):
         location = ""
         experience = ""
         education = ""
+        job_type = ""
         description_parts = []
 
         for sel in option_selectors:
@@ -216,14 +217,19 @@ class JobKoreaCrawler(BaseCrawler):
                             experience = t
                         elif any(e in t for e in ["대졸", "고졸", "석사", "박사", "학력"]):
                             education = t
+                        elif any(e in t for e in ["정규직", "계약직", "인턴", "프리랜서", "파견"]):
+                            job_type = t
             except Exception:
                 continue
 
         if not experience:
             experience = self._first_text_by_xpath(
                 card,
-                ".//span[contains(., '경력') or contains(., '신입') or contains(., '년↑') or contains(., '년 이상')]"
+                ".//span[not(ancestor::a[contains(@href, '/Recruit/GI_Read/')])]"
+                "[contains(., '경력') or contains(., '신입') or contains(., '년↑') or contains(., '년 이상')]"
             )
+            if experience and len(experience) > 20:
+                experience = ""
 
         # 마감일 / 등록일
         # safe_get_text는 첫 번째 요소만 반환하므로, find_elements로 전체 순회
@@ -244,6 +250,10 @@ class JobKoreaCrawler(BaseCrawler):
                             deadline = dm.group(1)
                         elif re.search(r'상시|채용시', text):
                             deadline = "상시채용"
+                        else:
+                            # 날짜/상시 패턴 미매칭 → normalize_deadline에 위임
+                            # (내일마감, 오늘마감, 채용 시 마감 등)
+                            deadline = normalize_deadline(text) or ""
                     if not posted_date and "등록" in text:
                         # 등록 바로 앞 날짜 추출: "06/22(월) 등록" → "06/22"
                         pm = re.search(r'(\d{1,2}[./]\d{1,2})(?:\([^)]*\))?\s*등록', text)
@@ -261,12 +271,13 @@ class JobKoreaCrawler(BaseCrawler):
                 salary = t
                 break
 
-        # 직종 카테고리: 위치/경력/학력/급여/혜택 제외한 짧은 항목
+        # 직종 카테고리: 위치/경력/학력/고용형태/급여/혜택 제외한 항목
+        # 참고: 잡코리아 GrayChip은 직종이 여러 개일 때 하나의 칩에 쉼표로 묶어 표현하므로
+        #       25자 길이 제한을 두면 정상 카테고리가 탈락함 → 길이 제한 제거
         categories = list(dict.fromkeys([
             t for t in description_parts
-            if t not in (location, experience, education)
+            if t not in (location, experience, education, job_type)
             and t != salary
-            and len(t) < 25
             and not any(kw in t for kw in Config.BENEFIT_KEYWORDS)
         ]))
 
@@ -279,6 +290,7 @@ class JobKoreaCrawler(BaseCrawler):
             experience=experience,
             education=education,
             salary=salary,
+            job_type=job_type,
             categories=categories,
             deadline=normalize_date(deadline),
             deadline_date=normalize_deadline(deadline),
